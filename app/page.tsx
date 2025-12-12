@@ -63,7 +63,7 @@ export default function Home() {
                 Start as a student
               </Link>
               <Link
-                href="/login"
+                href="/parent"
                 className="rounded-full border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 transition"
               >
                 I am a parent
