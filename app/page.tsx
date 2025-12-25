@@ -30,7 +30,7 @@ export default function HomePage() {
                   href="/subjects"
                   className="block rounded-lg px-3 py-2 text-sm hover:bg-slate-100"
                 >
-                  Explore subjects
+                  View subjects
                 </Link>
                 <Link
                   href="/parent"
@@ -80,13 +80,14 @@ export default function HomePage() {
             </p>
 
             <h1 className="mt-4 text-4xl font-semibold leading-tight tracking-tight md:text-5xl">
-              Unlock Your Potential in <br className="hidden md:block" />
-              Learning and Confidence
+              Calm learning for students, <br className="hidden md:block" />
+              peace of mind for parents
             </h1>
 
             <p className="mt-5 text-base leading-7 text-white/85 md:text-lg">
-              Short lessons, smart practice, and bilingual support (English + Urdu)
-              designed to build real understanding without stress.
+              Short lessons and smart practice to build real understanding without
+              stress. The experience is bilingual (English + Urdu) so students don’t
+              get stuck because of language.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -100,12 +101,59 @@ export default function HomePage() {
                 href="/subjects"
                 className="rounded-xl border border-white/30 px-5 py-3 text-sm font-semibold text-white hover:bg-white/10"
               >
-                Explore subjects
+                View subjects
               </Link>
             </div>
 
             <div className="mt-6 inline-flex rounded-lg bg-white/10 px-3 py-2 text-xs text-white/80">
               No ads • Calm experience • Guided learning
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* HOW IT WORKS (White) */}
+      <section className="bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-14">
+          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <div>
+              <h2 className="text-xl font-semibold">How it works</h2>
+              <p className="mt-2 max-w-2xl text-sm text-slate-700">
+                A simple routine students can follow daily. Clear steps, small effort,
+                steady progress.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-8 grid gap-5 md:grid-cols-3">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6">
+              <div className="text-sm font-medium text-slate-600">Step 1</div>
+              <div className="mt-2 text-lg font-semibold tracking-tight">
+                Choose a subject
+              </div>
+              <p className="mt-2 text-sm leading-6 text-slate-700">
+                Start with what feels difficult today. Keep it focused and manageable.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-6">
+              <div className="text-sm font-medium text-slate-600">Step 2</div>
+              <div className="mt-2 text-lg font-semibold tracking-tight">
+                Learn in small steps
+              </div>
+              <p className="mt-2 text-sm leading-6 text-slate-700">
+                Short explanations designed for understanding, not memorizing.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-6">
+              <div className="text-sm font-medium text-slate-600">Step 3</div>
+              <div className="mt-2 text-lg font-semibold tracking-tight">
+                Practice and improve
+              </div>
+              <p className="mt-2 text-sm leading-6 text-slate-700">
+                Quick checks build confidence and make progress visible over time.
+              </p>
             </div>
           </div>
         </div>
@@ -167,7 +215,8 @@ export default function HomePage() {
                 <div className="rounded-2xl border border-white/15 bg-white/10 p-6">
                   <h4 className="text-lg font-semibold md:text-xl">Bilingual support</h4>
                   <p className="mt-2 text-sm leading-6 text-white/80 md:text-base">
-                    Help in Urdu and English so students don’t get stuck because of language.
+                    Help in Urdu and English so students don’t get stuck because of
+                    language. Urdu is support language here, not a separate subject.
                   </p>
                 </div>
               </div>
@@ -202,7 +251,7 @@ export default function HomePage() {
           </div>
 
           <div className="mt-8 grid gap-5 md:grid-cols-3">
-            <Stat label="Core subjects" value="3" note="Math, English, Urdu" />
+            <Stat label="Core subjects" value="2" note="Math, English" />
             <Stat label="Learning style" value="Short" note="Daily-friendly lessons" />
             <Stat label="AI usage" value="Limited" note="Guided, not unlimited" />
           </div>
@@ -228,9 +277,9 @@ export default function HomePage() {
             </div>
 
             <div className="rounded-2xl border border-white/15 bg-white/10 p-6">
-              <h4 className="text-lg font-semibold md:text-xl">No noise</h4>
+              <h4 className="text-lg font-semibold md:text-xl">No ads, no distractions</h4>
               <p className="mt-2 text-sm leading-6 text-white/80 md:text-base">
-                No flashy distractions. Students focus on learning.
+                A clean experience that helps students focus on learning.
               </p>
             </div>
 
@@ -242,21 +291,22 @@ export default function HomePage() {
             </div>
 
             <div className="rounded-2xl border border-white/15 bg-white/10 p-6">
-              <h4 className="text-lg font-semibold md:text-xl">Controlled AI</h4>
+              <h4 className="text-lg font-semibold md:text-xl">Bilingual support</h4>
               <p className="mt-2 text-sm leading-6 text-white/80 md:text-base">
-                AI supports learning. It does not replace thinking.
+                Help is available in English and Urdu so language doesn’t block learning.
+                Urdu is support language, not a subject track.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* SUBJECTS GRID (White) */}
+      {/* SUBJECTS AREA (White) - heading stays, CTA bar here */}
       <section className="bg-white">
         <div className="mx-auto max-w-6xl px-4 py-14">
           <div className="flex items-end justify-between gap-6">
             <div>
-              <h3 className="text-xl font-semibold">Explore subjects</h3>
+              <h3 className="text-xl font-semibold">Subjects</h3>
               <p className="mt-2 text-sm text-slate-700">
                 Start with the basics. Build consistency first.
               </p>
@@ -269,25 +319,30 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="mt-8 grid gap-5 md:grid-cols-3">
-            <SubjectCard
-              title="Math"
-              desc="Clear steps and practice to strengthen fundamentals."
-              href="/subjects/math"
-              cta="Start Math"
-            />
-            <SubjectCard
-              title="English"
-              desc="Improve reading and writing with simple explanations."
-              href="/subjects/english"
-              cta="Start English"
-            />
-            <SubjectCard
-              title="Urdu"
-              desc="Learn with bilingual support for confidence and clarity."
-              href="/subjects/urdu"
-              cta="Start Urdu"
-            />
+          <div className="mt-8">
+            <div className="rounded-2xl border border-white/15 bg-[#0B2B5A] p-7 text-white md:flex md:items-center md:justify-between">
+              <div className="max-w-2xl">
+                <h3 className="text-xl font-semibold">Start with calm, consistent learning</h3>
+                <p className="mt-2 text-sm leading-6 text-white/80">
+                  Try Phase 1 and help us spot confusion. We’re building trust and clarity
+                  first.
+                </p>
+              </div>
+              <div className="mt-5 flex flex-wrap gap-3 md:mt-0">
+                <Link
+                  href="/signup"
+                  className="inline-flex rounded-xl bg-white px-5 py-3 text-sm font-semibold text-[#0B2B5A] hover:bg-white/95"
+                >
+                  Get started
+                </Link>
+                <Link
+                  href="/subjects"
+                  className="inline-flex rounded-xl border border-white/30 px-5 py-3 text-sm font-semibold text-white hover:bg-white/10"
+                >
+                  See subjects
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -299,8 +354,8 @@ export default function HomePage() {
             <div className="max-w-2xl">
               <h3 className="text-xl font-semibold">For Parents (Beta)</h3>
               <p className="mt-2 text-sm leading-6 text-slate-700">
-                A simple preview to help parents understand progress and support
-                daily learning. This expands after Phase 1 stabilizes.
+                A simple preview to help parents understand progress and support daily
+                learning. This expands after Phase 1 stabilizes.
               </p>
             </div>
             <div className="mt-5 md:mt-0">
@@ -382,31 +437,6 @@ function Stat({
       <div className="text-sm font-medium text-slate-600">{label}</div>
       <div className="mt-2 text-3xl font-semibold tracking-tight">{value}</div>
       <div className="mt-2 text-sm text-slate-700">{note}</div>
-    </div>
-  );
-}
-
-function SubjectCard({
-  title,
-  desc,
-  href,
-  cta,
-}: {
-  title: string;
-  desc: string;
-  href: string;
-  cta: string;
-}) {
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6">
-      <h4 className="text-base font-semibold">{title}</h4>
-      <p className="mt-2 text-sm leading-6 text-slate-700">{desc}</p>
-      <Link
-        href={href}
-        className="mt-5 inline-flex w-fit rounded-xl bg-[#0B2B5A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0A2550]"
-      >
-        {cta}
-      </Link>
     </div>
   );
 }
