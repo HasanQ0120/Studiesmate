@@ -354,7 +354,7 @@ export default function HomePage() {
                 If you’re testing Phase 1 and spot confusion, send feedback.
               </p>
               <p className="mt-3 text-xs text-white/65">
-                (Use your preferred contact route later. Keep it simple for now.)
+                (Use your preferred contact route later.Keep it simple for now.)
               </p>
             </div>
           </div>
