@@ -4,73 +4,6 @@ import Image from "next/image";
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-white text-slate-900">
-      {/* Top Nav */}
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-[#0B2B5A] text-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="text-lg font-semibold tracking-tight">StudiesMate</span>
-          </Link>
-
-          <nav className="hidden items-center gap-6 text-sm md:flex">
-            <Link href="/" className="opacity-95 hover:opacity-100">
-              Home
-            </Link>
-
-            <div className="group relative">
-              <button
-                type="button"
-                className="flex items-center opacity-95 hover:opacity-100"
-                aria-label="Courses menu"
-              >
-                Courses
-              </button>
-
-              <div className="invisible absolute left-0 mt-3 w-56 rounded-xl border border-white/15 bg-white/95 p-2 text-slate-900 shadow-lg opacity-0 backdrop-blur transition group-hover:visible group-hover:opacity-100">
-                <Link
-                  href="/subjects"
-                  className="block rounded-lg px-3 py-2 text-sm hover:bg-slate-100"
-                >
-                  View subjects
-                </Link>
-                <Link
-                  href="/parent"
-                  className="block rounded-lg px-3 py-2 text-sm hover:bg-slate-100"
-                >
-                  Parent dashboard (beta)
-                </Link>
-              </div>
-            </div>
-
-            <Link href="/about" className="opacity-95 hover:opacity-100">
-              About us
-            </Link>
-
-            <Link href="/subjects" className="opacity-95 hover:opacity-100">
-              StudiesMate
-            </Link>
-
-            <Link href="/parent" className="opacity-95 hover:opacity-100">
-              Parent dashboard
-            </Link>
-          </nav>
-
-          <div className="flex items-center gap-2">
-            <Link
-              href="/login"
-              className="rounded-lg px-3 py-2 text-sm font-medium text-white/90 hover:text-white"
-            >
-              Log in
-            </Link>
-            <Link
-              href="/signup"
-              className="rounded-lg bg-white px-3 py-2 text-sm font-semibold text-[#0B2B5A] hover:bg-white/95"
-            >
-              Sign up
-            </Link>
-          </div>
-        </div>
-      </header>
-
       {/* HERO (Blue) */}
       <section className="bg-[#0B2B5A] text-white">
         <div className="mx-auto max-w-6xl px-4 py-16 md:py-20">
@@ -301,7 +234,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SUBJECTS AREA (White) - heading stays, CTA bar here */}
+      {/* SUBJECTS AREA (White) */}
       <section className="bg-white">
         <div className="mx-auto max-w-6xl px-4 py-14">
           <div className="flex items-end justify-between gap-6">
@@ -369,56 +302,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* FOOTER (Blue) */}
-      <footer className="bg-[#0B2B5A] text-white">
-        <div className="mx-auto max-w-6xl px-4 py-10">
-          <div className="grid gap-8 md:grid-cols-3">
-            <div>
-              <div className="text-lg font-semibold">StudiesMate</div>
-              <p className="mt-2 text-sm text-white/80">Calm learning. Clear progress.</p>
-              <p className="mt-4 text-xs text-white/65">
-                Phase 1 focuses on trust and clarity, not hype.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <Link href="/about" className="text-white/85 hover:text-white">
-                About & Privacy
-              </Link>
-              <Link href="/vision" className="text-white/85 hover:text-white">
-                Vision
-              </Link>
-              <Link href="/subjects" className="text-white/85 hover:text-white">
-                Subjects
-              </Link>
-              <Link href="/parent" className="text-white/85 hover:text-white">
-                Parent
-              </Link>
-              <Link href="/login" className="text-white/85 hover:text-white">
-                Login
-              </Link>
-              <Link href="/signup" className="text-white/85 hover:text-white">
-                Sign up
-              </Link>
-            </div>
-
-            <div>
-              <div className="text-sm font-semibold">Contact</div>
-              <p className="mt-2 text-sm text-white/80">
-                If you’re testing Phase 1 and spot confusion, send feedback.
-              </p>
-              <p className="mt-3 text-xs text-white/65">
-                (Use your preferred contact route later.Keep it simple for now.)
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-10 border-t border-white/15 pt-6 text-xs text-white/65">
-            © {new Date().getFullYear()} StudiesMate. All rights reserved.
-          </div>
-        </div>
-      </footer>
     </main>
   );
 }

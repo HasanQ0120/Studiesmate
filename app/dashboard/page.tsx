@@ -1,95 +1,239 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Calculator, BookOpen, Languages, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+
+const STORAGE_KEY = "studiesmate_selected_subjects";
+
+// Phase 1 dashboard keys
+const WEEKLY_GOAL = 5;
+const PROGRESS_KEY = "studiesmate_progress_v1";
+const LAST_ACTIVITY_KEY = "studiesmate_last_activity_v1";
+
+function safeParseJSON<T>(raw: string | null, fallback: T): T {
+  try {
+    return raw ? (JSON.parse(raw) as T) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+const ALL_SUBJECTS = [
+  {
+    title: "Mathematics",
+    desc: "Numbers, algebra, geometry, and problem solving.",
+    href: "/subjects/maths/chapters",
+  },
+  {
+    title: "English",
+    desc: "Reading, writing, grammar, and vocabulary.",
+    href: "/subjects/english",
+  },
+  {
+    title: "Science",
+    desc: "Basics of physics, chemistry, and biology.",
+    href: "/subjects/science",
+  },
+  {
+    title: "Social Studies",
+    desc: "People, places, maps, and how society works.",
+    href: "/subjects/social-studies",
+  },
+  {
+    title: "Computer / ICT",
+    desc: "Digital skills, typing, internet basics, and safety.",
+    href: "/subjects/computer-ict",
+  },
+  {
+    title: "Geography",
+    desc: "Maps, continents, climate, and environments.",
+    href: "/subjects/geography",
+  },
+  {
+    title: "History",
+    desc: "Past events, timelines, and key stories of the world.",
+    href: "/subjects/history",
+  },
+  {
+    title: "General Knowledge",
+    desc: "Everyday facts, reasoning, and quick learning topics.",
+    href: "/subjects/general-knowledge",
+  },
+  {
+    title: "Art",
+    desc: "Drawing, creativity, colors, and basic design.",
+    href: "/subjects/art",
+  },
+  {
+    title: "Urdu (Support)",
+    desc: "Helper explanations only (not a full course yet).",
+    href: "/subjects/urdu-support",
+  },
+];
+
+type SubjectProgress = Record<string, { completed: number; total: number }>;
+type ProgressPayload = {
+  weeklyCompleted: number;
+  subjects: SubjectProgress;
+};
 
 export default function DashboardPage() {
   const router = useRouter();
 
-  const subjects = [
-    {
-      id: "maths",
-      title: "Maths",
-      desc: "Numbers, addition, subtraction, and shapes.",
-      icon: <Calculator className="w-6 h-6 text-blue-600" />,
-      href: "/subjects/maths",
-    },
-    {
-      id: "english",
-      title: "English",
-      desc: "Reading stories, grammar, and writing.",
-      icon: <BookOpen className="w-6 h-6 text-blue-600" />,
-      href: "/subjects/english",
-    },
-    {
-      id: "urdu",
-      title: "Urdu",
-      desc: "Harf-e-Tahajji, reading, and vocabulary.",
-      icon: <Languages className="w-6 h-6 text-blue-600" />,
-      href: "/subjects/urdu",
-    },
-  ];
+  const [selectedTitles, setSelectedTitles] = useState<string[]>([]);
+  const [weeklyCompleted, setWeeklyCompleted] = useState<number>(0);
+  const [lastActivity, setLastActivity] = useState<string>("");
+  const [subjectProgress, setSubjectProgress] = useState<SubjectProgress>({});
+
+  useEffect(() => {
+    // read selected subjects
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      setSelectedTitles(Array.isArray(parsed) ? parsed : []);
+    } catch {
+      setSelectedTitles([]);
+    }
+
+    // read progress (Phase 1)
+    const progress = safeParseJSON<ProgressPayload>(localStorage.getItem(PROGRESS_KEY), {
+      weeklyCompleted: 0,
+      subjects: {},
+    });
+    setWeeklyCompleted(typeof progress.weeklyCompleted === "number" ? progress.weeklyCompleted : 0);
+    setSubjectProgress(progress.subjects || {});
+
+    // read last activity (Phase 1)
+    const last = localStorage.getItem(LAST_ACTIVITY_KEY) || "";
+    setLastActivity(last);
+
+    // auto-update if localStorage changes (another tab)
+    const onStorage = (e: StorageEvent) => {
+      if (!e.key) return;
+
+      if (e.key === STORAGE_KEY) {
+        try {
+          const parsed = e.newValue ? JSON.parse(e.newValue) : [];
+          setSelectedTitles(Array.isArray(parsed) ? parsed : []);
+        } catch {
+          setSelectedTitles([]);
+        }
+      }
+
+      if (e.key === PROGRESS_KEY) {
+        const next = safeParseJSON<ProgressPayload>(e.newValue, { weeklyCompleted: 0, subjects: {} });
+        setWeeklyCompleted(typeof next.weeklyCompleted === "number" ? next.weeklyCompleted : 0);
+        setSubjectProgress(next.subjects || {});
+      }
+
+      if (e.key === LAST_ACTIVITY_KEY) {
+        setLastActivity(e.newValue || "");
+      }
+    };
+
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
+  const selectedSubjects = useMemo(() => {
+    const set = new Set(selectedTitles);
+    return ALL_SUBJECTS.filter((s) => set.has(s.title));
+  }, [selectedTitles]);
+
+  const weeklyPct = Math.min(100, (Math.min(weeklyCompleted, WEEKLY_GOAL) / WEEKLY_GOAL) * 100);
 
   return (
     <div className="min-h-screen bg-white px-6 py-10">
       <div className="max-w-6xl mx-auto">
-
-        {/* Heading */}
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Welcome 👋
-        </h1>
-        <p className="text-gray-600 mb-10">
-          Choose a subject to begin your learning.
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome 👋</h1>
+        <p className="text-gray-600 mb-6">
+          Your selected subjects are shown below. You can add more anytime from the Subjects page.
         </p>
 
-        {/* Subject Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {subjects.map((subject) => (
-            <div
-              key={subject.id}
-              className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 
-              hover:shadow-md hover:-translate-y-1 transition-all duration-200"
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="bg-blue-50 p-3 rounded-lg">
-                  {subject.icon}
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {subject.title}
-                </h3>
-              </div>
+        {/* Focus + Activity (Phase 1 safe) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+            <h3 className="text-lg font-semibold text-gray-900">Today’s Focus</h3>
+            <p className="mt-1 text-sm text-gray-600">
+              {lastActivity ? `Continue: ${lastActivity}` : "Start a lesson to build momentum this week."}
+            </p>
+          </div>
 
-              <p className="text-gray-600 text-sm mb-6">{subject.desc}</p>
-
-              {/* BUTTON — text color fixed */}
-              <button
-                onClick={() => router.push(subject.href)}
-                className="
-                  inline-flex items-center justify-center gap-2 
-                  px-4 py-2 rounded-full 
-                  border border-blue-400 
-                  text-blue-600 font-medium text-sm
-                  hover:bg-blue-50 hover:text-blue-700 
-                  transition-all duration-200
-                "
-              >
-                Open {subject.title}
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          ))}
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+            <h3 className="text-lg font-semibold text-gray-900">Last Activity</h3>
+            <p className="mt-1 text-sm text-gray-600">{lastActivity ? lastActivity : "No activity yet."}</p>
+          </div>
         </div>
 
-        {/* Weekly Goal Box */}
-        <div className="mt-12 bg-blue-50 border border-blue-100 rounded-2xl p-8">
+        {selectedSubjects.length === 0 ? (
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+            <h3 className="text-lg font-semibold text-gray-900">No subjects selected yet</h3>
+            <p className="mt-1 text-sm text-gray-600">
+              Go to Subjects and pick what you want to study. Then you’ll see them here.
+            </p>
+
+            <Link
+              href="/subjects"
+              className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#0B2B5A] px-4 py-2 text-sm font-semibold text-white"
+            >
+              Select subjects <ArrowRight className="h-4 w-4" />
+            </Link>
+
+            {/* Debug line (remove later) */}
+            <div className="mt-4 text-xs text-gray-500">
+              Debug: storage key = <span className="font-mono">{STORAGE_KEY}</span>, value ={" "}
+              <span className="font-mono">{JSON.stringify(selectedTitles)}</span>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {selectedSubjects.map((subject) => {
+              const p = subjectProgress[subject.title];
+              const pct = p && p.total > 0 ? Math.round((p.completed / p.total) * 100) : 0;
+
+              return (
+                <div
+                  key={subject.title}
+                  className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 hover:shadow-md hover:-translate-y-1 transition-all duration-200"
+                >
+                  <h3 className="text-lg font-semibold text-gray-900">{subject.title}</h3>
+                  <p className="text-gray-600 text-sm mt-2">{subject.desc}</p>
+
+                  {/* Subject progress (Phase 1 light) */}
+                  <p className="text-xs text-gray-500 mt-3 mb-4">Progress: {pct}%</p>
+
+                  <button
+                    onClick={() => router.push(subject.href)}
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-blue-400 text-blue-600 font-medium text-sm hover:bg-blue-50 hover:text-blue-700 transition-all duration-200"
+                  >
+                    Open {subject.title}
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Weekly Goal (Phase 1) */}
+        <div className="mt-10 bg-blue-50 border border-blue-100 rounded-2xl p-8">
           <h3 className="text-lg font-semibold text-blue-900">Weekly Goal</h3>
           <p className="text-blue-800 text-sm mb-3">
-            You've completed 3/5 lessons this week!
+            {Math.min(weeklyCompleted, WEEKLY_GOAL)}/{WEEKLY_GOAL} lessons completed this week
           </p>
 
           <div className="w-full h-3 bg-white rounded-full overflow-hidden">
-            <div className="h-full w-[60%] bg-blue-500 rounded-full"></div>
+            <div
+              className="h-full bg-blue-500 rounded-full transition-all duration-300"
+              style={{ width: `${weeklyPct}%` }}
+            />
           </div>
+
+          <p className="mt-3 text-xs text-blue-800/80">
+            Phase 1: progress is stored locally and becomes real once lessons exist.
+          </p>
         </div>
       </div>
     </div>
