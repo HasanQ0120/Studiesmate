@@ -1,9 +1,10 @@
-export const dynamic = "force-dynamic";
 "use client";
+
+export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 
 const GRADES = [
   "Class 1",
@@ -17,56 +18,16 @@ const GRADES = [
 ];
 
 const SUBJECTS = [
-  {
-    title: "Mathematics",
-    desc: "Numbers, algebra, geometry, and problem solving.",
-    icon: "➗",
-  },
-  {
-    title: "English",
-    desc: "Reading, writing, grammar, and vocabulary.",
-    icon: "📘",
-  },
-  {
-    title: "Science",
-    desc: "Basics of physics, chemistry, and biology.",
-    icon: "🧪",
-  },
-  {
-    title: "Social Studies",
-    desc: "People, places, maps, and how society works.",
-    icon: "🌍",
-  },
-  {
-    title: "Computer / ICT",
-    desc: "Digital skills, typing, internet basics, and safety.",
-    icon: "💻",
-  },
-  {
-    title: "Geography",
-    desc: "Maps, continents, climate, and environments.",
-    icon: "🗺️",
-  },
-  {
-    title: "History",
-    desc: "Past events, timelines, and key stories of the world.",
-    icon: "🏛️",
-  },
-  {
-    title: "General Knowledge",
-    desc: "Everyday facts, reasoning, and quick learning topics.",
-    icon: "🧠",
-  },
-  {
-    title: "Art",
-    desc: "Drawing, creativity, colors, and basic design.",
-    icon: "🎨",
-  },
-  {
-    title: "Urdu (Support)",
-    desc: "Helper explanations only (not a full course yet).",
-    icon: "📝",
-  },
+  { title: "Mathematics", desc: "Numbers, algebra, geometry, and problem solving.", icon: "➗" },
+  { title: "English", desc: "Reading, writing, grammar, and vocabulary.", icon: "📘" },
+  { title: "Science", desc: "Basics of physics, chemistry, and biology.", icon: "🧪" },
+  { title: "Social Studies", desc: "People, places, maps, and how society works.", icon: "🌍" },
+  { title: "Computer / ICT", desc: "Digital skills, typing, internet basics, and safety.", icon: "💻" },
+  { title: "Geography", desc: "Maps, continents, climate, and environments.", icon: "🗺️" },
+  { title: "History", desc: "Past events, timelines, and key stories of the world.", icon: "🏛️" },
+  { title: "General Knowledge", desc: "Everyday facts, reasoning, and quick learning topics.", icon: "🧠" },
+  { title: "Art", desc: "Drawing, creativity, colors, and basic design.", icon: "🎨" },
+  { title: "Urdu (Support)", desc: "Helper explanations only (not a full course yet).", icon: "📝" },
 ];
 
 function normalizeTitle(s: string) {
@@ -74,6 +35,14 @@ function normalizeTitle(s: string) {
 }
 
 export default function SubjectsPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-slate-600">Loading subjects…</div>}>
+      <SubjectsPageInner />
+    </Suspense>
+  );
+}
+
+function SubjectsPageInner() {
   const sp = useSearchParams();
 
   // selected class comes from query OR localStorage profile
@@ -207,8 +176,7 @@ export default function SubjectsPage() {
             </div>
 
             <div className="text-sm text-slate-700">
-              Selected:{" "}
-              <span className="font-semibold text-slate-900">{selected.length}</span>
+              Selected: <span className="font-semibold text-slate-900">{selected.length}</span>
             </div>
           </div>
 
@@ -232,9 +200,7 @@ export default function SubjectsPage() {
               ))}
             </div>
           ) : (
-            <div className="mt-3 text-sm text-slate-600">
-              No subjects selected yet. Pick 2–4 to start.
-            </div>
+            <div className="mt-3 text-sm text-slate-600">No subjects selected yet. Pick 2–4 to start.</div>
           )}
         </div>
 
@@ -248,7 +214,7 @@ export default function SubjectsPage() {
                 key={s.title}
                 type="button"
                 onClick={() => toggleSubject(s.title)}
-                className={`relative text-left rounded-2xl border p-5 shadow-sm transition ${
+                className={`relative rounded-2xl border p-5 text-left shadow-sm transition ${
                   chosen
                     ? "border-[#0B2B5A] bg-slate-50"
                     : "border-slate-200 bg-white hover:bg-slate-50"
@@ -286,15 +252,11 @@ export default function SubjectsPage() {
 
                 {/* Action hint */}
                 <div className="mt-5 flex items-center justify-between">
-                  <span className="text-xs text-slate-600">
-                    {chosen ? "Selected" : "Click to select"}
-                  </span>
+                  <span className="text-xs text-slate-600">{chosen ? "Selected" : "Click to select"}</span>
 
                   <span
                     className={`rounded-xl px-3 py-2 text-xs font-semibold ${
-                      chosen
-                        ? "bg-[#0B2B5A] text-white"
-                        : "bg-slate-100 text-slate-700"
+                      chosen ? "bg-[#0B2B5A] text-white" : "bg-slate-100 text-slate-700"
                     }`}
                   >
                     {chosen ? "Selected ✓" : "Select"}
