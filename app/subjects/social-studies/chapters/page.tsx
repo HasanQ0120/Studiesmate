@@ -3,27 +3,24 @@
 import Link from "next/link";
 import BackButton from "@/components/BackButton";
 
-const SUBJECT_TITLE = "Mathematics";
-const SUBJECT_ID = "maths";
+const SUBJECT_TITLE = "Social Studies";
+const SUBJECT_ID = "social-studies";
 
 const CHAPTERS = [
-  { id: "numbers", title: "Numbers & Place Value", desc: "Understanding numbers, counting, and place value." },
-  { id: "addition-subtraction", title: "Addition & Subtraction", desc: "Basic operations with real-life examples." },
-  { id: "multiplication-division", title: "Multiplication & Division", desc: "Repeated addition, sharing, and grouping." },
-  { id: "fractions", title: "Fractions", desc: "Parts of a whole using simple visuals." },
-  { id: "decimals", title: "Decimals", desc: "Introduction to decimal numbers." },
-  { id: "measurement", title: "Measurement", desc: "Length, mass, and time basics." },
-  { id: "geometry", title: "Geometry", desc: "Shapes, angles, and spatial understanding." },
-  { id: "data-handling", title: "Data Handling", desc: "Simple graphs, tables, and charts." },
-  { id: "patterns", title: "Patterns & Sequences", desc: "Finding patterns and logical sequences." },
-  { id: "word-problems", title: "Word Problems", desc: "Applying maths to daily life situations." },
+  { id: "myself-family-community", title: "Myself, Family & Community", desc: "Roles at home, helping others, and community life." },
+  { id: "citizenship-responsibility", title: "Citizenship & Responsibility", desc: "Rules, rights, duties, and being a good citizen." },
+  { id: "culture-traditions", title: "Culture & Traditions", desc: "Festivals, traditions, values, and respecting differences." },
+  { id: "maps-directions", title: "Maps & Directions", desc: "Maps, symbols, simple directions, and places around us." },
+{ id: "environment-caring-earth", title: "Environment & Caring for Earth", desc: "Cleanliness, recycling, resources, and protecting nature." },
+  { id: "basic-economics", title: "Basic Economics", desc: "Needs vs wants, money basics, saving, and simple trade." },
+  { id: "history-around-us", title: "History Around Us", desc: "Past vs present, timelines, and local history basics." },
+  { id: "government-services", title: "Government & Services", desc: "What governments do and services in a community." },
 ];
 
-export default function MathsChaptersPage() {
+export default function SocialStudiesChaptersPage() {
   return (
     <main className="min-h-screen bg-white text-slate-900">
       <div className="mx-auto max-w-5xl px-4 py-12">
-        {/* ✅ Back should go to the selected subjects dashboard */}
         <BackButton href="/dashboard" label="Back to Dashboard" />
 
         <h1 className="mt-6 text-3xl font-semibold tracking-tight">{SUBJECT_TITLE}</h1>

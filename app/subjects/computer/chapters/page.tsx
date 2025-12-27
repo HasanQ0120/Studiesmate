@@ -3,27 +3,24 @@
 import Link from "next/link";
 import BackButton from "@/components/BackButton";
 
-const SUBJECT_TITLE = "Mathematics";
-const SUBJECT_ID = "maths";
+const SUBJECT_TITLE = "Computer / ICT";
+const SUBJECT_ID = "computer";
 
 const CHAPTERS = [
-  { id: "numbers", title: "Numbers & Place Value", desc: "Understanding numbers, counting, and place value." },
-  { id: "addition-subtraction", title: "Addition & Subtraction", desc: "Basic operations with real-life examples." },
-  { id: "multiplication-division", title: "Multiplication & Division", desc: "Repeated addition, sharing, and grouping." },
-  { id: "fractions", title: "Fractions", desc: "Parts of a whole using simple visuals." },
-  { id: "decimals", title: "Decimals", desc: "Introduction to decimal numbers." },
-  { id: "measurement", title: "Measurement", desc: "Length, mass, and time basics." },
-  { id: "geometry", title: "Geometry", desc: "Shapes, angles, and spatial understanding." },
-  { id: "data-handling", title: "Data Handling", desc: "Simple graphs, tables, and charts." },
-  { id: "patterns", title: "Patterns & Sequences", desc: "Finding patterns and logical sequences." },
-  { id: "word-problems", title: "Word Problems", desc: "Applying maths to daily life situations." },
+  { id: "computer-basics", title: "Computer Basics", desc: "What a computer is, how it works, and common types of devices." },
+  { id: "using-software", title: "Using Software", desc: "Documents, presentations, and spreadsheets at a beginner level." },
+  { id: "internet-safety", title: "Internet & Online Safety", desc: "Safe browsing, passwords, privacy, and responsible use." },
+  { id: "data-file-management", title: "Data & File Management", desc: "Folders, files, storage, and how to organize work." },
+  { id: "digital-communication", title: "Digital Communication", desc: "Email basics, messages, and online etiquette." },
+  { id: "intro-to-coding", title: "Introduction to Coding", desc: "Basic logic, sequences, and beginner coding concepts." },
+  { id: "hardware-devices", title: "Hardware & Devices", desc: "Parts of a computer, input/output devices, and peripherals." },
+  { id: "problem-solving-logic", title: "Problem Solving & Logic", desc: "Patterns, steps, and thinking like a problem solver." },
 ];
 
-export default function MathsChaptersPage() {
+export default function ComputerChaptersPage() {
   return (
     <main className="min-h-screen bg-white text-slate-900">
       <div className="mx-auto max-w-5xl px-4 py-12">
-        {/* ✅ Back should go to the selected subjects dashboard */}
         <BackButton href="/dashboard" label="Back to Dashboard" />
 
         <h1 className="mt-6 text-3xl font-semibold tracking-tight">{SUBJECT_TITLE}</h1>

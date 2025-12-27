@@ -1,35 +1,30 @@
+"use client";
+
 import Link from "next/link";
+import BackButton from "@/components/BackButton";
 
 export default function MathSubjectPage() {
   return (
     <main className="min-h-screen bg-white text-slate-900">
       <div className="mx-auto max-w-4xl px-4 py-12">
-        <h1 className="text-3xl font-semibold tracking-tight">Math</h1>
+        <BackButton href="/subjects" label="Back to Subjects" />
+
+        <h1 className="mt-6 text-3xl font-semibold tracking-tight">Mathematics</h1>
         <p className="mt-2 text-sm text-slate-700">
-          Placeholder page for Phase 1. Lessons and quizzes will be added later.
+          Phase 1: universal foundations. Chapters are the same for everyone for now.
         </p>
 
         <div className="mt-8 rounded-2xl border border-slate-200 bg-[#F1F7FF] p-6">
-          <h2 className="text-base font-semibold">Coming next</h2>
-          <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-700">
-            <li>Short concept explanations</li>
-            <li>Simple practice questions</li>
-            <li>Progress tracking (basic)</li>
-          </ul>
-        </div>
+          <h2 className="text-base font-semibold">Start here</h2>
+          <p className="mt-2 text-sm text-slate-700">
+            Go to chapters and pick one. Lessons will be added gradually.
+          </p>
 
-        <div className="mt-10 flex gap-3">
           <Link
-            href="/subjects"
-            className="inline-flex items-center gap-2 rounded-xl bg-[#0B2B5A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0A2550]"
+            href="/subjects/maths/chapters"
+            className="mt-5 inline-flex items-center justify-center rounded-xl bg-[#0B2B5A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0A2550]"
           >
-            ← Subjects
-          </Link>
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 rounded-xl bg-[#0B2B5A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0A2550]"
-          >
-            Home
+            Open Maths Chapters →
           </Link>
         </div>
       </div>

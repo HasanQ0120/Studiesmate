@@ -184,7 +184,7 @@ export default function HomePage() {
           </div>
 
           <div className="mt-8 grid gap-5 md:grid-cols-3">
-            <Stat label="Core subjects" value="2" note="Math, English" />
+            <Stat label="Core subjects" value="10" note="Math, English, Science & more" />
             <Stat label="Learning style" value="Short" note="Daily-friendly lessons" />
             <Stat label="AI usage" value="Limited" note="Guided, not unlimited" />
           </div>

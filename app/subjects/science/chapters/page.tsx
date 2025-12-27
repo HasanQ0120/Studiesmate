@@ -3,27 +3,24 @@
 import Link from "next/link";
 import BackButton from "@/components/BackButton";
 
-const SUBJECT_TITLE = "Mathematics";
-const SUBJECT_ID = "maths";
+const SUBJECT_TITLE = "Science";
+const SUBJECT_ID = "science";
 
 const CHAPTERS = [
-  { id: "numbers", title: "Numbers & Place Value", desc: "Understanding numbers, counting, and place value." },
-  { id: "addition-subtraction", title: "Addition & Subtraction", desc: "Basic operations with real-life examples." },
-  { id: "multiplication-division", title: "Multiplication & Division", desc: "Repeated addition, sharing, and grouping." },
-  { id: "fractions", title: "Fractions", desc: "Parts of a whole using simple visuals." },
-  { id: "decimals", title: "Decimals", desc: "Introduction to decimal numbers." },
-  { id: "measurement", title: "Measurement", desc: "Length, mass, and time basics." },
-  { id: "geometry", title: "Geometry", desc: "Shapes, angles, and spatial understanding." },
-  { id: "data-handling", title: "Data Handling", desc: "Simple graphs, tables, and charts." },
-  { id: "patterns", title: "Patterns & Sequences", desc: "Finding patterns and logical sequences." },
-  { id: "word-problems", title: "Word Problems", desc: "Applying maths to daily life situations." },
+  { id: "scientific-skills-safety", title: "Scientific Skills & Safety", desc: "Observation, experiments, tools, and lab safety basics." },
+  { id: "living-things", title: "Living Things", desc: "Plants, animals, habitats, and life processes." },
+  { id: "materials-matter", title: "Materials & States of Matter", desc: "Solids, liquids, gases, and material properties." },
+  { id: "forces-motion", title: "Forces & Motion", desc: "Pushes, pulls, speed, and simple forces." },
+  { id: "energy-heat", title: "Energy & Heat", desc: "Forms of energy, transfer, and temperature." },
+  { id: "light-sound", title: "Light & Sound", desc: "Reflection, shadows, vibration, and sound basics." },
+  { id: "electricity-magnetism", title: "Electricity & Magnetism", desc: "Simple circuits, components, and magnets." },
+  { id: "earth-space", title: "Earth & Space", desc: "Earth, sun, moon, seasons, and space basics." },
 ];
 
-export default function MathsChaptersPage() {
+export default function ScienceChaptersPage() {
   return (
     <main className="min-h-screen bg-white text-slate-900">
       <div className="mx-auto max-w-5xl px-4 py-12">
-        {/* ✅ Back should go to the selected subjects dashboard */}
         <BackButton href="/dashboard" label="Back to Dashboard" />
 
         <h1 className="mt-6 text-3xl font-semibold tracking-tight">{SUBJECT_TITLE}</h1>

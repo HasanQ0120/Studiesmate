@@ -20,6 +20,10 @@ function safeParseJSON<T>(raw: string | null, fallback: T): T {
   }
 }
 
+function normalizeTitle(s: string) {
+  return s.trim().toLowerCase();
+}
+
 const ALL_SUBJECTS = [
   {
     title: "Mathematics",
@@ -29,47 +33,56 @@ const ALL_SUBJECTS = [
   {
     title: "English",
     desc: "Reading, writing, grammar, and vocabulary.",
-    href: "/subjects/english",
+    href: "/subjects/english/chapters",
   },
   {
     title: "Science",
     desc: "Basics of physics, chemistry, and biology.",
-    href: "/subjects/science",
+    href: "/subjects/science/chapters",
   },
   {
     title: "Social Studies",
     desc: "People, places, maps, and how society works.",
-    href: "/subjects/social-studies",
+    href: "/subjects/social-studies/chapters",
   },
   {
     title: "Computer / ICT",
     desc: "Digital skills, typing, internet basics, and safety.",
-    href: "/subjects/computer-ict",
+    href: "/subjects/computer/chapters",
   },
   {
     title: "Geography",
     desc: "Maps, continents, climate, and environments.",
-    href: "/subjects/geography",
+    href: "/subjects/geography/chapters",
   },
   {
     title: "History",
     desc: "Past events, timelines, and key stories of the world.",
-    href: "/subjects/history",
+    href: "/subjects/history/chapters",
   },
   {
     title: "General Knowledge",
     desc: "Everyday facts, reasoning, and quick learning topics.",
-    href: "/subjects/general-knowledge",
+    href: "/subjects/general-knowledge/chapters",
   },
+
+  // ✅ Added Islamiat (so dashboard recognizes the selection)
+  {
+    title: "Islamiat",
+    desc: "Beliefs, worship, Seerah, and Islamic manners.",
+    href: "/subjects/islamiat/chapters",
+  },
+
+  // Keep these if you still want them visible as optional
   {
     title: "Art",
     desc: "Drawing, creativity, colors, and basic design.",
-    href: "/subjects/art",
+    href: "/subjects/art/chapters",
   },
   {
     title: "Urdu (Support)",
     desc: "Helper explanations only (not a full course yet).",
-    href: "/subjects/urdu-support",
+    href: "/subjects/urdu-support/chapters",
   },
 ];
 
@@ -138,8 +151,8 @@ export default function DashboardPage() {
   }, []);
 
   const selectedSubjects = useMemo(() => {
-    const set = new Set(selectedTitles);
-    return ALL_SUBJECTS.filter((s) => set.has(s.title));
+    const selectedSet = new Set(selectedTitles.map(normalizeTitle));
+    return ALL_SUBJECTS.filter((s) => selectedSet.has(normalizeTitle(s.title)));
   }, [selectedTitles]);
 
   const weeklyPct = Math.min(100, (Math.min(weeklyCompleted, WEEKLY_GOAL) / WEEKLY_GOAL) * 100);
@@ -180,12 +193,6 @@ export default function DashboardPage() {
             >
               Select subjects <ArrowRight className="h-4 w-4" />
             </Link>
-
-            {/* Debug line (remove later) */}
-            <div className="mt-4 text-xs text-gray-500">
-              Debug: storage key = <span className="font-mono">{STORAGE_KEY}</span>, value ={" "}
-              <span className="font-mono">{JSON.stringify(selectedTitles)}</span>
-            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

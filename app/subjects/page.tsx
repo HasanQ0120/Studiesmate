@@ -3,8 +3,9 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
+import BackButton from "@/components/BackButton";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 const GRADES = [
   "Class 1",
@@ -26,8 +27,7 @@ const SUBJECTS = [
   { title: "Geography", desc: "Maps, continents, climate, and environments.", icon: "🗺️" },
   { title: "History", desc: "Past events, timelines, and key stories of the world.", icon: "🏛️" },
   { title: "General Knowledge", desc: "Everyday facts, reasoning, and quick learning topics.", icon: "🧠" },
-  { title: "Art", desc: "Drawing, creativity, colors, and basic design.", icon: "🎨" },
-  { title: "Urdu (Support)", desc: "Helper explanations only (not a full course yet).", icon: "📝" },
+  { title: "Islamiat", desc: "Beliefs, worship, Seerah, and Islamic manners.", icon: "🕌" },
 ];
 
 function normalizeTitle(s: string) {
@@ -45,40 +45,34 @@ export default function SubjectsPage() {
 function SubjectsPageInner() {
   const sp = useSearchParams();
 
-  // selected class comes from query OR localStorage profile
-  const selectedClass = useMemo(() => {
-    const fromQuery = sp.get("class");
-    if (fromQuery) return fromQuery;
-
-    if (typeof window !== "undefined") {
-      const raw = localStorage.getItem("studiesmate_profile");
-      if (raw) {
-        try {
-          const p = JSON.parse(raw);
-          if (p?.studentClass) return p.studentClass as string;
-        } catch {}
-      }
-    }
-
-    return "";
-  }, [sp]);
-
-  // selected subjects
+  const [selectedClass, setSelectedClass] = useState("");
   const [selected, setSelected] = useState<string[]>([]);
 
-  // load previous selections
+  useEffect(() => {
+    const fromQuery = sp.get("class");
+    if (fromQuery) {
+      setSelectedClass(fromQuery);
+      return;
+    }
+
+    try {
+      const raw = localStorage.getItem("studiesmate_profile");
+      if (!raw) return;
+
+      const p = JSON.parse(raw);
+      if (p?.studentClass) setSelectedClass(String(p.studentClass));
+    } catch {}
+  }, [sp]);
+
   useEffect(() => {
     try {
       const raw = localStorage.getItem("studiesmate_selected_subjects");
       if (!raw) return;
       const arr = JSON.parse(raw);
-      if (Array.isArray(arr)) {
-        setSelected(arr.map((x) => String(x)));
-      }
+      if (Array.isArray(arr)) setSelected(arr.map((x) => String(x)));
     } catch {}
   }, []);
 
-  // persist selections
   useEffect(() => {
     try {
       localStorage.setItem("studiesmate_selected_subjects", JSON.stringify(selected));
@@ -89,7 +83,6 @@ function SubjectsPageInner() {
     setSelected((prev) => {
       const key = normalizeTitle(title);
       const exists = prev.some((x) => normalizeTitle(x) === key);
-
       if (exists) return prev.filter((x) => normalizeTitle(x) !== key);
       return [...prev, title];
     });
@@ -103,8 +96,9 @@ function SubjectsPageInner() {
   return (
     <main className="bg-white text-slate-900">
       <div className="mx-auto max-w-6xl px-4 py-12">
-        {/* Header */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <BackButton href="/" label="Back to Home" />
+
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="text-3xl font-semibold tracking-tight">Subjects</h1>
             <p className="mt-2 text-sm text-slate-600">
@@ -123,14 +117,13 @@ function SubjectsPageInner() {
             <Link
               href="/dashboard"
               className="inline-flex w-fit items-center justify-center rounded-xl bg-[#0B2B5A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0A2550]"
-              title="Go back to dashboard"
+              title="Go to dashboard"
             >
               Continue →
             </Link>
           </div>
         </div>
 
-        {/* Grade reminder (read-only) */}
         <div className="mt-8">
           <div className="flex items-center justify-between">
             <div className="text-sm font-semibold text-slate-800">Grade</div>
@@ -165,7 +158,6 @@ function SubjectsPageInner() {
           </div>
         </div>
 
-        {/* Selected summary */}
         <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-5">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -204,7 +196,6 @@ function SubjectsPageInner() {
           )}
         </div>
 
-        {/* Subjects grid */}
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {SUBJECTS.map((s) => {
             const chosen = isSelected(s.title);
@@ -215,12 +206,9 @@ function SubjectsPageInner() {
                 type="button"
                 onClick={() => toggleSubject(s.title)}
                 className={`relative rounded-2xl border p-5 text-left shadow-sm transition ${
-                  chosen
-                    ? "border-[#0B2B5A] bg-slate-50"
-                    : "border-slate-200 bg-white hover:bg-slate-50"
+                  chosen ? "border-[#0B2B5A] bg-slate-50" : "border-slate-200 bg-white hover:bg-slate-50"
                 }`}
               >
-                {/* Tick */}
                 <div className="absolute right-4 top-4">
                   <div
                     className={`flex h-7 w-7 items-center justify-center rounded-full border text-sm font-bold ${
@@ -250,7 +238,6 @@ function SubjectsPageInner() {
                   </div>
                 </div>
 
-                {/* Action hint */}
                 <div className="mt-5 flex items-center justify-between">
                   <span className="text-xs text-slate-600">{chosen ? "Selected" : "Click to select"}</span>
 
@@ -267,7 +254,6 @@ function SubjectsPageInner() {
           })}
         </div>
 
-        {/* Footer note */}
         <div className="mt-10 rounded-2xl bg-slate-50 p-5 text-sm text-slate-600">
           <div className="font-semibold text-slate-800">Phase 1 note</div>
           <ul className="mt-2 list-disc space-y-1 pl-5">
