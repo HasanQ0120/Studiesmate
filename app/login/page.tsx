@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 const CLASSES = [
   "Class 1",
@@ -15,12 +16,32 @@ const CLASSES = [
   "Class 8",
 ];
 
+const PROFILE_KEY = "studiesmate_profile";
+const SESSION_KEY = "studiesmate_session";
+
+function safeParseJSON<T>(raw: string | null): T | null {
+  try {
+    return raw ? (JSON.parse(raw) as T) : null;
+  } catch {
+    return null;
+  }
+}
+
+type StoredProfile = {
+  studentName?: string;
+  studentClass?: string;
+  className?: string; // old key support
+  password?: string;
+  parentEmail?: string;
+};
+
 export default function LoginPage() {
   const router = useRouter();
 
   const [studentName, setStudentName] = useState("");
   const [studentClass, setStudentClass] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
   const canContinue = useMemo(() => {
@@ -35,29 +56,42 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
 
-    const stored = localStorage.getItem("studiesmate_profile");
-    if (!stored) {
+    const profile = safeParseJSON<StoredProfile>(localStorage.getItem(PROFILE_KEY));
+    if (!profile) {
       setError("No profile found. Please sign up first.");
       return;
     }
 
-    const profile = JSON.parse(stored);
+    const storedName = (profile.studentName || "").trim();
+    const storedClass = (profile.studentClass || profile.className || "").trim();
+    const storedPassword = (profile.password || "").trim();
 
-    const nameMatch =
-      profile.studentName.toLowerCase() === studentName.trim().toLowerCase();
-    const classMatch = profile.studentClass === studentClass;
-    const passwordMatch = profile.password === password;
+    if (!storedPassword) {
+      setError("This profile is missing a password. Please create a new profile.");
+      return;
+    }
+
+    const nameMatch = storedName.toLowerCase() === studentName.trim().toLowerCase();
+    const classMatch = storedClass === studentClass;
+    const passwordMatch = storedPassword === password.trim();
 
     if (!nameMatch || !classMatch || !passwordMatch) {
       setError("Incorrect name, class, or password.");
       return;
     }
 
-    router.push(
-      `/dashboard?name=${encodeURIComponent(profile.studentName)}&class=${encodeURIComponent(
-        profile.studentClass
-      )}`
-    );
+    const session = {
+      studentName: storedName,
+      studentClass: storedClass,
+      parentEmail: (profile.parentEmail || "").trim(),
+      loggedInAt: new Date().toISOString(),
+    };
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+
+    // Tell Header to refresh immediately
+    window.dispatchEvent(new Event("studiesmate_auth_changed"));
+
+    router.push("/dashboard");
   }
 
   return (
@@ -72,7 +106,6 @@ export default function LoginPage() {
           </p>
 
           <form className="mt-8 space-y-5" onSubmit={onSubmit}>
-            {/* Student name */}
             <div>
               <label className="text-sm font-medium text-slate-700">
                 Student name
@@ -85,7 +118,6 @@ export default function LoginPage() {
               />
             </div>
 
-            {/* Class */}
             <div>
               <label className="text-sm font-medium text-slate-700">Class</label>
               <select
@@ -102,19 +134,34 @@ export default function LoginPage() {
               </select>
             </div>
 
-            {/* Password */}
             <div>
               <label className="text-sm font-medium text-slate-700">
                 Password
               </label>
-              <input
-                type="password"
-                minLength={6}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
-                className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-400"
-              />
+
+              <div className="relative mt-2">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  minLength={6}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  className="w-full rounded-xl border border-slate-300 px-4 py-3 pr-12 text-sm outline-none focus:border-slate-400"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-2 text-slate-600 hover:bg-slate-100"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
+
               <p className="mt-1 text-xs text-slate-500">
                 Enter the password you set during signup (at least 6 characters)
               </p>
@@ -135,16 +182,10 @@ export default function LoginPage() {
             </button>
 
             <div className="flex items-center justify-between text-sm">
-              <Link
-                href="/forgot-password"
-                className="text-slate-600 hover:underline"
-              >
+              <Link href="/forgot-password" className="text-slate-600 hover:underline">
                 Forgot password?
               </Link>
-              <Link
-                href="/signup"
-                className="text-[#0B2B5A] hover:underline"
-              >
+              <Link href="/signup" className="text-[#0B2B5A] hover:underline">
                 Create new profile
               </Link>
             </div>

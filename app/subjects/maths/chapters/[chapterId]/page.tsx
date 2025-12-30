@@ -3,6 +3,8 @@
 import BackButton from "@/components/BackButton";
 import { useParams } from "next/navigation";
 
+const SUBJECT_TITLE = "Maths";
+
 const CHAPTER_META: Record<string, { title: string; desc: string }> = {
   numbers: { title: "Numbers & Place Value", desc: "Understanding numbers, counting, and place value." },
   "addition-subtraction": { title: "Addition & Subtraction", desc: "Basic operations with real-life examples." },
@@ -20,34 +22,29 @@ export default function ChapterPage() {
   const params = useParams<{ chapterId: string }>();
   const chapterId = params.chapterId;
 
-  const meta = CHAPTER_META[chapterId] ?? { title: "Chapter", desc: "This chapter will be added soon." };
+  const meta =
+    CHAPTER_META[chapterId] ?? {
+      title: "Chapter",
+      desc: "This chapter will be added soon.",
+    };
 
   return (
-    <div className="min-h-screen bg-white px-6 py-10">
-      <div className="max-w-4xl mx-auto">
+    <main className="min-h-screen bg-white text-slate-900">
+      <div className="mx-auto max-w-4xl px-6 py-10">
         <BackButton href="/subjects/maths/chapters" label="Back to Chapters" />
 
-        <h1 className="mt-6 text-3xl font-bold text-gray-900">{meta.title}</h1>
-        <p className="mt-2 text-gray-600">{meta.desc}</p>
+        <h1 className="mt-6 text-3xl font-semibold tracking-tight">
+          {SUBJECT_TITLE} • {meta.title}
+        </h1>
+        <p className="mt-2 text-sm text-slate-700">{meta.desc}</p>
 
-        <div className="mt-10 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-900">Lessons</h2>
-          <p className="text-sm text-gray-600 mt-1">
+        <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-6">
+          <h2 className="text-base font-semibold">Lessons</h2>
+          <p className="mt-2 text-sm text-slate-700">
             Lessons will be added gradually. For Phase 1, this is a placeholder.
           </p>
-
-          <ul className="mt-4 space-y-3 text-sm text-gray-700">
-            <li className="flex items-center justify-between border rounded-xl p-4">
-              <span>Lesson 1 (coming soon)</span>
-              <span className="text-gray-400">Locked</span>
-            </li>
-            <li className="flex items-center justify-between border rounded-xl p-4">
-              <span>Lesson 2 (coming soon)</span>
-              <span className="text-gray-400">Locked</span>
-            </li>
-          </ul>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

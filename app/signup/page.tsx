@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 const CLASSES = [
   "Class 1",
@@ -14,6 +15,8 @@ const CLASSES = [
   "Class 7",
   "Class 8",
 ];
+
+const PROFILE_KEY = "studiesmate_profile";
 
 function isValidEmail(email: string) {
   const e = email.trim().toLowerCase();
@@ -27,6 +30,7 @@ export default function SignupPage() {
   const [studentClass, setStudentClass] = useState("");
   const [parentEmail, setParentEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const canContinue = useMemo(() => {
     return (
@@ -45,17 +49,14 @@ export default function SignupPage() {
       studentName: studentName.trim(),
       studentClass: studentClass.trim(),
       parentEmail: parentEmail.trim(),
-      password: password.trim(), // Phase 1 local only (replace with DB later)
+      password: password.trim(),
       createdAt: new Date().toISOString(),
     };
 
-    localStorage.setItem("studiesmate_profile", JSON.stringify(profile));
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
 
-    router.push(
-      `/dashboard?name=${encodeURIComponent(profile.studentName)}&class=${encodeURIComponent(
-        profile.studentClass
-      )}`
-    );
+    // After signup, go to login
+    router.push("/login");
   }
 
   return (
@@ -70,7 +71,6 @@ export default function SignupPage() {
           </p>
 
           <form className="mt-8 space-y-5" onSubmit={onSubmit}>
-            {/* Student name */}
             <div>
               <label className="text-sm font-medium text-slate-700">
                 Student name
@@ -83,7 +83,6 @@ export default function SignupPage() {
               />
             </div>
 
-            {/* Class */}
             <div>
               <label className="text-sm font-medium text-slate-700">Class</label>
               <select
@@ -100,7 +99,6 @@ export default function SignupPage() {
               </select>
             </div>
 
-            {/* Parent email */}
             <div>
               <label className="text-sm font-medium text-slate-700">
                 Parent email
@@ -117,32 +115,35 @@ export default function SignupPage() {
               </p>
             </div>
 
-            {/* Set password */}
             <div>
               <label className="text-sm font-medium text-slate-700">
                 Set password
               </label>
-              <input
-                type="password"
-                minLength={6}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter password"
-                className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-400"
-              />
-              <p className="mt-1 text-xs text-slate-500">At least 6 characters</p>
 
-              {/* Continue with Google (coming soon) - placed under password */}
-              <button
-                type="button"
-                disabled
-                className="mt-4 w-full rounded-xl border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-semibold text-slate-500"
-                title="Coming soon"
-              >
-                Continue with Google (coming soon)
-              </button>
-              <p className="mt-2 text-center text-xs text-slate-500">
-              </p>
+              <div className="relative mt-2">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  minLength={6}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter password"
+                  className="w-full rounded-xl border border-slate-300 px-4 py-3 pr-12 text-sm outline-none focus:border-slate-400"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-2 text-slate-600 hover:bg-slate-100"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
+
+              <p className="mt-1 text-xs text-slate-500">At least 6 characters</p>
             </div>
 
             <button
@@ -153,7 +154,6 @@ export default function SignupPage() {
               Create profile →
             </button>
 
-            {/* Note */}
             <div className="rounded-xl bg-slate-50 p-4 text-xs text-slate-600">
               <div className="font-medium text-slate-800">Important</div>
               <ul className="mt-2 list-disc space-y-1 pl-5">
