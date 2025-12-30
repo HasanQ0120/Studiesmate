@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 
+import { QUIZZES, type Quiz } from "@/data/quizzes";
+
 const STORAGE_KEY = "studiesmate_selected_subjects";
 
 // Phase 1 dashboard keys
@@ -134,6 +136,17 @@ export default function DashboardPage() {
     closeRemoveConfirm();
   }
 
+  // ✅ FIX: show quizzes ONLY for selected subjects, then take up to 8
+  const dashboardQuizzes: Quiz[] = useMemo(() => {
+    const selectedSet = new Set(selectedTitles.map(normalizeTitle));
+
+    const filtered = (Array.isArray(QUIZZES) ? QUIZZES : []).filter((q) =>
+      selectedSet.has(normalizeTitle(q.subjectTitle))
+    );
+
+    return filtered.slice(0, 9);
+  }, [selectedTitles]);
+
   return (
     <div className="min-h-screen bg-white px-6 py-10">
       <div className="max-w-6xl mx-auto">
@@ -227,6 +240,58 @@ export default function DashboardPage() {
           </div>
         )}
 
+        {/* Quick Quizzes */}
+        <div className="mt-10 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">Quick Quizzes</h3>
+              <p className="mt-1 text-sm text-gray-600">
+                Short practice to build confidence. Pick any quiz and go.
+              </p>
+            </div>
+
+            {dashboardQuizzes.length > 0 && (
+              <div className="text-xs text-gray-500">
+                Showing <span className="font-semibold text-gray-700">{dashboardQuizzes.length}</span> quizzes
+              </div>
+            )}
+          </div>
+
+          {dashboardQuizzes.length === 0 ? (
+            <div className="mt-4 rounded-xl bg-gray-50 px-4 py-3 text-sm text-gray-600">
+              Quizzes will appear here soon.
+            </div>
+          ) : (
+            <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {dashboardQuizzes.map((q) => {
+                const questionsCount = Array.isArray(q.questions) ? q.questions.length : 0;
+
+                return (
+                  <Link
+                    key={q.id}
+                    href={`/quiz/${q.id}`}
+                    className="rounded-xl border border-gray-200 bg-white p-4 hover:bg-gray-50 transition"
+                  >
+                    <div className="text-sm font-semibold text-gray-900 line-clamp-2">{q.title}</div>
+
+                    <div className="mt-2 text-xs text-gray-600">
+                      <span className="font-semibold">{q.subjectTitle}</span>
+                      {q.level ? <span> • {q.level}</span> : null}
+                    </div>
+
+                    <div className="mt-3 flex items-center justify-between">
+                      <span className="text-xs text-gray-500">{questionsCount} questions</span>
+                      <span className="text-xs font-semibold text-[#0B2B5A]">Start →</span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+
+          <div className="mt-4 text-xs text-gray-500">Tip: finish one quiz daily. Small wins add up.</div>
+        </div>
+
         {/* Weekly Goal */}
         <div className="mt-10 bg-blue-50 border border-blue-100 rounded-2xl p-8">
           <h3 className="text-lg font-semibold text-blue-900">Weekly Goal</h3>
@@ -235,10 +300,7 @@ export default function DashboardPage() {
           </p>
 
           <div className="w-full h-3 bg-white rounded-full overflow-hidden">
-            <div
-              className="h-full bg-blue-500 rounded-full transition-all duration-300"
-              style={{ width: `${weeklyPct}%` }}
-            />
+            <div className="h-full bg-blue-500 rounded-full transition-all duration-300" style={{ width: `${weeklyPct}%` }} />
           </div>
 
           <p className="mt-3 text-xs text-blue-800/80">
