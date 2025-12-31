@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Menu, X } from "lucide-react";
+import { supabase, signOutAccount } from "@/lib/auth";
 
 type Profile = {
   studentName?: string;
@@ -11,7 +13,7 @@ type Profile = {
   className?: string;
 };
 
-type Session = {
+type SessionShape = {
   studentName?: string;
   studentClass?: string;
   parentEmail?: string;
@@ -33,69 +35,151 @@ export default function Header() {
   const router = useRouter();
 
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [localSession, setLocalSession] = useState<SessionShape | null>(null);
 
-  const [menuOpen, setMenuOpen] = useState(false);
+  // Supabase session state
+  const [sbStudentName, setSbStudentName] = useState("");
+  const [sbStudentClass, setSbStudentClass] = useState("");
+  const [sbParentEmail, setSbParentEmail] = useState("");
+
+  const [menuOpen, setMenuOpen] = useState(false); // account menu
+  const [mobileNavOpen, setMobileNavOpen] = useState(false); // hamburger menu
+
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const mobileRef = useRef<HTMLDivElement | null>(null);
 
   function syncFromStorage() {
     const p = safeParseJSON<Profile>(localStorage.getItem(PROFILE_KEY));
-    const s = safeParseJSON<Session>(localStorage.getItem(SESSION_KEY));
+    const s = safeParseJSON<SessionShape>(localStorage.getItem(SESSION_KEY));
     setProfile(p);
-    setSession(s);
+    setLocalSession(s);
+  }
+
+  async function syncFromSupabase() {
+    const { data } = await supabase.auth.getUser();
+    const user = data.user;
+
+    const meta = (user?.user_metadata || {}) as {
+      studentName?: string;
+      studentClass?: string;
+      parentEmail?: string;
+    };
+
+    setSbStudentName((meta.studentName || "").trim());
+    setSbStudentClass((meta.studentClass || "").trim());
+    setSbParentEmail((user?.email || meta.parentEmail || "").trim());
   }
 
   useEffect(() => {
+    // localStorage sync (kept for backward compatibility)
     syncFromStorage();
 
     const onStorage = (e: StorageEvent) => {
       if (e.key === PROFILE_KEY || e.key === SESSION_KEY) syncFromStorage();
     };
 
-    const onFocus = () => syncFromStorage();
-    const onAuthChanged = () => syncFromStorage();
+    const onFocus = () => {
+      syncFromStorage();
+      syncFromSupabase();
+    };
+
+    const onAuthChanged = () => {
+      syncFromStorage();
+      syncFromSupabase();
+    };
 
     window.addEventListener("storage", onStorage);
     window.addEventListener("focus", onFocus);
-    window.addEventListener("studiesmate_auth_changed", onAuthChanged as EventListener);
+    window.addEventListener(
+      "studiesmate_auth_changed",
+      onAuthChanged as EventListener
+    );
+
+    // Supabase auth changes
+    const { data: sub } = supabase.auth.onAuthStateChange(() => {
+      syncFromSupabase();
+    });
+
+    // initial supabase sync
+    syncFromSupabase();
 
     return () => {
       window.removeEventListener("storage", onStorage);
       window.removeEventListener("focus", onFocus);
-      window.removeEventListener("studiesmate_auth_changed", onAuthChanged as EventListener);
+      window.removeEventListener(
+        "studiesmate_auth_changed",
+        onAuthChanged as EventListener
+      );
+      sub.subscription.unsubscribe();
     };
   }, []);
 
   useEffect(() => {
     function onDocClick(e: MouseEvent) {
-      if (!menuRef.current) return;
-      if (!menuRef.current.contains(e.target as Node)) setMenuOpen(false);
+      const target = e.target as Node;
+
+      // close account dropdown if click outside
+      if (menuRef.current && !menuRef.current.contains(target)) setMenuOpen(false);
+
+      // close mobile menu if click outside
+      if (mobileRef.current && !mobileRef.current.contains(target)) setMobileNavOpen(false);
     }
+
     document.addEventListener("mousedown", onDocClick);
     return () => document.removeEventListener("mousedown", onDocClick);
   }, []);
 
-  const isLoggedIn = !!session?.studentName;
+  // Logged in if Supabase has a user, OR fallback local session exists
+  const isLoggedIn = useMemo(() => {
+    return !!(sbParentEmail || localSession?.studentName);
+  }, [sbParentEmail, localSession]);
 
   const displayName = useMemo(() => {
-    return (session?.studentName || profile?.studentName || "").trim();
-  }, [session, profile]);
+    return (
+      sbStudentName ||
+      (localSession?.studentName || profile?.studentName || "").trim()
+    );
+  }, [sbStudentName, localSession, profile]);
 
   const displayEmail = useMemo(() => {
-    return (session?.parentEmail || profile?.parentEmail || "").trim();
-  }, [session, profile]);
+    return (
+      sbParentEmail ||
+      (localSession?.parentEmail || profile?.parentEmail || "").trim()
+    );
+  }, [sbParentEmail, localSession, profile]);
 
   const avatarLetter = useMemo(() => {
     const name = displayName.trim();
     return name ? name[0].toUpperCase() : "U";
   }, [displayName]);
 
-  function handleLogout() {
+  async function handleLogout() {
+    // Supabase sign out (if user exists)
+    await signOutAccount();
+
+    // Cleanup local session (kept for compatibility)
     localStorage.removeItem(SESSION_KEY);
+
     window.dispatchEvent(new Event("studiesmate_auth_changed"));
     setMenuOpen(false);
+    setMobileNavOpen(false);
     router.push("/");
     router.refresh();
+  }
+
+  function closeMobileNav() {
+    setMobileNavOpen(false);
+  }
+
+  function toggleMobileNav() {
+    // don’t open both menus together
+    setMenuOpen(false);
+    setMobileNavOpen((v) => !v);
+  }
+
+  function toggleAccountMenu() {
+    setMobileNavOpen(false);
+    setMenuOpen((v) => !v);
   }
 
   return (
@@ -105,6 +189,7 @@ export default function Header() {
           <span className="text-lg font-semibold tracking-tight">StudiesMate</span>
         </Link>
 
+        {/* Desktop nav (UNCHANGED) */}
         <nav className="hidden items-center gap-6 text-sm md:flex">
           <Link href="/" className="opacity-95 hover:opacity-100">Home</Link>
 
@@ -133,6 +218,46 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
+          {/* Mobile hamburger */}
+          <div className="md:hidden" ref={mobileRef}>
+            <button
+              type="button"
+              onClick={toggleMobileNav}
+              className="mr-1 inline-flex h-9 w-9 items-center justify-center rounded-lg bg-white/10 ring-1 ring-white/15 hover:bg-white/15"
+              aria-label="Open menu"
+            >
+              {mobileNavOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+
+            {mobileNavOpen && (
+              <div className="absolute left-0 right-0 top-full border-t border-white/10 bg-[#0B2B5A]">
+                <div className="mx-auto max-w-6xl px-4 py-3">
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <Link href="/" onClick={closeMobileNav} className="rounded-lg px-3 py-2 hover:bg-white/10">
+                      Home
+                    </Link>
+                    <Link href="/subjects" onClick={closeMobileNav} className="rounded-lg px-3 py-2 hover:bg-white/10">
+                      Subjects
+                    </Link>
+                    <Link href="/parent" onClick={closeMobileNav} className="rounded-lg px-3 py-2 hover:bg-white/10">
+                      Parent
+                    </Link>
+                    <Link href="/about" onClick={closeMobileNav} className="rounded-lg px-3 py-2 hover:bg-white/10">
+                      About
+                    </Link>
+
+                    {isLoggedIn && (
+                      <Link href="/dashboard" onClick={closeMobileNav} className="col-span-2 rounded-lg px-3 py-2 hover:bg-white/10">
+                        Dashboard
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Auth / Account */}
           {!isLoggedIn ? (
             <>
               <Link
@@ -152,7 +277,7 @@ export default function Header() {
             <div className="relative" ref={menuRef}>
               <button
                 type="button"
-                onClick={() => setMenuOpen((v) => !v)}
+                onClick={toggleAccountMenu}
                 className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-sm font-semibold text-white ring-1 ring-white/20 hover:bg-white/20"
                 aria-label="Account menu"
               >
@@ -191,20 +316,6 @@ export default function Header() {
               )}
             </div>
           )}
-        </div>
-      </div>
-
-      <div className="border-t border-white/10 md:hidden">
-        <div className="mx-auto flex max-w-6xl items-center gap-4 overflow-x-auto px-4 py-3 text-sm">
-          <Link href="/subjects" className="whitespace-nowrap text-white/90 hover:text-white">
-            Subjects
-          </Link>
-          <Link href="/parent" className="whitespace-nowrap text-white/90 hover:text-white">
-            Parent
-          </Link>
-          <Link href="/about" className="whitespace-nowrap text-white/90 hover:text-white">
-            About
-          </Link>
         </div>
       </div>
     </header>

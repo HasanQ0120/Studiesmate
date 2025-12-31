@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { signInParentAccount, supabase } from "@/lib/auth";
 
 const CLASSES = [
   "Class 1",
@@ -16,28 +17,12 @@ const CLASSES = [
   "Class 8",
 ];
 
-const PROFILE_KEY = "studiesmate_profile";
 const SESSION_KEY = "studiesmate_session";
-
-function safeParseJSON<T>(raw: string | null): T | null {
-  try {
-    return raw ? (JSON.parse(raw) as T) : null;
-  } catch {
-    return null;
-  }
-}
-
-type StoredProfile = {
-  studentName?: string;
-  studentClass?: string;
-  className?: string; // old key support
-  password?: string;
-  parentEmail?: string;
-};
 
 export default function LoginPage() {
   const router = useRouter();
 
+  const [parentEmail, setParentEmail] = useState("");
   const [studentName, setStudentName] = useState("");
   const [studentClass, setStudentClass] = useState("");
   const [password, setPassword] = useState("");
@@ -46,51 +31,57 @@ export default function LoginPage() {
 
   const canContinue = useMemo(() => {
     return (
+      parentEmail.trim().length >= 6 &&
+      parentEmail.includes("@") &&
       studentName.trim().length >= 2 &&
       studentClass.trim().length > 0 &&
       password.trim().length >= 6
     );
-  }, [studentName, studentClass, password]);
+  }, [parentEmail, studentName, studentClass, password]);
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
 
-    const profile = safeParseJSON<StoredProfile>(localStorage.getItem(PROFILE_KEY));
-    if (!profile) {
-      setError("No profile found. Please sign up first.");
+    const { error: signInError } = await signInParentAccount({
+      parentEmail,
+      password,
+    });
+
+    if (signInError) {
+      setError(signInError.message || "Login failed.");
       return;
     }
 
-    const storedName = (profile.studentName || "").trim();
-    const storedClass = (profile.studentClass || profile.className || "").trim();
-    const storedPassword = (profile.password || "").trim();
+    const { data } = await supabase.auth.getUser();
+    const meta = (data.user?.user_metadata || {}) as {
+      studentName?: string;
+      studentClass?: string;
+      parentEmail?: string;
+    };
 
-    if (!storedPassword) {
-      setError("This profile is missing a password. Please create a new profile.");
+    const metaName = (meta.studentName || "").trim();
+    const metaClass = (meta.studentClass || "").trim();
+
+    const nameMatch =
+      metaName.toLowerCase() === studentName.trim().toLowerCase();
+    const classMatch = metaClass === studentClass.trim();
+
+    if (metaName && metaClass && (!nameMatch || !classMatch)) {
+      setError("Student name/class does not match this account.");
       return;
     }
 
-    const nameMatch = storedName.toLowerCase() === studentName.trim().toLowerCase();
-    const classMatch = storedClass === studentClass;
-    const passwordMatch = storedPassword === password.trim();
-
-    if (!nameMatch || !classMatch || !passwordMatch) {
-      setError("Incorrect name, class, or password.");
-      return;
-    }
-
+    // Keep your existing session shape for compatibility with other pages
     const session = {
-      studentName: storedName,
-      studentClass: storedClass,
-      parentEmail: (profile.parentEmail || "").trim(),
+      studentName: metaName || studentName.trim(),
+      studentClass: metaClass || studentClass.trim(),
+      parentEmail: (meta.parentEmail || parentEmail).trim(),
       loggedInAt: new Date().toISOString(),
     };
     localStorage.setItem(SESSION_KEY, JSON.stringify(session));
 
-    // Tell Header to refresh immediately
     window.dispatchEvent(new Event("studiesmate_auth_changed"));
-
     router.push("/dashboard");
   }
 
@@ -106,6 +97,19 @@ export default function LoginPage() {
           </p>
 
           <form className="mt-8 space-y-5" onSubmit={onSubmit}>
+            <div>
+              <label className="text-sm font-medium text-slate-700">
+                Parent email
+              </label>
+              <input
+                type="email"
+                value={parentEmail}
+                onChange={(e) => setParentEmail(e.target.value)}
+                placeholder="Same email used during signup"
+                className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-400"
+              />
+            </div>
+
             <div>
               <label className="text-sm font-medium text-slate-700">
                 Student name

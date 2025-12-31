@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { signUpParentAccount } from "@/lib/auth";
 
 const CLASSES = [
   "Class 1",
@@ -15,8 +16,6 @@ const CLASSES = [
   "Class 7",
   "Class 8",
 ];
-
-const PROFILE_KEY = "studiesmate_profile";
 
 function isValidEmail(email: string) {
   const e = email.trim().toLowerCase();
@@ -32,6 +31,9 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
   const canContinue = useMemo(() => {
     return (
       studentName.trim().length >= 2 &&
@@ -41,22 +43,31 @@ export default function SignupPage() {
     );
   }, [studentName, studentClass, parentEmail, password]);
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!canContinue) return;
+    if (!canContinue || submitting) return;
 
-    const profile = {
-      studentName: studentName.trim(),
-      studentClass: studentClass.trim(),
-      parentEmail: parentEmail.trim(),
-      password: password.trim(),
-      createdAt: new Date().toISOString(),
-    };
+    setError("");
+    setSubmitting(true);
 
-    localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+    const cleanEmail = parentEmail.trim().toLowerCase();
 
-    // After signup, go to login
-    router.push("/login");
+    const { error: supaError } = await signUpParentAccount({
+      parentEmail: cleanEmail,
+      password,
+      studentName,
+      studentClass,
+    });
+
+    setSubmitting(false);
+
+    if (supaError) {
+      setError(supaError.message || "Signup failed. Please try again.");
+      return;
+    }
+
+    // ✅ After signup: go to a clear "check your email" page (Option A)
+    router.push(`/auth/check-email?email=${encodeURIComponent(cleanEmail)}`);
   }
 
   return (
@@ -146,12 +157,18 @@ export default function SignupPage() {
               <p className="mt-1 text-xs text-slate-500">At least 6 characters</p>
             </div>
 
+            {error && (
+              <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
+                {error}
+              </div>
+            )}
+
             <button
               type="submit"
-              disabled={!canContinue}
+              disabled={!canContinue || submitting}
               className="mt-2 w-full rounded-xl bg-[#0B2B5A] px-5 py-3 text-sm font-semibold text-white hover:bg-[#0A2550] disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Create profile →
+              {submitting ? "Creating..." : "Create profile →"}
             </button>
 
             <div className="rounded-xl bg-slate-50 p-4 text-xs text-slate-600">
