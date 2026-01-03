@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import PageTransition from "@/components/PageTransition";
 
 export const metadata: Metadata = {
   title: "StudiesMate",
@@ -17,7 +18,9 @@ export default function RootLayout({
     <html lang="en">
       <body className="min-h-screen flex flex-col bg-[#0B2B5A] text-white">
         <Header />
-        <main className="flex-1 w-full">{children}</main>
+        <main className="flex-1 w-full">
+          <PageTransition>{children}</PageTransition>
+        </main>
         <Footer />
       </body>
     </html>

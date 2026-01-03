@@ -44,12 +44,10 @@ export default function Header() {
 
     window.addEventListener("focus", onFocus);
 
-    // Supabase auth changes
     const { data: sub } = supabase.auth.onAuthStateChange(() => {
       syncFromSupabase();
     });
 
-    // initial supabase sync
     syncFromSupabase();
 
     return () => {
@@ -58,26 +56,11 @@ export default function Header() {
     };
   }, []);
 
-  // Lock background scroll when mobile menu is open
-  useEffect(() => {
-    if (!mobileNavOpen) return;
-
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.body.style.overflow = prevOverflow;
-    };
-  }, [mobileNavOpen]);
-
   useEffect(() => {
     function onDocClick(e: MouseEvent) {
       const target = e.target as Node;
 
-      // close account dropdown if click outside
       if (menuRef.current && !menuRef.current.contains(target)) setMenuOpen(false);
-
-      // close mobile menu if click outside
       if (mobileRef.current && !mobileRef.current.contains(target)) setMobileNavOpen(false);
     }
 
@@ -85,7 +68,6 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", onDocClick);
   }, []);
 
-  // Logged in if Supabase user exists
   const isLoggedIn = useMemo(() => {
     return !!sbParentEmail;
   }, [sbParentEmail]);
@@ -118,7 +100,6 @@ export default function Header() {
   }
 
   function toggleMobileNav() {
-    // don’t open both menus together
     setMenuOpen(false);
     setMobileNavOpen((v) => !v);
   }
@@ -141,27 +122,34 @@ export default function Header() {
             Home
           </Link>
 
+          {/* Renamed: Courses -> What we offer */}
           <div className="group relative">
             <button
               type="button"
               className="flex items-center opacity-95 hover:opacity-100"
-              aria-label="Courses menu"
+              aria-label="What we offer menu"
             >
-              Courses
+              What we offer
             </button>
 
             <div className="invisible absolute left-0 mt-3 w-56 rounded-xl border border-white/15 bg-white/95 p-2 text-slate-900 shadow-lg opacity-0 backdrop-blur transition group-hover:visible group-hover:opacity-100">
               <Link
+                href="/signup"
+                className="block rounded-lg px-3 py-2 text-sm hover:bg-slate-100"
+              >
+                Start Phase 1
+              </Link>
+              <Link
                 href="/subjects"
                 className="block rounded-lg px-3 py-2 text-sm hover:bg-slate-100"
               >
-                View subjects
+                Subjects
               </Link>
               <Link
                 href="/parent"
                 className="block rounded-lg px-3 py-2 text-sm hover:bg-slate-100"
               >
-                Parent dashboard (beta)
+                Parent view (beta)
               </Link>
             </div>
           </div>
@@ -175,6 +163,7 @@ export default function Header() {
           <Link href="/parent" className="opacity-95 hover:opacity-100">
             Parent
           </Link>
+
           {isLoggedIn && (
             <Link href="/dashboard" className="opacity-95 hover:opacity-100">
               Dashboard
@@ -183,163 +172,125 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
-          {/* Mobile hamburger + mobile panel */}
+          {/* Mobile hamburger */}
           <div className="md:hidden" ref={mobileRef}>
             <button
               type="button"
               onClick={toggleMobileNav}
               className="mr-1 inline-flex h-9 w-9 items-center justify-center rounded-lg bg-white/10 ring-1 ring-white/15 hover:bg-white/15"
-              aria-label={mobileNavOpen ? "Close menu" : "Open menu"}
+              aria-label="Open menu"
             >
               {mobileNavOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
 
             {mobileNavOpen && (
-              <>
-                {/* Backdrop (below header area) */}
-                <button
-                  type="button"
-                  aria-label="Close mobile menu"
-                  onClick={closeMobileNav}
-                  className="fixed left-0 right-0 top-16 bottom-0 z-40 bg-black/35"
-                />
-
-                {/* Full-height menu panel (below header) */}
-                <div className="fixed left-0 right-0 top-16 bottom-0 z-50 overflow-y-auto bg-[#0B2B5A]">
-                  <div className="mx-auto max-w-6xl px-4 py-4">
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <Link
-                        href="/"
-                        onClick={closeMobileNav}
-                        className="rounded-lg px-3 py-2 hover:bg-white/10"
-                      >
-                        Home
-                      </Link>
-                      <Link
-                        href="/subjects"
-                        onClick={closeMobileNav}
-                        className="rounded-lg px-3 py-2 hover:bg-white/10"
-                      >
-                        Subjects
-                      </Link>
-                      <Link
-                        href="/parent"
-                        onClick={closeMobileNav}
-                        className="rounded-lg px-3 py-2 hover:bg-white/10"
-                      >
-                        Parent
-                      </Link>
-                      <Link
-                        href="/about"
-                        onClick={closeMobileNav}
-                        className="rounded-lg px-3 py-2 hover:bg-white/10"
-                      >
-                        About
-                      </Link>
-
-                      {isLoggedIn && (
-                        <Link
-                          href="/dashboard"
-                          onClick={closeMobileNav}
-                          className="col-span-2 rounded-lg px-3 py-2 hover:bg-white/10"
-                        >
-                          Dashboard
-                        </Link>
-                      )}
-
-                      {!isLoggedIn ? (
-                        <>
-                          <Link
-                            href="/login"
-                            onClick={closeMobileNav}
-                            className="col-span-2 rounded-lg px-3 py-2 hover:bg-white/10"
-                          >
-                            Log in
-                          </Link>
-                          <Link
-                            href="/signup"
-                            onClick={closeMobileNav}
-                            className="col-span-2 rounded-xl bg-white px-4 py-3 text-center text-sm font-semibold text-[#0B2B5A] hover:bg-white/95"
-                          >
-                            Start with Phase 1
-                          </Link>
-                        </>
-                      ) : null}
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-
-          {/* Auth / Account (hidden on mobile when menu open) */}
-          <div
-            className={
-              mobileNavOpen
-                ? "hidden md:flex md:items-center md:gap-2"
-                : "flex items-center gap-2"
-            }
-          >
-            {!isLoggedIn ? (
-              <>
-                <Link
-                  href="/login"
-                  className="rounded-lg px-3 py-2 text-sm font-medium text-white/90 hover:text-white"
-                >
-                  Log in
-                </Link>
-
-                <Link
-                  href="/signup"
-                  className="rounded-lg bg-white px-3 py-2 text-sm font-semibold text-[#0B2B5A] hover:bg-white/95"
-                >
-                  Start with Phase 1
-                </Link>
-              </>
-            ) : (
-              <div className="relative" ref={menuRef}>
-                <button
-                  type="button"
-                  onClick={toggleAccountMenu}
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-sm font-semibold text-white ring-1 ring-white/20 hover:bg-white/20"
-                  aria-label="Account menu"
-                >
-                  {avatarLetter}
-                </button>
-
-                {menuOpen && (
-                  <div className="absolute right-0 mt-3 w-60 rounded-xl border border-white/15 bg-white/95 p-2 text-slate-900 shadow-lg backdrop-blur">
-                    <div className="px-3 py-2">
-                      <div className="text-sm font-semibold text-slate-900">
-                        {displayName || "Student"}
-                      </div>
-                      <div className="mt-0.5 break-all text-xs text-slate-600">
-                        {displayEmail || "No parent email"}
-                      </div>
-                    </div>
-
-                    <div className="my-2 h-px bg-slate-200" />
-
+              <div className="absolute left-0 right-0 top-full border-t border-white/10 bg-[#0B2B5A]">
+                <div className="mx-auto max-w-6xl px-4 py-3">
+                  <div className="grid grid-cols-2 gap-2 text-sm">
                     <Link
-                      href="/dashboard"
-                      onClick={() => setMenuOpen(false)}
-                      className="block rounded-lg px-3 py-2 text-sm hover:bg-slate-100"
+                      href="/"
+                      onClick={closeMobileNav}
+                      className="rounded-lg px-3 py-2 hover:bg-white/10"
                     >
-                      Dashboard
+                      Home
+                    </Link>
+                    <Link
+                      href="/subjects"
+                      onClick={closeMobileNav}
+                      className="rounded-lg px-3 py-2 hover:bg-white/10"
+                    >
+                      Subjects
+                    </Link>
+                    <Link
+                      href="/parent"
+                      onClick={closeMobileNav}
+                      className="rounded-lg px-3 py-2 hover:bg-white/10"
+                    >
+                      Parent
+                    </Link>
+                    <Link
+                      href="/about"
+                      onClick={closeMobileNav}
+                      className="rounded-lg px-3 py-2 hover:bg-white/10"
+                    >
+                      About
                     </Link>
 
-                    <button
-                      type="button"
-                      onClick={handleLogout}
-                      className="mt-1 block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-slate-100"
-                    >
-                      Logout
-                    </button>
+                    {isLoggedIn && (
+                      <Link
+                        href="/dashboard"
+                        onClick={closeMobileNav}
+                        className="col-span-2 rounded-lg px-3 py-2 hover:bg-white/10"
+                      >
+                        Dashboard
+                      </Link>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
             )}
           </div>
+
+          {/* Auth / Account */}
+          {!isLoggedIn ? (
+            <>
+              <Link
+                href="/login"
+                className="rounded-lg px-3 py-2 text-sm font-medium text-white/90 hover:text-white"
+              >
+                Log in
+              </Link>
+
+              <Link
+                href="/signup"
+                className="rounded-lg bg-white px-3 py-2 text-sm font-semibold text-[#0B2B5A] hover:bg-white/95"
+              >
+                Start with Phase 1
+              </Link>
+            </>
+          ) : (
+            <div className="relative" ref={menuRef}>
+              <button
+                type="button"
+                onClick={toggleAccountMenu}
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-sm font-semibold text-white ring-1 ring-white/20 hover:bg-white/20"
+                aria-label="Account menu"
+              >
+                {avatarLetter}
+              </button>
+
+              {menuOpen && (
+                <div className="absolute right-0 mt-3 w-60 rounded-xl border border-white/15 bg-white/95 p-2 text-slate-900 shadow-lg backdrop-blur">
+                  <div className="px-3 py-2">
+                    <div className="text-sm font-semibold text-slate-900">
+                      {displayName || "Student"}
+                    </div>
+                    <div className="mt-0.5 break-all text-xs text-slate-600">
+                      {displayEmail || "No parent email"}
+                    </div>
+                  </div>
+
+                  <div className="my-2 h-px bg-slate-200" />
+
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setMenuOpen(false)}
+                    className="block rounded-lg px-3 py-2 text-sm hover:bg-slate-100"
+                  >
+                    Dashboard
+                  </Link>
+
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="mt-1 block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-slate-100"
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </header>
