@@ -58,6 +58,18 @@ export default function Header() {
     };
   }, []);
 
+  // Lock background scroll when mobile menu is open
+  useEffect(() => {
+    if (!mobileNavOpen) return;
+
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [mobileNavOpen]);
+
   useEffect(() => {
     function onDocClick(e: MouseEvent) {
       const target = e.target as Node;
@@ -66,8 +78,7 @@ export default function Header() {
       if (menuRef.current && !menuRef.current.contains(target)) setMenuOpen(false);
 
       // close mobile menu if click outside
-      if (mobileRef.current && !mobileRef.current.contains(target))
-        setMobileNavOpen(false);
+      if (mobileRef.current && !mobileRef.current.contains(target)) setMobileNavOpen(false);
     }
 
     document.addEventListener("mousedown", onDocClick);
@@ -172,7 +183,7 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
-          {/* Mobile hamburger */}
+          {/* Mobile hamburger + mobile panel */}
           <div className="md:hidden" ref={mobileRef}>
             <button
               type="button"
@@ -180,83 +191,95 @@ export default function Header() {
               className="mr-1 inline-flex h-9 w-9 items-center justify-center rounded-lg bg-white/10 ring-1 ring-white/15 hover:bg-white/15"
               aria-label={mobileNavOpen ? "Close menu" : "Open menu"}
             >
-              {mobileNavOpen ? (
-                <X className="h-5 w-5" />
-              ) : (
-                <Menu className="h-5 w-5" />
-              )}
+              {mobileNavOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
 
             {mobileNavOpen && (
-              <div className="absolute left-0 right-0 top-full border-t border-white/10 bg-[#0B2B5A]">
-                <div className="mx-auto max-w-6xl px-4 py-3">
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <Link
-                      href="/"
-                      onClick={closeMobileNav}
-                      className="rounded-lg px-3 py-2 hover:bg-white/10"
-                    >
-                      Home
-                    </Link>
-                    <Link
-                      href="/subjects"
-                      onClick={closeMobileNav}
-                      className="rounded-lg px-3 py-2 hover:bg-white/10"
-                    >
-                      Subjects
-                    </Link>
-                    <Link
-                      href="/parent"
-                      onClick={closeMobileNav}
-                      className="rounded-lg px-3 py-2 hover:bg-white/10"
-                    >
-                      Parent
-                    </Link>
-                    <Link
-                      href="/about"
-                      onClick={closeMobileNav}
-                      className="rounded-lg px-3 py-2 hover:bg-white/10"
-                    >
-                      About
-                    </Link>
+              <>
+                {/* Backdrop (below header area) */}
+                <button
+                  type="button"
+                  aria-label="Close mobile menu"
+                  onClick={closeMobileNav}
+                  className="fixed left-0 right-0 top-16 bottom-0 z-40 bg-black/35"
+                />
 
-                    {isLoggedIn && (
+                {/* Full-height menu panel (below header) */}
+                <div className="fixed left-0 right-0 top-16 bottom-0 z-50 overflow-y-auto bg-[#0B2B5A]">
+                  <div className="mx-auto max-w-6xl px-4 py-4">
+                    <div className="grid grid-cols-2 gap-2 text-sm">
                       <Link
-                        href="/dashboard"
+                        href="/"
                         onClick={closeMobileNav}
-                        className="col-span-2 rounded-lg px-3 py-2 hover:bg-white/10"
+                        className="rounded-lg px-3 py-2 hover:bg-white/10"
                       >
-                        Dashboard
+                        Home
                       </Link>
-                    )}
+                      <Link
+                        href="/subjects"
+                        onClick={closeMobileNav}
+                        className="rounded-lg px-3 py-2 hover:bg-white/10"
+                      >
+                        Subjects
+                      </Link>
+                      <Link
+                        href="/parent"
+                        onClick={closeMobileNav}
+                        className="rounded-lg px-3 py-2 hover:bg-white/10"
+                      >
+                        Parent
+                      </Link>
+                      <Link
+                        href="/about"
+                        onClick={closeMobileNav}
+                        className="rounded-lg px-3 py-2 hover:bg-white/10"
+                      >
+                        About
+                      </Link>
 
-                    {/* Optional: mobile-only auth buttons inside the menu */}
-                    {!isLoggedIn ? (
-                      <>
+                      {isLoggedIn && (
                         <Link
-                          href="/login"
+                          href="/dashboard"
                           onClick={closeMobileNav}
                           className="col-span-2 rounded-lg px-3 py-2 hover:bg-white/10"
                         >
-                          Log in
+                          Dashboard
                         </Link>
-                        <Link
-                          href="/signup"
-                          onClick={closeMobileNav}
-                          className="col-span-2 rounded-lg bg-white px-3 py-2 font-semibold text-[#0B2B5A]"
-                        >
-                          Start with Phase 1
-                        </Link>
-                      </>
-                    ) : null}
+                      )}
+
+                      {!isLoggedIn ? (
+                        <>
+                          <Link
+                            href="/login"
+                            onClick={closeMobileNav}
+                            className="col-span-2 rounded-lg px-3 py-2 hover:bg-white/10"
+                          >
+                            Log in
+                          </Link>
+                          <Link
+                            href="/signup"
+                            onClick={closeMobileNav}
+                            className="col-span-2 rounded-xl bg-white px-4 py-3 text-center text-sm font-semibold text-[#0B2B5A] hover:bg-white/95"
+                          >
+                            Start with Phase 1
+                          </Link>
+                        </>
+                      ) : null}
+                    </div>
                   </div>
                 </div>
-              </div>
+              </>
             )}
           </div>
 
-          {/* Auth / Account (hide on mobile when hamburger is open) */}
-          <div className={mobileNavOpen ? "hidden md:flex md:items-center md:gap-2" : "flex items-center gap-2"}>
+          {/* Auth / Account (hidden on mobile when menu open) */}
+          <div
+            className={
+              mobileNavOpen
+                ? "hidden md:flex md:items-center md:gap-2"
+                : "flex items-center gap-2"
+            }
+          >
             {!isLoggedIn ? (
               <>
                 <Link
