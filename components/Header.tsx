@@ -66,7 +66,8 @@ export default function Header() {
       if (menuRef.current && !menuRef.current.contains(target)) setMenuOpen(false);
 
       // close mobile menu if click outside
-      if (mobileRef.current && !mobileRef.current.contains(target)) setMobileNavOpen(false);
+      if (mobileRef.current && !mobileRef.current.contains(target))
+        setMobileNavOpen(false);
     }
 
     document.addEventListener("mousedown", onDocClick);
@@ -177,9 +178,13 @@ export default function Header() {
               type="button"
               onClick={toggleMobileNav}
               className="mr-1 inline-flex h-9 w-9 items-center justify-center rounded-lg bg-white/10 ring-1 ring-white/15 hover:bg-white/15"
-              aria-label="Open menu"
+              aria-label={mobileNavOpen ? "Close menu" : "Open menu"}
             >
-              {mobileNavOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {mobileNavOpen ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Menu className="h-5 w-5" />
+              )}
             </button>
 
             {mobileNavOpen && (
@@ -224,73 +229,94 @@ export default function Header() {
                         Dashboard
                       </Link>
                     )}
+
+                    {/* Optional: mobile-only auth buttons inside the menu */}
+                    {!isLoggedIn ? (
+                      <>
+                        <Link
+                          href="/login"
+                          onClick={closeMobileNav}
+                          className="col-span-2 rounded-lg px-3 py-2 hover:bg-white/10"
+                        >
+                          Log in
+                        </Link>
+                        <Link
+                          href="/signup"
+                          onClick={closeMobileNav}
+                          className="col-span-2 rounded-lg bg-white px-3 py-2 font-semibold text-[#0B2B5A]"
+                        >
+                          Start with Phase 1
+                        </Link>
+                      </>
+                    ) : null}
                   </div>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Auth / Account */}
-          {!isLoggedIn ? (
-            <>
-              <Link
-                href="/login"
-                className="rounded-lg px-3 py-2 text-sm font-medium text-white/90 hover:text-white"
-              >
-                Log in
-              </Link>
+          {/* Auth / Account (hide on mobile when hamburger is open) */}
+          <div className={mobileNavOpen ? "hidden md:flex md:items-center md:gap-2" : "flex items-center gap-2"}>
+            {!isLoggedIn ? (
+              <>
+                <Link
+                  href="/login"
+                  className="rounded-lg px-3 py-2 text-sm font-medium text-white/90 hover:text-white"
+                >
+                  Log in
+                </Link>
 
-              {/* Only change: button text */}
-              <Link
-                href="/signup"
-                className="rounded-lg bg-white px-3 py-2 text-sm font-semibold text-[#0B2B5A] hover:bg-white/95"
-              >
-                Start with Phase 1
-              </Link>
-            </>
-          ) : (
-            <div className="relative" ref={menuRef}>
-              <button
-                type="button"
-                onClick={toggleAccountMenu}
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-sm font-semibold text-white ring-1 ring-white/20 hover:bg-white/20"
-                aria-label="Account menu"
-              >
-                {avatarLetter}
-              </button>
+                <Link
+                  href="/signup"
+                  className="rounded-lg bg-white px-3 py-2 text-sm font-semibold text-[#0B2B5A] hover:bg-white/95"
+                >
+                  Start with Phase 1
+                </Link>
+              </>
+            ) : (
+              <div className="relative" ref={menuRef}>
+                <button
+                  type="button"
+                  onClick={toggleAccountMenu}
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-sm font-semibold text-white ring-1 ring-white/20 hover:bg-white/20"
+                  aria-label="Account menu"
+                >
+                  {avatarLetter}
+                </button>
 
-              {menuOpen && (
-                <div className="absolute right-0 mt-3 w-60 rounded-xl border border-white/15 bg-white/95 p-2 text-slate-900 shadow-lg backdrop-blur">
-                  <div className="px-3 py-2">
-                    <div className="text-sm font-semibold text-slate-900">
-                      {displayName || "Student"}
+                {menuOpen && (
+                  <div className="absolute right-0 mt-3 w-60 rounded-xl border border-white/15 bg-white/95 p-2 text-slate-900 shadow-lg backdrop-blur">
+                    <div className="px-3 py-2">
+                      <div className="text-sm font-semibold text-slate-900">
+                        {displayName || "Student"}
+                      </div>
+                      <div className="mt-0.5 break-all text-xs text-slate-600">
+                        {displayEmail || "No parent email"}
+                      </div>
                     </div>
-                    <div className="mt-0.5 text-xs text-slate-600 break-all">
-                      {displayEmail || "No parent email"}
-                    </div>
+
+                    <div className="my-2 h-px bg-slate-200" />
+
+                    <Link
+                      href="/dashboard"
+                      onClick={() => setMenuOpen(false)}
+                      className="block rounded-lg px-3 py-2 text-sm hover:bg-slate-100"
+                    >
+                      Dashboard
+                    </Link>
+
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="mt-1 block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-slate-100"
+                    >
+                      Logout
+                    </button>
                   </div>
-
-                  <div className="my-2 h-px bg-slate-200" />
-
-                  <Link
-                    href="/dashboard"
-                    onClick={() => setMenuOpen(false)}
-                    className="block rounded-lg px-3 py-2 text-sm hover:bg-slate-100"
-                  >
-                    Dashboard
-                  </Link>
-
-                  <button
-                    type="button"
-                    onClick={handleLogout}
-                    className="mt-1 block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-slate-100"
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>
