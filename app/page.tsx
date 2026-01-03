@@ -1,6 +1,17 @@
 import Link from "next/link";
 import Image from "next/image";
 
+const SUBJECT_PREVIEW = [
+  "Math",
+  "English",
+  "Science",
+  "Urdu (Support)",
+  "Islamiyat",
+  "Computer",
+  "General Knowledge",
+  "More...",
+];
+
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-white text-slate-900">
@@ -40,6 +51,22 @@ export default function HomePage() {
 
             <div className="mt-6 inline-flex rounded-lg bg-white/10 px-3 py-2 text-xs text-white/80">
               No ads • Calm experience • Guided learning
+            </div>
+
+            {/* Proof strip (small, no layout shift) */}
+            <div className="mt-4 flex flex-wrap gap-2">
+              <span className="rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs text-white/85">
+                Parent-friendly
+              </span>
+              <span className="rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs text-white/85">
+                Urdu + English support
+              </span>
+              <span className="rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs text-white/85">
+                Short daily lessons
+              </span>
+              <span className="rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs text-white/85">
+                Phase 1 (Foundation)
+              </span>
             </div>
           </div>
         </div>
@@ -261,6 +288,18 @@ export default function HomePage() {
             </Link>
           </div>
 
+          {/* Subject preview (small add, no section re-order) */}
+          <div className="mt-5 flex flex-wrap gap-2">
+            {SUBJECT_PREVIEW.map((s) => (
+              <span
+                key={s}
+                className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-700"
+              >
+                {s}
+              </span>
+            ))}
+          </div>
+
           <div className="mt-8">
             <div className="rounded-2xl border border-white/15 bg-[#0B2B5A] p-7 text-white md:flex md:items-center md:justify-between">
               <div className="max-w-2xl">
@@ -277,7 +316,7 @@ export default function HomePage() {
                   href="/signup"
                   className="inline-flex rounded-xl bg-white px-5 py-3 text-sm font-semibold text-[#0B2B5A] hover:bg-white/95"
                 >
-                  Start with Phase 1
+                  Get started
                 </Link>
                 <Link
                   href="/subjects"
