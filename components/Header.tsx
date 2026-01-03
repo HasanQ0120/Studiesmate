@@ -239,11 +239,13 @@ export default function Header() {
               >
                 Log in
               </Link>
+
+              {/* Only change: button text */}
               <Link
                 href="/signup"
                 className="rounded-lg bg-white px-3 py-2 text-sm font-semibold text-[#0B2B5A] hover:bg-white/95"
               >
-                Sign up
+                Start with Phase 1
               </Link>
             </>
           ) : (

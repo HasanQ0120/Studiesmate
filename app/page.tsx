@@ -13,14 +13,14 @@ export default function HomePage() {
             </p>
 
             <h1 className="mt-4 text-4xl font-semibold leading-tight tracking-tight md:text-5xl">
-              Calm learning for students, <br className="hidden md:block" />
-              peace of mind for parents
+              Smart learning for school students,
+              <br className="hidden md:block" />
+              without stress.
             </h1>
 
             <p className="mt-5 text-base leading-7 text-white/85 md:text-lg">
-              Short lessons and smart practice to build real understanding without
-              stress. The experience is bilingual (English + Urdu) so students don’t
-              get stuck because of language.
+              StudiesMate helps students practice daily with simple, bilingual
+              lessons while parents stay informed and confident.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -28,7 +28,7 @@ export default function HomePage() {
                 href="/signup"
                 className="rounded-xl bg-white px-5 py-3 text-sm font-semibold text-[#0B2B5A] hover:bg-white/95"
               >
-                Get started
+                Start with Phase 1
               </Link>
               <Link
                 href="/subjects"
@@ -52,8 +52,8 @@ export default function HomePage() {
             <div>
               <h2 className="text-xl font-semibold">How it works</h2>
               <p className="mt-2 max-w-2xl text-sm text-slate-700">
-                A simple routine students can follow daily. Clear steps, small effort,
-                steady progress.
+                A simple routine students can follow daily. Clear steps, small
+                effort, steady progress.
               </p>
             </div>
           </div>
@@ -65,7 +65,8 @@ export default function HomePage() {
                 Choose a subject
               </div>
               <p className="mt-2 text-sm leading-6 text-slate-700">
-                Start with what feels difficult today. Keep it focused and manageable.
+                Start with what feels difficult today. Keep it focused and
+                manageable.
               </p>
             </div>
 
@@ -85,33 +86,25 @@ export default function HomePage() {
                 Practice and improve
               </div>
               <p className="mt-2 text-sm leading-6 text-slate-700">
-                Quick checks build confidence and make progress visible over time.
+                Quick checks build confidence and make progress visible over
+                time.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* VISION + MISSION (White) - STACKED */}
+      {/* VISION (MERGED) */}
       <section className="bg-white">
         <div className="mx-auto max-w-6xl px-4 py-14">
-          <div className="space-y-6">
-            <div className="rounded-2xl border border-slate-200 p-6">
-              <h2 className="text-lg font-semibold">StudiesMate Vision</h2>
-              <p className="mt-3 text-sm leading-6 text-slate-700">
-                Make learning feel clear, calm, and consistent for every student, so
-                progress becomes a habit, not a struggle.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-slate-200 p-6">
-              <h2 className="text-lg font-semibold">Our Mission</h2>
-              <p className="mt-3 text-sm leading-6 text-slate-700">
-                Give students a simple path: understand the concept, practice it
-                briefly, and build confidence. Keep the experience safe and
-                parent-friendly from day one.
-              </p>
-            </div>
+          <div className="max-w-3xl rounded-2xl border border-slate-200 bg-white p-7">
+            <h2 className="text-lg font-semibold">Our vision</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-700">
+              StudiesMate is built to make learning clear, calm, and consistent.
+              Students understand concepts, practice briefly, and build
+              confidence without stress. The experience stays safe, focused, and
+              parent-friendly from day one.
+            </p>
           </div>
         </div>
       </section>
@@ -130,9 +123,12 @@ export default function HomePage() {
 
               <div className="mt-8 space-y-4">
                 <div className="rounded-2xl border border-white/15 bg-white/10 p-6">
-                  <h4 className="text-lg font-semibold md:text-xl">Clarity first</h4>
+                  <h4 className="text-lg font-semibold md:text-xl">
+                    Clarity first
+                  </h4>
                   <p className="mt-2 text-sm leading-6 text-white/80 md:text-base">
-                    Short explanations that focus on understanding, not memorizing.
+                    Short explanations that focus on understanding, not
+                    memorizing.
                   </p>
                 </div>
 
@@ -141,15 +137,19 @@ export default function HomePage() {
                     Practice that builds confidence
                   </h4>
                   <p className="mt-2 text-sm leading-6 text-white/80 md:text-base">
-                    Small checks that reinforce learning without overwhelming students.
+                    Small checks that reinforce learning without overwhelming
+                    students.
                   </p>
                 </div>
 
                 <div className="rounded-2xl border border-white/15 bg-white/10 p-6">
-                  <h4 className="text-lg font-semibold md:text-xl">Bilingual support</h4>
+                  <h4 className="text-lg font-semibold md:text-xl">
+                    Bilingual support
+                  </h4>
                   <p className="mt-2 text-sm leading-6 text-white/80 md:text-base">
-                    Help in Urdu and English so students don’t get stuck because of
-                    language. Urdu is support language here, not a separate subject.
+                    Help in Urdu and English so students don’t get stuck because
+                    of language. Urdu is support language here, not a separate
+                    subject.
                   </p>
                 </div>
               </div>
@@ -178,14 +178,23 @@ export default function HomePage() {
             <div>
               <h3 className="text-xl font-semibold">Phase 1 (Foundation)</h3>
               <p className="mt-2 max-w-2xl text-sm text-slate-700">
-                We are building trust first. Everything stays controlled and simple.
+                We are building trust first. Everything stays controlled and
+                simple.
               </p>
             </div>
           </div>
 
           <div className="mt-8 grid gap-5 md:grid-cols-3">
-            <Stat label="Core subjects" value="10" note="Math, English, Science & more" />
-            <Stat label="Learning style" value="Short" note="Daily-friendly lessons" />
+            <Stat
+              label="Core subjects"
+              value="10"
+              note="Math, English, Science & more"
+            />
+            <Stat
+              label="Learning style"
+              value="Short"
+              note="Daily-friendly lessons"
+            />
             <Stat label="AI usage" value="Limited" note="Guided, not unlimited" />
           </div>
         </div>
@@ -210,25 +219,25 @@ export default function HomePage() {
             </div>
 
             <div className="rounded-2xl border border-white/15 bg-white/10 p-6">
-              <h4 className="text-lg font-semibold md:text-xl">No ads, no distractions</h4>
+              <h4 className="text-lg font-semibold md:text-xl">
+                No ads, no distractions
+              </h4>
               <p className="mt-2 text-sm leading-6 text-white/80 md:text-base">
                 A clean experience that helps students focus on learning.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-white/15 bg-white/10 p-6">
-              <h4 className="text-lg font-semibold md:text-xl">Step-by-step progress</h4>
-              <p className="mt-2 text-sm leading-6 text-white/80 md:text-base">
-                Understand → practice → improve, consistently.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-white/15 bg-white/10 p-6">
-              <h4 className="text-lg font-semibold md:text-xl">Bilingual support</h4>
-              <p className="mt-2 text-sm leading-6 text-white/80 md:text-base">
-                Help is available in English and Urdu so language doesn’t block learning.
-                Urdu is support language, not a subject track.
-              </p>
+            {/* Card 3 - centered under the first two (no other layout changes) */}
+            <div className="md:col-span-2 flex justify-center">
+              <div className="w-full max-w-3xl rounded-2xl border border-white/15 bg-white/10 p-6">
+                <h4 className="text-lg font-semibold md:text-xl">
+                  Bilingual support
+                </h4>
+                <p className="mt-2 text-sm leading-6 text-white/80 md:text-base">
+                  Help is available in English and Urdu so language doesn’t block
+                  learning. Urdu is support language, not a subject track.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -255,10 +264,12 @@ export default function HomePage() {
           <div className="mt-8">
             <div className="rounded-2xl border border-white/15 bg-[#0B2B5A] p-7 text-white md:flex md:items-center md:justify-between">
               <div className="max-w-2xl">
-                <h3 className="text-xl font-semibold">Start with calm, consistent learning</h3>
+                <h3 className="text-xl font-semibold">
+                  Start with calm, consistent learning
+                </h3>
                 <p className="mt-2 text-sm leading-6 text-white/80">
-                  Try Phase 1 and help us spot confusion. We’re building trust and clarity
-                  first.
+                  Try Phase 1 and help us spot confusion. We’re building trust
+                  and clarity first.
                 </p>
               </div>
               <div className="mt-5 flex flex-wrap gap-3 md:mt-0">
@@ -266,7 +277,7 @@ export default function HomePage() {
                   href="/signup"
                   className="inline-flex rounded-xl bg-white px-5 py-3 text-sm font-semibold text-[#0B2B5A] hover:bg-white/95"
                 >
-                  Get started
+                  Start with Phase 1
                 </Link>
                 <Link
                   href="/subjects"
@@ -287,8 +298,8 @@ export default function HomePage() {
             <div className="max-w-2xl">
               <h3 className="text-xl font-semibold">For Parents (Beta)</h3>
               <p className="mt-2 text-sm leading-6 text-slate-700">
-                A simple preview to help parents understand progress and support daily
-                learning. This expands after Phase 1 stabilizes.
+                A simple preview to help parents understand progress and support
+                daily learning. This expands after Phase 1 stabilizes.
               </p>
             </div>
             <div className="mt-5 md:mt-0">
