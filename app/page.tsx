@@ -40,7 +40,7 @@ export default function HomePage() {
                 href="/signup"
                 className="rounded-xl bg-white px-5 py-3 text-sm font-semibold text-[#0B2B5A] transition-all duration-200 hover:bg-white/95 hover:-translate-y-0.5 active:translate-y-0"
               >
-                Start with Phase 1
+                Start Phase 1 (Free Beta)
               </Link>
               <Link
                 href="/subjects"
@@ -51,7 +51,7 @@ export default function HomePage() {
             </div>
 
             <div className="mt-6 inline-flex rounded-lg bg-white/10 px-3 py-2 text-xs text-white/80 transition-colors duration-200 hover:bg-white/15">
-              No ads • Calm experience • Guided learning
+              Early Access (Beta) • No ads • Calm experience
             </div>
 
             {/* Proof strip (small, no layout shift) */}
@@ -60,7 +60,7 @@ export default function HomePage() {
                 "Parent-friendly",
                 "Urdu + English support",
                 "Short daily lessons",
-                "Phase 1 (Foundation)",
+                "Phase 1 (Beta)",
               ].map((t) => (
                 <span
                   key={t}
@@ -213,13 +213,13 @@ export default function HomePage() {
 
             <div className="mt-8 grid gap-5 md:grid-cols-3">
               <Reveal delayMs={0}>
-                <Stat label="Core subjects" value="10" note="Math, English, Science & more" />
+                <Stat label="Core subjects" value="9" note="Math, English, Science & more" />
               </Reveal>
               <Reveal delayMs={80}>
                 <Stat label="Learning style" value="Short" note="Daily-friendly lessons" />
               </Reveal>
               <Reveal delayMs={160}>
-                <Stat label="AI usage" value="Limited" note="Guided, not unlimited" />
+                <Stat label="AI usage" value="Off" note="AI is disabled in Phase 1 beta" />
               </Reveal>
             </div>
           </Reveal>
@@ -314,8 +314,8 @@ export default function HomePage() {
                     Start with calm, consistent learning
                   </h3>
                   <p className="mt-2 text-sm leading-6 text-white/80">
-                    Try Phase 1 and help us spot confusion. We’re building trust
-                    and clarity first.
+                    Try Phase 1 (free beta) and help us spot confusion. We’re building
+                    trust and clarity first.
                   </p>
                 </div>
                 <div className="mt-5 flex flex-wrap gap-3 md:mt-0">
@@ -346,8 +346,8 @@ export default function HomePage() {
               <div className="max-w-2xl">
                 <h3 className="text-xl font-semibold">For Parents (Beta)</h3>
                 <p className="mt-2 text-sm leading-6 text-slate-700">
-                  A simple preview to help parents understand progress and support
-                  daily learning. This expands after Phase 1 stabilizes.
+                  A simple preview to help parents see learning activity. This expands
+                  after Phase 1 stabilizes.
                 </p>
               </div>
               <div className="mt-5 md:mt-0">
