@@ -13,28 +13,26 @@ export default function AboutPrivacyPage() {
 
         <Reveal delayMs={80}>
           <p className="mt-4 text-sm leading-6 text-slate-700">
-            StudiesMate is designed to make learning calm, focused, and
-            understandable for school students. The goal is simple: reduce
-            confusion, remove pressure, and help students build confidence through
-            clear explanations and structured practice.
+            StudiesMate is built to make learning calm, focused, and easy to
+            understand for school students. The goal is simple: reduce confusion,
+            remove pressure, and help students build confidence through clear
+            explanations and structured practice.
           </p>
         </Reveal>
 
         <Reveal delayMs={140}>
           <p className="mt-4 text-sm leading-6 text-slate-700">
             Many students struggle not because they lack ability, but because
-            learning feels overwhelming. StudiesMate aims to change that by
-            keeping lessons simple, progress visible, and the experience
-            distraction-free.
+            learning feels overwhelming. StudiesMate keeps lessons simple,
+            progress visible, and the overall experience distraction-free.
           </p>
         </Reveal>
 
         <Reveal delayMs={200}>
           <p className="mt-4 text-sm leading-6 text-slate-700">
             StudiesMate follows a bilingual learning approach. Concepts are
-            explained in both English and Urdu so students can understand ideas
-            clearly in the language they are most comfortable with, without
-            feeling stuck or left behind.
+            explained in English with Urdu support, so students can understand
+            ideas clearly without feeling stuck because of language.
           </p>
         </Reveal>
 
@@ -56,7 +54,10 @@ export default function AboutPrivacyPage() {
             <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-700">
               <li>No advertisements or hidden distractions</li>
               <li>No selling or sharing of user data</li>
-              <li>Only minimal information is stored, locally during Phase 1</li>
+              <li>
+                Only essential account and learning-related information is stored
+                during Phase 1
+              </li>
               <li>AI features are limited, guided, and education-focused</li>
             </ul>
           </div>

@@ -62,8 +62,6 @@ function SubjectsPageInner() {
 
   const [selectedClass, setSelectedClass] = useState("");
   const [hydrated, setHydrated] = useState(false);
-
-  // ✅ Load selected immediately (prevents "wipe old ones" bug)
   const [selected, setSelected] = useState<string[]>(() => readSelectedFromStorage());
 
   useEffect(() => {
@@ -84,7 +82,6 @@ function SubjectsPageInner() {
     } catch {}
   }, [sp]);
 
-  // ✅ Only write AFTER hydration, so we never overwrite existing selection accidentally
   useEffect(() => {
     if (!hydrated) return;
     try {
@@ -106,12 +103,12 @@ function SubjectsPageInner() {
     return selected.some((x) => normalizeTitle(x) === key);
   }
 
-  // optional: show selected in stable order (same as SUBJECTS order)
   const selectedSorted = useMemo(() => {
     const order = new Map(SUBJECTS.map((s, i) => [normalizeTitle(s.title), i]));
     return [...selected].sort(
       (a, b) =>
-        (order.get(normalizeTitle(a)) ?? 999) - (order.get(normalizeTitle(b)) ?? 999)
+        (order.get(normalizeTitle(a)) ?? 999) -
+        (order.get(normalizeTitle(b)) ?? 999)
     );
   }, [selected]);
 
@@ -126,13 +123,18 @@ function SubjectsPageInner() {
             <p className="mt-2 text-sm text-slate-600">
               Select the subjects you want. You can change this anytime.
             </p>
+
+            {/* ✅ Added line as requested */}
+            <p className="mt-3 text-sm text-slate-600">
+              <span className="font-semibold">Phase 1 note:</span> Each subject includes 3 core
+              chapters with quizzes. More chapters will be added gradually.
+            </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
             <Link
               href="/dashboard"
               className="inline-flex w-fit items-center justify-center rounded-xl bg-[#0B2B5A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0A2550]"
-              title="Go to dashboard"
             >
               Continue →
             </Link>
@@ -160,7 +162,6 @@ function SubjectsPageInner() {
                       : "border-slate-200 bg-white text-slate-600"
                   }`}
                   aria-disabled="true"
-                  title="Class is selected during login"
                 >
                   {g}
                 </button>
@@ -186,7 +187,9 @@ function SubjectsPageInner() {
 
             <div className="text-sm text-slate-700">
               Selected:{" "}
-              <span className="font-semibold text-slate-900">{selected.length}</span>
+              <span className="font-semibold text-slate-900">
+                {selected.length}
+              </span>
             </div>
           </div>
 
@@ -202,7 +205,6 @@ function SubjectsPageInner() {
                     type="button"
                     onClick={() => toggleSubject(t)}
                     className="rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-50"
-                    title="Remove"
                   >
                     Remove
                   </button>
@@ -238,7 +240,6 @@ function SubjectsPageInner() {
                         ? "border-[#0B2B5A] bg-[#0B2B5A] text-white"
                         : "border-slate-200 bg-white text-slate-300"
                     }`}
-                    aria-hidden
                   >
                     ✓
                   </div>
@@ -267,7 +268,9 @@ function SubjectsPageInner() {
 
                   <span
                     className={`rounded-xl px-3 py-2 text-xs font-semibold ${
-                      chosen ? "bg-[#0B2B5A] text-white" : "bg-slate-100 text-slate-700"
+                      chosen
+                        ? "bg-[#0B2B5A] text-white"
+                        : "bg-slate-100 text-slate-700"
                     }`}
                   >
                     {chosen ? "Selected ✓" : "Select"}

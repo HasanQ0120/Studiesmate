@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/lib/auth";
+import Reveal from "@/components/Reveal";
 
 type SbMeta = {
   studentName?: string;
@@ -19,7 +20,9 @@ export default function FeedbackPage() {
   const [screenshot, setScreenshot] = useState<File | null>(null);
   const [fileError, setFileError] = useState("");
 
-  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">(
+    "idle"
+  );
   const [error, setError] = useState("");
 
   const fileInputId = "feedback-screenshot";
@@ -73,7 +76,9 @@ export default function FeedbackPage() {
   async function uploadScreenshot(file: File) {
     const ext = file.name.split(".").pop()?.toLowerCase() || "png";
     const safeExt = ["png", "jpg", "jpeg", "webp"].includes(ext) ? ext : "png";
-    const path = `feedback/${Date.now()}-${Math.random().toString(16).slice(2)}.${safeExt}`;
+    const path = `feedback/${Date.now()}-${Math.random()
+      .toString(16)
+      .slice(2)}.${safeExt}`;
 
     const { error: upErr } = await supabase.storage
       .from("feedback-screenshots")
@@ -85,7 +90,9 @@ export default function FeedbackPage() {
 
     if (upErr) throw upErr;
 
-    const { data } = supabase.storage.from("feedback-screenshots").getPublicUrl(path);
+    const { data } = supabase.storage
+      .from("feedback-screenshots")
+      .getPublicUrl(path);
     return data.publicUrl;
   }
 
@@ -128,93 +135,100 @@ export default function FeedbackPage() {
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-6xl px-4 py-16">
-        <div className="mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 text-slate-900 shadow-sm">
-          <div className="flex items-center justify-between gap-3">
-            <h1 className="text-xl font-semibold tracking-tight">Feedback</h1>
-            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-              Beta
-            </span>
-          </div>
-
-          <p className="mt-2 text-sm text-slate-600">
-            Tell us what’s confusing, broken, missing, or annoying. Short and specific feedback is best.
-          </p>
-
-          <div className="mt-6">
-            <label className="text-sm font-medium text-slate-800">
-              Your feedback (min 10 characters)
-            </label>
-            <textarea
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              rows={6}
-              placeholder="Example: Subjects page takes too long to load on mobile..."
-              className="mt-2 w-full rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-slate-200"
-            />
-          </div>
-
-          {/* Screenshot upload (styled like the Submit button) */}
-          <div className="mt-6">
-            <p className="text-sm font-medium text-slate-800">Optional screenshot</p>
-
-            <input
-              ref={fileInputRef}
-              id={fileInputId}
-              type="file"
-              accept="image/png,image/jpeg,image/webp"
-              onChange={handlePickFile}
-              className="sr-only"
-            />
-
-            <div className="mt-2 flex flex-wrap items-center gap-3">
-              <label
-                htmlFor={fileInputId}
-                className="cursor-pointer rounded-xl bg-[#0B2B5A] px-4 py-2 text-sm font-semibold text-white"
-              >
-                Choose image
-              </label>
-
-              <span className="text-sm text-slate-600">
-                {screenshot ? screenshot.name : "No file chosen"}
+        <Reveal>
+          <div className="mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 text-slate-900 shadow-sm">
+            <div className="flex items-center justify-between gap-3">
+              <h1 className="text-xl font-semibold tracking-tight">Feedback</h1>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                Beta
               </span>
-
-              {screenshot && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setScreenshot(null);
-                    setFileError("");
-                    if (fileInputRef.current) fileInputRef.current.value = "";
-                  }}
-                  className="text-sm font-semibold text-slate-700 underline"
-                >
-                  Remove
-                </button>
-              )}
             </div>
 
-            <p className="mt-2 text-xs text-slate-500">
-              Optional. Upload one screenshot (PNG/JPG/WebP, max 5MB). Please avoid sharing passwords,
-              phone numbers, or private information.
+            <p className="mt-2 text-sm text-slate-600">
+              Tell us what’s confusing, broken, missing, or annoying. Short and
+              specific feedback is best.
             </p>
 
-            {fileError && <p className="mt-2 text-sm text-red-600">{fileError}</p>}
-          </div>
+            <div className="mt-6">
+              <label className="text-sm font-medium text-slate-800">
+                Your feedback (min 10 characters)
+              </label>
+              <textarea
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                rows={6}
+                placeholder="Example: Subjects page takes too long to load on mobile..."
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-slate-200"
+              />
+            </div>
 
-          {status === "error" && <p className="mt-3 text-sm text-red-600">{error}</p>}
-          {status === "sent" && <p className="mt-3 text-sm text-green-700">Feedback sent. Thanks.</p>}
+            {/* Screenshot upload (styled like the Submit button) */}
+            <div className="mt-6">
+              <p className="text-sm font-medium text-slate-800">
+                Optional screenshot
+              </p>
 
-          <div className="mt-5">
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={!canSend}
-              className="rounded-xl bg-[#0B2B5A] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
-            >
-              {status === "sending" ? "Sending..." : "Submit feedback"}
-            </button>
+              <input
+                ref={fileInputRef}
+                id={fileInputId}
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                onChange={handlePickFile}
+                className="sr-only"
+              />
+
+              <div className="mt-2 flex flex-wrap items-center gap-3">
+                <label
+                  htmlFor={fileInputId}
+                  className="cursor-pointer rounded-xl bg-[#0B2B5A] px-4 py-2 text-sm font-semibold text-white"
+                >
+                  Choose image
+                </label>
+
+                <span className="text-sm text-slate-600">
+                  {screenshot ? screenshot.name : "No file chosen"}
+                </span>
+
+                {screenshot && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setScreenshot(null);
+                      setFileError("");
+                      if (fileInputRef.current) fileInputRef.current.value = "";
+                    }}
+                    className="text-sm font-semibold text-slate-700 underline"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+
+              <p className="mt-2 text-xs text-slate-500">
+                Optional. Upload one screenshot (PNG/JPG/WebP, max 5MB). Please
+                avoid sharing passwords, phone numbers, or private information.
+              </p>
+
+              {fileError && <p className="mt-2 text-sm text-red-600">{fileError}</p>}
+            </div>
+
+            {status === "error" && <p className="mt-3 text-sm text-red-600">{error}</p>}
+            {status === "sent" && (
+              <p className="mt-3 text-sm text-green-700">Feedback sent. Thanks.</p>
+            )}
+
+            <div className="mt-5">
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={!canSend}
+                className="rounded-xl bg-[#0B2B5A] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+              >
+                {status === "sending" ? "Sending..." : "Submit feedback"}
+              </button>
+            </div>
           </div>
-        </div>
+        </Reveal>
       </div>
     </div>
   );
