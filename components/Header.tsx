@@ -122,37 +122,13 @@ export default function Header() {
             Home
           </Link>
 
-          {/* Renamed: Courses -> What we offer */}
-          <div className="group relative">
-            <button
-              type="button"
-              className="flex items-center opacity-95 hover:opacity-100"
-              aria-label="What we offer menu"
-            >
-              What we offer
-            </button>
+          <Link href="/ai-support" className="opacity-95 hover:opacity-100">
+            StudiesMate AI (Beta)
+          </Link>
 
-            <div className="invisible absolute left-0 mt-3 w-56 rounded-xl border border-white/15 bg-white/95 p-2 text-slate-900 shadow-lg opacity-0 backdrop-blur transition group-hover:visible group-hover:opacity-100">
-              <Link
-                href="/signup"
-                className="block rounded-lg px-3 py-2 text-sm hover:bg-slate-100"
-              >
-                Start Phase 1
-              </Link>
-              <Link
-                href="/subjects"
-                className="block rounded-lg px-3 py-2 text-sm hover:bg-slate-100"
-              >
-                Subjects
-              </Link>
-              <Link
-                href="/parent"
-                className="block rounded-lg px-3 py-2 text-sm hover:bg-slate-100"
-              >
-                Parent view (beta)
-              </Link>
-            </div>
-          </div>
+          <Link href="/feedback" className="opacity-95 hover:opacity-100">
+            Feedback (Beta)
+          </Link>
 
           <Link href="/about" className="opacity-95 hover:opacity-100">
             About
@@ -194,6 +170,23 @@ export default function Header() {
                     >
                       Home
                     </Link>
+
+                    <Link
+                      href="/ai-support"
+                      onClick={closeMobileNav}
+                      className="rounded-lg px-3 py-2 hover:bg-white/10"
+                    >
+                      StudiesMate AI (Beta)
+                    </Link>
+
+                    <Link
+                      href="/feedback"
+                      onClick={closeMobileNav}
+                      className="rounded-lg px-3 py-2 hover:bg-white/10"
+                    >
+                      Feedback (Beta)
+                    </Link>
+
                     <Link
                       href="/subjects"
                       onClick={closeMobileNav}
