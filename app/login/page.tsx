@@ -1,3 +1,4 @@
+// app/login/page.tsx
 "use client";
 
 import Link from "next/link";
@@ -17,6 +18,7 @@ const CLASSES = [
   "Class 8",
 ];
 
+const BETA_CLASS = "Class 4";
 const SESSION_KEY = "studiesmate_session";
 
 export default function LoginPage() {
@@ -72,7 +74,6 @@ export default function LoginPage() {
       return;
     }
 
-    // Keep your existing session shape for compatibility with other pages
     const session = {
       studentName: metaName || studentName.trim(),
       studentClass: metaClass || studentClass.trim(),
@@ -131,11 +132,16 @@ export default function LoginPage() {
               >
                 <option value="">Select class</option>
                 {CLASSES.map((c) => (
-                  <option key={c} value={c}>
+                  <option key={c} value={c} disabled={c !== BETA_CLASS}>
                     {c}
                   </option>
                 ))}
               </select>
+
+              <p className="mt-2 text-xs text-slate-500">
+                Phase 1 Beta: Only Class 4 is available. All classes will be
+                unlocked on the launch of full Phase 1.
+              </p>
             </div>
 
             <div>
@@ -186,7 +192,10 @@ export default function LoginPage() {
             </button>
 
             <div className="flex items-center justify-between text-sm">
-              <Link href="/forgot-password" className="text-slate-600 hover:underline">
+              <Link
+                href="/forgot-password"
+                className="text-slate-600 hover:underline"
+              >
                 Forgot password?
               </Link>
               <Link href="/signup" className="text-[#0B2B5A] hover:underline">

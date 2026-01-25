@@ -1,3 +1,4 @@
+// app/signup/page.tsx
 "use client";
 
 import Link from "next/link";
@@ -16,6 +17,8 @@ const CLASSES = [
   "Class 7",
   "Class 8",
 ];
+
+const BETA_CLASS = "Class 4";
 
 function isValidEmail(email: string) {
   const e = email.trim().toLowerCase();
@@ -66,7 +69,6 @@ export default function SignupPage() {
       return;
     }
 
-    // ✅ After signup: go to a clear "check your email" page (Option A)
     router.push(`/auth/check-email?email=${encodeURIComponent(cleanEmail)}`);
   }
 
@@ -103,11 +105,16 @@ export default function SignupPage() {
               >
                 <option value="">Select class</option>
                 {CLASSES.map((c) => (
-                  <option key={c} value={c}>
+                  <option key={c} value={c} disabled={c !== BETA_CLASS}>
                     {c}
                   </option>
                 ))}
               </select>
+
+              <p className="mt-2 text-xs text-slate-500">
+                Phase 1 Beta: Only Class 4 is available. All classes will be
+                unlocked on the launch of full Phase 1.
+              </p>
             </div>
 
             <div>

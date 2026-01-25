@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/lib/auth";
 import Reveal from "@/components/Reveal";
@@ -41,10 +42,14 @@ export default function FeedbackPage() {
     loadUser();
   }, []);
 
+  const isLoggedIn = useMemo(() => {
+    return !!parentEmail.trim();
+  }, [parentEmail]);
+
   const canSend = useMemo(() => {
-    // allow sending with or without screenshot
-    return message.trim().length >= 10 && status !== "sending";
-  }, [message, status]);
+    // allow sending with or without screenshot, but only if logged in
+    return isLoggedIn && message.trim().length >= 10 && status !== "sending";
+  }, [isLoggedIn, message, status]);
 
   function handlePickFile(e: React.ChangeEvent<HTMLInputElement>) {
     setFileError("");
@@ -97,6 +102,13 @@ export default function FeedbackPage() {
   }
 
   async function handleSubmit() {
+    // Hard guard: never hit Supabase if user is not logged in
+    if (!isLoggedIn) {
+      setStatus("error");
+      setError("Please log in or sign up to submit feedback.");
+      return;
+    }
+
     if (!canSend) return;
 
     setStatus("sending");
@@ -149,6 +161,31 @@ export default function FeedbackPage() {
               specific feedback is best.
             </p>
 
+            {!isLoggedIn && (
+              <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4">
+                <p className="text-sm font-semibold text-slate-900">
+                  Log in required
+                </p>
+                <p className="mt-1 text-sm text-slate-700">
+                  Please log in or sign up to submit feedback.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Link
+                    href="/login"
+                    className="rounded-lg bg-[#0B2B5A] px-3 py-2 text-sm font-semibold text-white hover:bg-[#0A2550]"
+                  >
+                    Log in
+                  </Link>
+                  <Link
+                    href="/signup"
+                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50"
+                  >
+                    Sign up
+                  </Link>
+                </div>
+              </div>
+            )}
+
             <div className="mt-6">
               <label className="text-sm font-medium text-slate-800">
                 Your feedback (min 10 characters)
@@ -162,7 +199,7 @@ export default function FeedbackPage() {
               />
             </div>
 
-            {/* Screenshot upload (styled like the Submit button) */}
+            {/* Screenshot upload */}
             <div className="mt-6">
               <p className="text-sm font-medium text-slate-800">
                 Optional screenshot

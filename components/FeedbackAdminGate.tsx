@@ -14,7 +14,7 @@ export default function FeedbackAdminGate({
   subtitle = "Enter the password to continue.",
 }: Props) {
   const [password, setPassword] = useState("");
-  const [adminPassword, setAdminPassword] = useState(""); // ✅ stored only in memory
+  const [adminPassword, setAdminPassword] = useState(""); // ✅ store for API calls (memory only)
   const [unlocked, setUnlocked] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -43,10 +43,11 @@ export default function FeedbackAdminGate({
         return;
       }
 
-      // ✅ keep password only in memory, so refresh asks again
+      // ✅ keep password in memory so /api/feedback-admin/list can use it
       setAdminPassword(password);
-      setUnlocked(true);
-      setPassword("");
+
+      setUnlocked(true); // asks again on refresh/next visit (as you wanted)
+      setPassword(""); // clear input field only
       setLoading(false);
     } catch {
       setError("Something went wrong. Try again.");
@@ -55,7 +56,7 @@ export default function FeedbackAdminGate({
   }
 
   if (unlocked) {
-    // ✅ pass adminPassword to the child page (no storage)
+    // ✅ pass adminPassword to the child page
     if (React.isValidElement(children)) {
       return React.cloneElement(children as React.ReactElement<any>, {
         adminPassword,
@@ -74,7 +75,9 @@ export default function FeedbackAdminGate({
           onSubmit={handleUnlock}
           className="mt-8 rounded-2xl border border-slate-200 bg-white p-5"
         >
-          <label className="text-sm font-semibold text-slate-800">Password</label>
+          <label className="text-sm font-semibold text-slate-800">
+            Password
+          </label>
 
           <div className="mt-2 flex items-center gap-2">
             <input
@@ -96,7 +99,9 @@ export default function FeedbackAdminGate({
             </button>
           </div>
 
-          {error ? <div className="mt-3 text-sm text-red-600">{error}</div> : null}
+          {error ? (
+            <div className="mt-3 text-sm text-red-600">{error}</div>
+          ) : null}
 
           <button
             type="submit"

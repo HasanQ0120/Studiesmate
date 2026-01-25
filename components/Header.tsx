@@ -122,6 +122,10 @@ export default function Header() {
             Home
           </Link>
 
+          <Link href="/phase-1" className="opacity-95 hover:opacity-100">
+            Phase 1
+          </Link>
+
           <Link href="/ai-support" className="opacity-95 hover:opacity-100">
             StudiesMate AI (Beta)
           </Link>
@@ -133,9 +137,7 @@ export default function Header() {
           <Link href="/about" className="opacity-95 hover:opacity-100">
             About
           </Link>
-          <Link href="/subjects" className="opacity-95 hover:opacity-100">
-            Subjects
-          </Link>
+
           <Link href="/parent" className="opacity-95 hover:opacity-100">
             Parent
           </Link>
@@ -172,6 +174,14 @@ export default function Header() {
                     </Link>
 
                     <Link
+                      href="/phase-1"
+                      onClick={closeMobileNav}
+                      className="rounded-lg px-3 py-2 hover:bg-white/10"
+                    >
+                      Phase 1
+                    </Link>
+
+                    <Link
                       href="/ai-support"
                       onClick={closeMobileNav}
                       className="rounded-lg px-3 py-2 hover:bg-white/10"
@@ -188,19 +198,13 @@ export default function Header() {
                     </Link>
 
                     <Link
-                      href="/subjects"
-                      onClick={closeMobileNav}
-                      className="rounded-lg px-3 py-2 hover:bg-white/10"
-                    >
-                      Subjects
-                    </Link>
-                    <Link
                       href="/parent"
                       onClick={closeMobileNav}
                       className="rounded-lg px-3 py-2 hover:bg-white/10"
                     >
                       Parent
                     </Link>
+
                     <Link
                       href="/about"
                       onClick={closeMobileNav}

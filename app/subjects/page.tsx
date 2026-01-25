@@ -8,6 +8,9 @@ import PageEnter from "@/components/PageEnter";
 
 const STORAGE_KEY = "studiesmate_selected_subjects";
 
+const BETA_CLASS = "Class 4";
+const BETA_SUBJECT = "Mathematics";
+
 const GRADES = [
   "Class 1",
   "Class 2",
@@ -67,19 +70,11 @@ function SubjectsPageInner() {
   useEffect(() => {
     setHydrated(true);
 
-    const fromQuery = sp.get("class");
-    if (fromQuery) {
-      setSelectedClass(fromQuery);
-      return;
-    }
+    // Phase 1 Beta lock: force Class 4 view
+    setSelectedClass(BETA_CLASS);
 
-    try {
-      const raw = localStorage.getItem("studiesmate_profile");
-      if (!raw) return;
-
-      const p = JSON.parse(raw);
-      if (p?.studentClass) setSelectedClass(String(p.studentClass));
-    } catch {}
+    // Phase 1 Beta lock: force Mathematics only
+    setSelected([BETA_SUBJECT]);
   }, [sp]);
 
   useEffect(() => {
@@ -90,11 +85,17 @@ function SubjectsPageInner() {
   }, [selected, hydrated]);
 
   function toggleSubject(title: string) {
+    // Phase 1 Beta lock: only Mathematics selectable
+    if (normalizeTitle(title) !== normalizeTitle(BETA_SUBJECT)) return;
+
     setSelected((prev) => {
       const key = normalizeTitle(title);
       const exists = prev.some((x) => normalizeTitle(x) === key);
-      if (exists) return prev.filter((x) => normalizeTitle(x) !== key);
-      return [...prev, title];
+
+      // Never allow removing the only allowed subject
+      if (exists) return prev;
+
+      return [BETA_SUBJECT];
     });
   }
 
@@ -107,8 +108,7 @@ function SubjectsPageInner() {
     const order = new Map(SUBJECTS.map((s, i) => [normalizeTitle(s.title), i]));
     return [...selected].sort(
       (a, b) =>
-        (order.get(normalizeTitle(a)) ?? 999) -
-        (order.get(normalizeTitle(b)) ?? 999)
+        (order.get(normalizeTitle(a)) ?? 999) - (order.get(normalizeTitle(b)) ?? 999)
     );
   }, [selected]);
 
@@ -124,10 +124,9 @@ function SubjectsPageInner() {
               Select the subjects you want. You can change this anytime.
             </p>
 
-            {/* ✅ Added line as requested */}
             <p className="mt-3 text-sm text-slate-600">
-              <span className="font-semibold">Phase 1 note:</span> Each subject includes 3 core
-              chapters with quizzes. More chapters will be added gradually.
+              <span className="font-semibold">Phase 1 note:</span> Each subject includes 2 core
+              chapters with 2 quizzes. More chapters will be added on the launch of phase 1.
             </p>
           </div>
 
@@ -152,15 +151,19 @@ function SubjectsPageInner() {
           <div className="mt-3 flex flex-wrap gap-2">
             {GRADES.map((g) => {
               const active = selectedClass === g;
+              const locked = g !== BETA_CLASS;
+
               return (
                 <button
                   key={g}
                   type="button"
-                  className={`cursor-default rounded-full border px-3 py-1 text-xs font-medium ${
+                  className={`rounded-full border px-3 py-1 text-xs font-medium ${
                     active
                       ? "border-slate-300 bg-slate-100 text-slate-900"
+                      : locked
+                      ? "border-slate-200 bg-white text-slate-400 opacity-60"
                       : "border-slate-200 bg-white text-slate-600"
-                  }`}
+                  } cursor-default`}
                   aria-disabled="true"
                 >
                   {g}
@@ -170,7 +173,9 @@ function SubjectsPageInner() {
           </div>
 
           <div className="mt-2 text-xs text-slate-500">
-            Class is chosen during login/signup. This is just a reminder.
+            <span className="font-semibold">Phase 1 Beta:</span> Only{" "}
+            <span className="font-semibold">{BETA_CLASS}</span> is available. All classes will be
+            unlocked in Full Phase 1.
           </div>
         </div>
 
@@ -195,21 +200,30 @@ function SubjectsPageInner() {
 
           {selected.length > 0 ? (
             <div className="mt-3 flex flex-wrap gap-2">
-              {selectedSorted.map((t) => (
-                <span
-                  key={t}
-                  className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-800"
-                >
-                  {t}
-                  <button
-                    type="button"
-                    onClick={() => toggleSubject(t)}
-                    className="rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-50"
+              {selectedSorted.map((t) => {
+                const isMath = normalizeTitle(t) === normalizeTitle(BETA_SUBJECT);
+
+                return (
+                  <span
+                    key={t}
+                    className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-800"
                   >
-                    Remove
-                  </button>
-                </span>
-              ))}
+                    {t}
+                    <button
+                      type="button"
+                      onClick={() => toggleSubject(t)}
+                      disabled={isMath}
+                      className={`rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold ${
+                        isMath
+                          ? "text-slate-400 cursor-not-allowed"
+                          : "text-slate-700 hover:bg-slate-50"
+                      }`}
+                    >
+                      Remove
+                    </button>
+                  </span>
+                );
+              })}
             </div>
           ) : (
             <div className="mt-3 text-sm text-slate-600">
@@ -221,17 +235,22 @@ function SubjectsPageInner() {
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {SUBJECTS.map((s) => {
             const chosen = isSelected(s.title);
+            const unlocked = normalizeTitle(s.title) === normalizeTitle(BETA_SUBJECT);
+            const locked = !unlocked;
 
             return (
               <button
                 key={s.title}
                 type="button"
-                onClick={() => toggleSubject(s.title)}
+                onClick={() => {
+                  if (!locked) toggleSubject(s.title);
+                }}
+                disabled={locked}
                 className={`relative rounded-2xl border p-5 text-left shadow-sm transition ${
                   chosen
                     ? "border-[#0B2B5A] bg-slate-50"
                     : "border-slate-200 bg-white hover:bg-slate-50"
-                }`}
+                } ${locked ? "opacity-60 cursor-not-allowed hover:bg-white" : ""}`}
               >
                 <div className="absolute right-4 top-4">
                   <div
@@ -253,27 +272,43 @@ function SubjectsPageInner() {
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="text-base font-semibold">{s.title}</h3>
-                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-700">
-                        Beta
-                      </span>
+
+                      {locked ? (
+                        <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[11px] font-semibold text-slate-700">
+                          Locked
+                        </span>
+                      ) : (
+                        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-700">
+                          Beta
+                        </span>
+                      )}
                     </div>
+
                     <p className="mt-1 text-sm text-slate-600">{s.desc}</p>
+
+                    {locked && (
+                      <p className="mt-2 text-xs text-slate-500">
+                        Available in Full Phase 1.
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 <div className="mt-5 flex items-center justify-between">
                   <span className="text-xs text-slate-600">
-                    {chosen ? "Selected" : "Click to select"}
+                    {locked ? "Locked" : chosen ? "Selected" : "Click to select"}
                   </span>
 
                   <span
                     className={`rounded-xl px-3 py-2 text-xs font-semibold ${
                       chosen
                         ? "bg-[#0B2B5A] text-white"
+                        : locked
+                        ? "bg-slate-100 text-slate-400"
                         : "bg-slate-100 text-slate-700"
                     }`}
                   >
-                    {chosen ? "Selected ✓" : "Select"}
+                    {chosen ? "Selected ✓" : locked ? "Locked" : "Select"}
                   </span>
                 </div>
               </button>
