@@ -1,5 +1,7 @@
 export const dynamic = "force-dynamic";
 
+import CheckEmailClient from "./CheckEmailClient";
+
 type SearchParams = {
   email?: string | string[];
 };
@@ -37,6 +39,11 @@ export default async function Page(props: PageProps) {
           <p className="text-sm text-slate-700">
             If you don’t see the email, check Spam/Junk and try again.
           </p>
+
+          {/* ✅ This is the red marked area */}
+          <div className="mt-4">
+            <CheckEmailClient email={email} />
+          </div>
         </div>
       </section>
     </main>

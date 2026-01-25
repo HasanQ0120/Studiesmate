@@ -15,6 +15,10 @@ type FeedbackRow = {
   screenshot_url: string | null;
 };
 
+type Props = {
+  adminPassword?: string; // ✅ provided only when coming from /feedback-admin gate
+};
+
 function formatDate(input?: string | null) {
   if (!input) return "";
   const d = new Date(input);
@@ -33,11 +37,14 @@ function getAdminEmails(): Set<string> {
   );
 }
 
-export default function AdminFeedbackPage() {
+export default function AdminFeedbackPage({ adminPassword }: Props) {
   const router = useRouter();
+
+  const isPasswordAdminRoute = Boolean(adminPassword);
 
   const [meEmail, setMeEmail] = useState<string>("");
   const [authChecked, setAuthChecked] = useState(false);
+
   const [rows, setRows] = useState<FeedbackRow[]>([]);
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [error, setError] = useState("");
@@ -45,16 +52,28 @@ export default function AdminFeedbackPage() {
   const [limit, setLimit] = useState(30);
 
   const adminEmails = useMemo(() => getAdminEmails(), []);
-  const isAdmin = useMemo(() => {
-    if (!adminEmails.size) return false; // safer default
+  const isAdminByEmail = useMemo(() => {
+    if (!adminEmails.size) return false;
     return adminEmails.has((meEmail || "").toLowerCase());
   }, [adminEmails, meEmail]);
 
+  const isAllowed = useMemo(() => {
+    if (isPasswordAdminRoute) return true;
+    return isAdminByEmail;
+  }, [isPasswordAdminRoute, isAdminByEmail]);
+
+  // Auth check:
+  // - Password route: no Supabase session needed
+  // - Dashboard route: require Supabase session
   useEffect(() => {
+    if (isPasswordAdminRoute) {
+      setAuthChecked(true);
+      return;
+    }
+
     async function loadMe() {
       const { data, error } = await supabase.auth.getUser();
 
-      // Not logged in (or token error) -> send to login
       if (error || !data.user) {
         setAuthChecked(true);
         router.replace("/login");
@@ -66,24 +85,56 @@ export default function AdminFeedbackPage() {
     }
 
     loadMe();
-  }, [router]);
+  }, [isPasswordAdminRoute, router]);
 
-  // If logged in but not admin -> send to dashboard
+  // Redirect non-admin users ONLY for the dashboard route
   useEffect(() => {
     if (!authChecked) return;
-    if (!isAdmin) {
+    if (isPasswordAdminRoute) return;
+
+    if (!isAllowed) {
       router.replace("/dashboard");
     }
-  }, [authChecked, isAdmin, router]);
+  }, [authChecked, isAllowed, isPasswordAdminRoute, router]);
 
+  // Load feedback
   useEffect(() => {
     if (!authChecked) return;
-    if (!isAdmin) return;
+    if (!isAllowed) return;
 
     async function loadFeedback() {
       setStatus("loading");
       setError("");
 
+      // ✅ Password-based admin route loads via API with header
+      if (isPasswordAdminRoute) {
+        try {
+          const res = await fetch("/api/feedback-admin/list", {
+            method: "GET",
+            headers: {
+              "x-admin-password": adminPassword || "",
+            },
+          });
+
+          const json = await res.json().catch(() => null);
+
+          if (!res.ok || !json?.ok) {
+            setStatus("error");
+            setError(json?.error || "Failed to load feedback.");
+            return;
+          }
+
+          setRows(((json.rows || []) as FeedbackRow[]) ?? []);
+          setStatus("idle");
+          return;
+        } catch (e: any) {
+          setStatus("error");
+          setError(e?.message || "Failed to load feedback.");
+          return;
+        }
+      }
+
+      // Existing dashboard-admin route keeps supabase fetch
       const { data, error } = await supabase
         .from("feedback")
         .select("id, created_at, user_email, student_name, message, page, screenshot_url")
@@ -101,7 +152,7 @@ export default function AdminFeedbackPage() {
     }
 
     loadFeedback();
-  }, [authChecked, isAdmin]);
+  }, [authChecked, isAllowed, isPasswordAdminRoute, adminPassword]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -136,7 +187,7 @@ export default function AdminFeedbackPage() {
     );
   }
 
-  if (!isAdmin) {
+  if (!isAllowed) {
     return (
       <div className="min-h-screen bg-white px-6 py-10">
         <div className="mx-auto max-w-6xl">
