@@ -213,7 +213,7 @@ export default function HomePage() {
 
             <div className="mt-8 grid gap-5 md:grid-cols-3">
               <Reveal delayMs={0}>
-                <Stat label="Core subjects" value="10" note="Math, English, Science & more" />
+                <Stat label="Core subjects" value="9" note="Math, English, Science & more" />
               </Reveal>
               <Reveal delayMs={80}>
                 <Stat label="Learning style" value="Short" note="Daily-friendly lessons" />
