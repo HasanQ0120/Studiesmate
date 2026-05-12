@@ -186,20 +186,23 @@ export default function HomePage() {
               </div>
             </Reveal>
 
+            <div style={{ alignSelf: 'stretch', height: '100%' }}>
             <Reveal delayMs={120}>
-              <div className="relative mt-6 md:mt-16" style={{ alignSelf: 'center' }}>
-                <div className="mt-12 overflow-hidden rounded-2xl border border-white/15 bg-white/5 shadow-lg transition-all duration-300 hover:shadow-xl">
+              <div className="relative" style={{ height: '100%' }}>
+                <div className="overflow-hidden rounded-2xl border border-white/15 bg-white/5 shadow-lg transition-all duration-300 hover:shadow-xl" style={{ height: '100%' }}>
                   <Image
                     src="/images/picture.png"
                     alt="Student learning"
                     width={1200}
                     height={900}
-                    className="h-auto w-full object-cover transition-transform duration-500 hover:scale-[1.02]"
+                    className="w-full transition-transform duration-500 hover:scale-[1.02]"
+                    style={{ height: '100%', alignSelf: 'stretch', objectFit: 'cover' }}
                     priority
                   />
                 </div>
               </div>
             </Reveal>
+            </div>
           </div>
         </div>
       </section>
