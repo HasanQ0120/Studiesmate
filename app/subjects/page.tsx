@@ -89,7 +89,7 @@ function SubjectsPageInner() {
             );
 
             return unlocked ? (
-              <Link key={s.title} href="/subjects/maths/chapters" className={cardClass}>
+              <Link key={s.title} href="/dashboard" className={cardClass}>
                 {cardInner}
               </Link>
             ) : (
