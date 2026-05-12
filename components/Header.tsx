@@ -123,7 +123,7 @@ export default function Header() {
           </Link>
 
           <Link href="/phase-1" className="opacity-95 hover:opacity-100">
-            Phase 1
+            Grades
           </Link>
 
           <Link href="/feedback" className="opacity-95 hover:opacity-100">
@@ -170,7 +170,7 @@ export default function Header() {
                       onClick={closeMobileNav}
                       className="rounded-lg px-3 py-2 hover:bg-white/10"
                     >
-                      Phase 1
+                      Grades
                     </Link>
 
                     <Link
