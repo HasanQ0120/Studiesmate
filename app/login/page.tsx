@@ -7,26 +7,12 @@ import { useMemo, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { signInParentAccount, supabase } from "@/lib/auth";
 
-const CLASSES = [
-  "Class 1",
-  "Class 2",
-  "Class 3",
-  "Class 4",
-  "Class 5",
-  "Class 6",
-  "Class 7",
-  "Class 8",
-];
-
-const BETA_CLASS = "Class 4";
 const SESSION_KEY = "studiesmate_session";
 
 export default function LoginPage() {
   const router = useRouter();
 
   const [parentEmail, setParentEmail] = useState("");
-  const [studentName, setStudentName] = useState("");
-  const [studentClass, setStudentClass] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
@@ -35,11 +21,9 @@ export default function LoginPage() {
     return (
       parentEmail.trim().length >= 6 &&
       parentEmail.includes("@") &&
-      studentName.trim().length >= 2 &&
-      studentClass.trim().length > 0 &&
       password.trim().length >= 6
     );
-  }, [parentEmail, studentName, studentClass, password]);
+  }, [parentEmail, password]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -62,21 +46,9 @@ export default function LoginPage() {
       parentEmail?: string;
     };
 
-    const metaName = (meta.studentName || "").trim();
-    const metaClass = (meta.studentClass || "").trim();
-
-    const nameMatch =
-      metaName.toLowerCase() === studentName.trim().toLowerCase();
-    const classMatch = metaClass === studentClass.trim();
-
-    if (metaName && metaClass && (!nameMatch || !classMatch)) {
-      setError("Student name/class does not match this account.");
-      return;
-    }
-
     const session = {
-      studentName: metaName || studentName.trim(),
-      studentClass: metaClass || studentClass.trim(),
+      studentName: (meta.studentName || "").trim(),
+      studentClass: (meta.studentClass || "").trim(),
       parentEmail: (meta.parentEmail || parentEmail).trim(),
       loggedInAt: new Date().toISOString(),
     };
@@ -109,39 +81,6 @@ export default function LoginPage() {
                 placeholder="Same email used during signup"
                 className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-400"
               />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-slate-700">
-                Student name
-              </label>
-              <input
-                value={studentName}
-                onChange={(e) => setStudentName(e.target.value)}
-                placeholder="Same name used during signup"
-                className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-400"
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-slate-700">Class</label>
-              <select
-                value={studentClass}
-                onChange={(e) => setStudentClass(e.target.value)}
-                className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-400"
-              >
-                <option value="">Select class</option>
-                {CLASSES.map((c) => (
-                  <option key={c} value={c} disabled={c !== BETA_CLASS}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-
-              <p className="mt-2 text-xs text-slate-500">
-                Phase 1 Beta: Only Class 4 is available. All classes will be
-                unlocked on the launch of full Phase 1.
-              </p>
             </div>
 
             <div>

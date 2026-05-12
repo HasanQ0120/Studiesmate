@@ -7,19 +7,6 @@ import { useMemo, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { signUpParentAccount } from "@/lib/auth";
 
-const CLASSES = [
-  "Class 1",
-  "Class 2",
-  "Class 3",
-  "Class 4",
-  "Class 5",
-  "Class 6",
-  "Class 7",
-  "Class 8",
-];
-
-const BETA_CLASS = "Class 4";
-
 function isValidEmail(email: string) {
   const e = email.trim().toLowerCase();
   return e.includes("@") && e.includes(".") && e.length >= 6;
@@ -29,7 +16,6 @@ export default function SignupPage() {
   const router = useRouter();
 
   const [studentName, setStudentName] = useState("");
-  const [studentClass, setStudentClass] = useState("");
   const [parentEmail, setParentEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -40,11 +26,10 @@ export default function SignupPage() {
   const canContinue = useMemo(() => {
     return (
       studentName.trim().length >= 2 &&
-      studentClass.trim().length > 0 &&
       isValidEmail(parentEmail) &&
       password.trim().length >= 6
     );
-  }, [studentName, studentClass, parentEmail, password]);
+  }, [studentName, parentEmail, password]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -59,7 +44,7 @@ export default function SignupPage() {
       parentEmail: cleanEmail,
       password,
       studentName,
-      studentClass,
+      studentClass: "",
     });
 
     setSubmitting(false);
@@ -94,27 +79,6 @@ export default function SignupPage() {
                 placeholder="Ali, Ayesha, Hassan..."
                 className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-400"
               />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-slate-700">Class</label>
-              <select
-                value={studentClass}
-                onChange={(e) => setStudentClass(e.target.value)}
-                className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-400"
-              >
-                <option value="">Select class</option>
-                {CLASSES.map((c) => (
-                  <option key={c} value={c} disabled={c !== BETA_CLASS}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-
-              <p className="mt-2 text-xs text-slate-500">
-                Phase 1 Beta: Only Class 4 is available. All classes will be
-                unlocked on the launch of full Phase 1.
-              </p>
             </div>
 
             <div>
@@ -183,7 +147,7 @@ export default function SignupPage() {
               <ul className="mt-2 list-disc space-y-1 pl-5">
                 <li>Set password helps the student log in quickly next time</li>
                 <li>Parent email is used for recovery if password is forgotten</li>
-                <li>In Phase 2 we’ll add proper accounts and Google sign-in</li>
+                <li>In Phase 2 we'll add proper accounts and Google sign-in</li>
               </ul>
             </div>
 
