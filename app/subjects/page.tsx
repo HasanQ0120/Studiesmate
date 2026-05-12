@@ -10,12 +10,6 @@ const SUBJECTS = [
   { title: "Mathematics", desc: "Numbers, algebra, geometry, and problem solving.", icon: "➗" },
   { title: "English", desc: "Reading, writing, grammar, and vocabulary.", icon: "📘" },
   { title: "Science", desc: "Basics of physics, chemistry, and biology.", icon: "🧪" },
-  { title: "Social Studies", desc: "People, places, maps, and how society works.", icon: "🌍" },
-  { title: "Computer / ICT", desc: "Digital skills, typing, internet basics, and safety.", icon: "💻" },
-  { title: "Geography", desc: "Maps, continents, climate, and environments.", icon: "🗺️" },
-  { title: "History", desc: "Past events, timelines, and key stories of the world.", icon: "🏛️" },
-  { title: "General Knowledge", desc: "Everyday facts, reasoning, and quick learning topics.", icon: "🧠" },
-  { title: "Islamiat", desc: "Beliefs, worship, Seerah, and Islamic manners.", icon: "🕌" },
 ];
 
 function normalizeTitle(s: string) {
@@ -41,14 +35,6 @@ function SubjectsPageInner() {
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="text-3xl font-semibold tracking-tight">Subjects</h1>
-            <p className="mt-2 text-sm text-slate-600">
-              Select the subjects you want. You can change this anytime.
-            </p>
-
-            <p className="mt-3 text-sm text-slate-600">
-              <span className="font-semibold">Phase 1 note:</span> Each subject includes 2 core
-              chapters with 2 quizzes. More chapters will be added on the launch of phase 1.
-            </p>
           </div>
         </div>
 
