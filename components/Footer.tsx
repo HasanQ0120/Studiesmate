@@ -40,7 +40,7 @@ export default function Footer() {
               If you’re testing Phase 1 and spot confusion, send feedback.
             </p>
             <p className="mt-3 text-xs text-white/65">
-              (Use your preferred contact route later. Keep it simple for now.)
+              For feedback and support: studiesmate.pk@gmail.com
             </p>
           </div>
         </div>

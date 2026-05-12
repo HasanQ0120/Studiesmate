@@ -6,11 +6,6 @@ const SUBJECT_PREVIEW = [
   "Math",
   "English",
   "Science",
-  "Urdu (Support)",
-  "Islamiyat",
-  "Computer",
-  "General Knowledge",
-  "More...",
 ];
 
 export default function HomePage() {
@@ -60,7 +55,7 @@ export default function HomePage() {
                 "Parent-friendly",
                 "Urdu + English support",
                 "Short daily lessons",
-                "Phase 1 (Foundation)",
+                "What's included",
               ].map((t) => (
                 <span
                   key={t}
@@ -203,7 +198,7 @@ export default function HomePage() {
           <Reveal>
             <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
               <div>
-                <h3 className="text-xl font-semibold">Phase 1 (Foundation)</h3>
+                <h3 className="text-xl font-semibold">What's included</h3>
                 <p className="mt-2 max-w-2xl text-sm text-slate-700">
                   We are building trust first. Everything stays controlled and
                   simple.
@@ -213,7 +208,7 @@ export default function HomePage() {
 
             <div className="mt-8 grid gap-5 md:grid-cols-3">
               <Reveal delayMs={0}>
-                <Stat label="Core subjects" value="9" note="Math, English, Science & more" />
+                <Stat label="Core subjects" value="" note="Math, English, Science" />
               </Reveal>
               <Reveal delayMs={80}>
                 <Stat label="Learning style" value="Short" note="Daily-friendly lessons" />
