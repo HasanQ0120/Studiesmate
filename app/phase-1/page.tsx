@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/auth";
 
 const GRADES = [
   { name: "Beta",    desc: "2 Math lessons + 2 quizzes. Free forever.",        price: "Free",            blurPrice: false, isBeta: true,  status: null },
@@ -15,6 +17,14 @@ const GRADES = [
 ];
 
 export default function GradesPage() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setIsLoggedIn(!!data.session);
+    });
+  }, []);
+
   return (
     <main className="min-h-screen bg-white text-slate-900">
       <div className="mx-auto max-w-6xl px-4 py-14">
@@ -52,7 +62,7 @@ export default function GradesPage() {
               <div className="mt-5 flex flex-col gap-2">
                 {g.isBeta ? (
                   <Link
-                    href="/signup"
+                    href={isLoggedIn ? "/dashboard" : "/signup"}
                     className="inline-flex items-center justify-center rounded-xl bg-[#0B2B5A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0A2550]"
                   >
                     Start Free
