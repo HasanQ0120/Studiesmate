@@ -30,6 +30,9 @@ export default function GradesPage() {
         <p className="mt-3 text-base text-slate-600">
           Start free with Beta or unlock full access for your child's grade.
         </p>
+        <p className="mt-2 text-sm italic text-slate-400">
+          All grades include Urdu as a support language for better understanding, not as a separate subject.
+        </p>
 
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {GRADES.map((g) => (
