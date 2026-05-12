@@ -1,86 +1,66 @@
 import Link from "next/link";
 import Reveal from "@/components/Reveal";
 
-export default function AboutPrivacyPage() {
+export default function AboutPage() {
   return (
     <main className="min-h-screen bg-white text-slate-900">
       <div className="mx-auto max-w-4xl px-4 py-12">
+
         <Reveal>
-          <h1 className="text-3xl font-semibold tracking-tight">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50"
+          >
+            ← Back to Home
+          </Link>
+        </Reveal>
+
+        <Reveal delayMs={80}>
+          <h1 className="mt-8 text-3xl font-semibold tracking-tight">
             About StudiesMate
           </h1>
         </Reveal>
 
-        <Reveal delayMs={80}>
-          <p className="mt-4 text-sm leading-6 text-slate-700">
-            StudiesMate is built to make learning calm, focused, and easy to
-            understand for school students. The goal is simple: reduce confusion,
-            remove pressure, and help students build confidence through clear
-            explanations and structured practice.
-          </p>
-        </Reveal>
-
         <Reveal delayMs={140}>
           <p className="mt-4 text-sm leading-6 text-slate-700">
-            Many students struggle not because they lack ability, but because
-            learning feels overwhelming. StudiesMate keeps lessons simple,
-            progress visible, and the overall experience distraction-free.
+            StudiesMate is a bilingual learning platform built for school students in Pakistan. We make concepts clear, learning calm, and progress visible — in both English and Urdu.
           </p>
         </Reveal>
 
         <Reveal delayMs={200}>
-          <p className="mt-4 text-sm leading-6 text-slate-700">
-            StudiesMate follows a bilingual learning approach. Concepts are
-            explained in English with Urdu support, so students can understand
-            ideas clearly without feeling stuck because of language.
-          </p>
-        </Reveal>
-
-        <Reveal delayMs={260}>
           <div className="mt-10 rounded-2xl border border-slate-200 bg-[#F1F7FF] p-6">
             <h2 className="text-lg font-semibold">Our Vision</h2>
             <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-700">
-              <li>Help students learn at their own pace without stress</li>
-              <li>Support parents with clarity and transparency</li>
-              <li>Encourage consistent learning habits, not cramming</li>
-              <li>Use technology carefully, only where it adds real value</li>
+              <li>Help students understand concepts, not just memorize them</li>
+              <li>Support parents with transparency and progress tracking</li>
+              <li>Build consistent learning habits without pressure</li>
+              <li>Use technology only where it adds real value</li>
+            </ul>
+          </div>
+        </Reveal>
+
+        <Reveal delayMs={260}>
+          <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-6">
+            <h2 className="text-lg font-semibold">What We Offer</h2>
+            <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-700">
+              <li>Bilingual video lessons — English explanation, Urdu support</li>
+              <li>Quizzes aligned exactly to each lesson</li>
+              <li>Parent progress tracking</li>
+              <li>Clean, ad-free experience</li>
+              <li>Grades 1–8 (starting with Beta Math)</li>
             </ul>
           </div>
         </Reveal>
 
         <Reveal delayMs={320}>
-          <div className="mt-10 rounded-2xl border border-slate-200 bg-slate-50 p-6">
-            <h2 className="text-lg font-semibold">Privacy & Trust (Phase 1)</h2>
-            <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-700">
-              <li>No advertisements or hidden distractions</li>
-              <li>No selling or sharing of user data</li>
-              <li>
-                Only essential account and learning-related information is stored
-                during Phase 1
-              </li>
-              <li>AI features are limited, guided, and education-focused</li>
-            </ul>
+          <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
+            <h2 className="text-lg font-semibold">Our Team</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-700">
+              StudiesMate is built by a small team passionate about education in Pakistan. We are students and builders who believe every child deserves clarity in learning.
+            </p>
           </div>
         </Reveal>
 
-        <Reveal delayMs={380}>
-          <p className="mt-6 text-sm leading-6 text-slate-600">
-            StudiesMate is currently in its early phase. Features will grow
-            gradually, with student well-being and learning quality kept as the
-            top priority.
-          </p>
-        </Reveal>
-
-        <Reveal delayMs={440}>
-          <div className="mt-10">
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 rounded-xl bg-[#0B2B5A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0A2550]"
-            >
-              ← Back to home
-            </Link>
-          </div>
-        </Reveal>
       </div>
     </main>
   );
