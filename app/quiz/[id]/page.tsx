@@ -15,15 +15,7 @@ const SYLLABUS: Record<string, { title: string; topics: string[] }> = {
     title: "Mathematics Syllabus",
     topics: [
       "Numbers & Place Value",
-      "Fractions & Decimals",
-      "Percentages",
-      "Ratio & Proportion",
-      "Basic Algebra",
-      "Geometry Basics",
-      "Perimeter & Area",
-      "Data Handling",
-      "Probability Basics",
-      "Word Problems",
+      "Addition & Subtraction",
     ],
   },
   english: {
@@ -187,7 +179,11 @@ export default function QuizSyllabusPage() {
           <div>
             <h1 className="text-2xl font-semibold">{quiz.subjectTitle}</h1>
             <p className="mt-1 text-sm text-slate-600">
-              {quiz.level ? `${quiz.level} • ` : ""}
+              {subjectKey === "mathematics"
+                ? "Beta • "
+                : quiz.level
+                ? `${quiz.level} • `
+                : ""}
               Select a topic to start a quiz.
             </p>
           </div>
@@ -198,12 +194,6 @@ export default function QuizSyllabusPage() {
               className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50"
             >
               ← Dashboard
-            </Link>
-            <Link
-              href="/quizzes"
-              className="inline-flex items-center gap-2 rounded-xl bg-[#0B2B5A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0A2550]"
-            >
-              More quizzes →
             </Link>
           </div>
         </div>
