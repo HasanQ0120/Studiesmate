@@ -7,16 +7,8 @@ const SUBJECT_TITLE = "Mathematics";
 const SUBJECT_ID = "maths";
 
 const CHAPTERS = [
-  { id: "numbers", title: "Numbers & Place Value", desc: "Understanding numbers, counting, and place value." },
-  { id: "addition-subtraction", title: "Addition & Subtraction", desc: "Basic operations with real-life examples." },
-  { id: "multiplication-division", title: "Multiplication & Division", desc: "Repeated addition, sharing, and grouping." },
-  { id: "fractions", title: "Fractions", desc: "Parts of a whole using simple visuals." },
-  { id: "decimals", title: "Decimals", desc: "Introduction to decimal numbers." },
-  { id: "measurement", title: "Measurement", desc: "Length, mass, and time basics." },
-  { id: "geometry", title: "Geometry", desc: "Shapes, angles, and spatial understanding." },
-  { id: "data-handling", title: "Data Handling", desc: "Simple graphs, tables, and charts." },
-  { id: "patterns", title: "Patterns & Sequences", desc: "Finding patterns and logical sequences." },
-  { id: "word-problems", title: "Word Problems", desc: "Applying maths to daily life situations." },
+  { id: "numbers", title: "Numbers & Place Value", desc: "Understanding numbers and place value up to hundred thousands." },
+  { id: "addition-subtraction", title: "Addition & Subtraction", desc: "Multi-digit addition and subtraction with real-life examples." },
 ];
 
 export default function MathsChaptersPage() {
