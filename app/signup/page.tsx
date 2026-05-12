@@ -15,11 +15,12 @@ function isValidEmail(email: string) {
 export default function SignupPage() {
   const router = useRouter();
 
+  const [tab, setTab] = useState<"student" | "parent">("student");
+
   const [studentName, setStudentName] = useState("");
   const [parentEmail, setParentEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -68,98 +69,147 @@ export default function SignupPage() {
             Parent sets access. Student learns calmly.
           </p>
 
-          <form className="mt-8 space-y-5" onSubmit={onSubmit}>
-            <div>
-              <label className="text-sm font-medium text-slate-700">
-                Student name
-              </label>
-              <input
-                value={studentName}
-                onChange={(e) => setStudentName(e.target.value)}
-                placeholder="Ali, Ayesha, Hassan..."
-                className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-400"
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-slate-700">
-                Parent email
-              </label>
-              <input
-                type="email"
-                value={parentEmail}
-                onChange={(e) => setParentEmail(e.target.value)}
-                placeholder="parent@example.com"
-                className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-400"
-              />
-              <p className="mt-2 text-xs text-slate-500">
-                Used for recovery and future parent dashboard.
-              </p>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-slate-700">
-                Set password
-              </label>
-
-              <div className="relative mt-2">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  minLength={6}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter password"
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 pr-12 text-sm outline-none focus:border-slate-400"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-2 text-slate-600 hover:bg-slate-100"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
-
-              <p className="mt-1 text-xs text-slate-500">At least 6 characters</p>
-            </div>
-
-            {error && (
-              <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
-                {error}
-              </div>
-            )}
-
+          {/* Tabs */}
+          <div className="mt-6 flex overflow-hidden rounded-xl border border-slate-200">
             <button
-              type="submit"
-              disabled={!canContinue || submitting}
-              className="mt-2 w-full rounded-xl bg-[#0B2B5A] px-5 py-3 text-sm font-semibold text-white hover:bg-[#0A2550] disabled:cursor-not-allowed disabled:opacity-50"
+              type="button"
+              onClick={() => setTab("student")}
+              className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${
+                tab === "student"
+                  ? "bg-[#0B2B5A] text-white"
+                  : "bg-white text-slate-500 hover:bg-slate-50"
+              }`}
             >
-              {submitting ? "Creating..." : "Create profile →"}
+              Student
             </button>
+            <button
+              type="button"
+              onClick={() => setTab("parent")}
+              className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${
+                tab === "parent"
+                  ? "bg-[#0B2B5A] text-white"
+                  : "bg-white text-slate-500 hover:bg-slate-50"
+              }`}
+            >
+              Parent
+            </button>
+          </div>
 
-            <div className="rounded-xl bg-slate-50 p-4 text-xs text-slate-600">
-              <div className="font-medium text-slate-800">Important</div>
-              <ul className="mt-2 list-disc space-y-1 pl-5">
-                <li>Set password helps the student log in quickly next time</li>
-                <li>Parent email is used for recovery if password is forgotten</li>
-                <li>In Phase 2 we'll add proper accounts and Google sign-in</li>
-              </ul>
-            </div>
+          {/* Student form */}
+          {tab === "student" && (
+            <form className="mt-8 space-y-5" onSubmit={onSubmit}>
+              <div>
+                <label className="text-sm font-medium text-slate-700">
+                  Student name
+                </label>
+                <input
+                  value={studentName}
+                  onChange={(e) => setStudentName(e.target.value)}
+                  placeholder="Ali, Ayesha, Hassan..."
+                  className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-400"
+                />
+              </div>
 
-            <div className="flex items-center justify-between text-sm">
-              <Link href="/" className="text-[#0B2B5A] hover:underline">
-                ← Back to home
-              </Link>
-              <Link href="/login" className="text-slate-700 hover:underline">
-                Already have an account? Log in
-              </Link>
+              <div>
+                <label className="text-sm font-medium text-slate-700">
+                  Parent email
+                </label>
+                <input
+                  type="email"
+                  value={parentEmail}
+                  onChange={(e) => setParentEmail(e.target.value)}
+                  placeholder="parent@example.com"
+                  className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-400"
+                />
+                <p className="mt-2 text-xs text-slate-500">
+                  Used for recovery and future parent dashboard.
+                </p>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-slate-700">
+                  Set password
+                </label>
+
+                <div className="relative mt-2">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    minLength={6}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter password"
+                    className="w-full rounded-xl border border-slate-300 px-4 py-3 pr-12 text-sm outline-none focus:border-slate-400"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-2 text-slate-600 hover:bg-slate-100"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+
+                <p className="mt-1 text-xs text-slate-500">At least 6 characters</p>
+              </div>
+
+              {error && (
+                <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={!canContinue || submitting}
+                className="mt-2 w-full rounded-xl bg-[#0B2B5A] px-5 py-3 text-sm font-semibold text-white hover:bg-[#0A2550] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {submitting ? "Creating..." : "Create profile →"}
+              </button>
+
+              <div className="rounded-xl bg-slate-50 p-4 text-xs text-slate-600">
+                <div className="font-medium text-slate-800">Important</div>
+                <ul className="mt-2 list-disc space-y-1 pl-5">
+                  <li>Set password helps the student log in quickly next time</li>
+                  <li>Parent email is used for recovery if password is forgotten</li>
+                  <li>In Phase 2 we'll add proper accounts and Google sign-in</li>
+                </ul>
+              </div>
+
+              <div className="flex items-center justify-between text-sm">
+                <Link href="/" className="text-[#0B2B5A] hover:underline">
+                  ← Back to home
+                </Link>
+                <Link href="/login" className="text-slate-700 hover:underline">
+                  Already have an account? Log in
+                </Link>
+              </div>
+            </form>
+          )}
+
+          {/* Parent tab */}
+          {tab === "parent" && (
+            <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-6 text-center">
+              <p className="text-sm leading-6 text-slate-700">
+                Parent dashboard is coming with the Grade 4 launch.
+                <br />
+                Track your child's lessons, quiz scores, and weekly progress — all in one place.
+                <br />
+                Sign up as a student now to get started.
+              </p>
+              <button
+                type="button"
+                onClick={() => setTab("student")}
+                className="mt-5 inline-flex items-center justify-center rounded-xl bg-[#0B2B5A] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#0A2550]"
+              >
+                Sign up as Student
+              </button>
             </div>
-          </form>
+          )}
         </div>
       </div>
     </div>
