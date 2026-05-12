@@ -218,7 +218,6 @@ export default function DashboardPage() {
           ) : (
             <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {dashboardQuizzes.map((q) => {
-                const questionsCount = Array.isArray(q.questions) ? q.questions.length : 0;
                 const levelLabel = normalizeTitle(q.subjectTitle) === "mathematics" ? "Beta" : q.level;
 
                 return (
@@ -234,8 +233,7 @@ export default function DashboardPage() {
                       {levelLabel ? <span> • {levelLabel}</span> : null}
                     </div>
 
-                    <div className="mt-3 flex items-center justify-between">
-                      <span className="text-xs text-gray-500">{questionsCount} questions</span>
+                    <div className="mt-3 flex items-center justify-end">
                       <span className="text-xs font-semibold text-[#0B2B5A]">Start →</span>
                     </div>
                   </Link>
