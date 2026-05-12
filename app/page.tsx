@@ -1,6 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import Reveal from "@/components/Reveal";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/auth";
 
 const SUBJECT_PREVIEW = [
   "Math",
@@ -9,6 +13,14 @@ const SUBJECT_PREVIEW = [
 ];
 
 export default function HomePage() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setIsLoggedIn(!!data.session);
+    });
+  }, []);
+
   return (
     <main className="min-h-screen bg-white text-slate-900">
       {/* HERO (Blue) */}
@@ -32,7 +44,7 @@ export default function HomePage() {
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
-                href="/signup"
+                href={isLoggedIn ? "/dashboard" : "/signup"}
                 className="rounded-xl bg-white px-5 py-3 text-sm font-semibold text-[#0B2B5A] transition-all duration-200 hover:bg-white/95 hover:-translate-y-0.5 active:translate-y-0"
               >
                 Start with Phase 1
