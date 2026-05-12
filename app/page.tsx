@@ -148,7 +148,7 @@ export default function HomePage() {
       {/* FOCUS (Blue section + image on right) */}
       <section className="bg-[#0B2B5A] text-white">
         <div className="mx-auto max-w-6xl px-4 py-16">
-          <div className="grid items-center gap-10 md:grid-cols-2">
+          <div className="flex items-center gap-10">
             <Reveal>
               <div>
                 <h3 className="text-2xl font-semibold tracking-tight md:text-3xl">
