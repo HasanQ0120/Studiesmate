@@ -1,124 +1,80 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import Reveal from "@/components/Reveal";
 
-export default function Phase1Page() {
-  const [ready, setReady] = useState(false);
+const GRADES = [
+  {
+    name: "Beta",
+    desc: "2 Math lessons + 2 quizzes. Free forever.",
+    price: "Free",
+    blurPrice: false,
+    isBeta: true,
+  },
+  { name: "Grade 1", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 800/month",  blurPrice: true, isBeta: false },
+  { name: "Grade 2", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 1,000/month", blurPrice: true, isBeta: false },
+  { name: "Grade 3", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 1,200/month", blurPrice: true, isBeta: false },
+  { name: "Grade 4", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 1,500/month", blurPrice: true, isBeta: false },
+  { name: "Grade 5", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 2,000/month", blurPrice: true, isBeta: false },
+  { name: "Grade 6", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 2,500/month", blurPrice: true, isBeta: false },
+  { name: "Grade 7", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 3,000/month", blurPrice: true, isBeta: false },
+  { name: "Grade 8", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 3,500/month", blurPrice: true, isBeta: false },
+];
 
-  useEffect(() => {
-    const id = requestAnimationFrame(() => setReady(true));
-    return () => cancelAnimationFrame(id);
-  }, []);
-
+export default function GradesPage() {
   return (
-    <main
-      className={[
-        "min-h-screen bg-white text-slate-900",
-        "transition-opacity duration-500 ease-out",
-        ready ? "opacity-100" : "opacity-0",
-      ].join(" ")}
-    >
-      {/* Top header area */}
-      <section className="bg-[#0B2B5A] text-white">
-        <div className="mx-auto max-w-6xl px-4 py-14">
-          <Reveal className="max-w-3xl">
-            <p className="text-sm font-medium text-white/80">
-              Early Access (Beta)
-            </p>
+    <main className="min-h-screen bg-white text-slate-900">
+      <div className="mx-auto max-w-6xl px-4 py-14">
+        <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
+          Choose Your Grade
+        </h1>
+        <p className="mt-3 text-base text-slate-600">
+          Start free with Beta or unlock full access for your child's grade.
+        </p>
 
-            <h1 className="mt-4 text-3xl font-semibold md:text-4xl">
-              Phase 1 (Free Beta)
-            </h1>
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {GRADES.map((g) => (
+            <div
+              key={g.name}
+              className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+            >
+              <h2 className="text-lg font-semibold text-slate-900">{g.name}</h2>
+              <p className="mt-2 text-sm text-slate-600">{g.desc}</p>
 
-            <p className="mt-4 text-base leading-7 text-white/85 md:text-lg">
-              Phase 1 beta is free for early users. Try the experience, practice
-              with real lessons, and share feedback before the full Phase 1 paid
-              launch.
-            </p>
+              <div className={`mt-4 text-2xl font-bold text-slate-900 ${g.blurPrice ? "blur-sm select-none" : ""}`}>
+                {g.price}
+              </div>
 
-            <div className="mt-7 flex flex-wrap gap-3">
-              <Link
-                href="/signup"
-                className="rounded-xl bg-white px-5 py-3 text-sm font-semibold text-[#0B2B5A] hover:bg-white/95 hover:-translate-y-0.5"
-              >
-                Start Phase 1 (Free Beta)
-              </Link>
-
-              <Link
-                href="/"
-                className="rounded-xl border border-white/30 px-5 py-3 text-sm font-semibold text-white hover:bg-white/10 hover:-translate-y-0.5"
-              >
-                Back to Home
-              </Link>
+              <div className="mt-5 flex flex-col gap-2">
+                {g.isBeta ? (
+                  <Link
+                    href="/signup"
+                    className="inline-flex items-center justify-center rounded-xl bg-[#0B2B5A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0A2550]"
+                  >
+                    Start Free
+                  </Link>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      disabled
+                      className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-400 cursor-not-allowed"
+                    >
+                      Add to Cart
+                    </button>
+                    <button
+                      type="button"
+                      disabled
+                      className="inline-flex items-center justify-center rounded-xl bg-slate-200 px-4 py-2 text-sm font-semibold text-slate-400 cursor-not-allowed"
+                    >
+                      Buy Now
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
-          </Reveal>
+          ))}
         </div>
-      </section>
-
-      {/* Cards */}
-      <section className="bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-14">
-          <Reveal>
-            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-              {/* Card 1 */}
-              <Reveal>
-                <div className="rounded-2xl border border-slate-200 p-6 hover:-translate-y-1 hover:shadow-lg transition-all duration-200">
-                  <h2 className="text-lg font-semibold">What is Phase 1</h2>
-                  <p className="mt-2 text-sm leading-6 text-slate-700">
-                    Phase 1 is the complete Classes 1–8 learning system with
-                    lessons and quizzes. The beta gives early access to a small
-                    part of Phase 1 before full launch.
-                  </p>
-                </div>
-              </Reveal>
-
-              {/* Card 2 */}
-              <Reveal delayMs={80}>
-                <div className="rounded-2xl border border-slate-200 p-6 hover:-translate-y-1 hover:shadow-lg transition-all duration-200">
-                  <h2 className="text-lg font-semibold">
-                    What the Free Beta includes
-                  </h2>
-                  <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-700">
-                    <li>• Class 4 Math only</li>
-                    <li>• Core math lessons</li>
-                    <li>• Practice quizzes for understanding</li>
-                    <li>• Urdu + English support</li>
-                    <li>• Feedback submission</li>
-                  </ul>
-                </div>
-              </Reveal>
-
-              {/* Card 3 */}
-              <Reveal delayMs={160}>
-                <div className="rounded-2xl border border-slate-200 p-6 hover:-translate-y-1 hover:shadow-lg transition-all duration-200">
-                  <h2 className="text-lg font-semibold">
-                    What Full Phase 1 will include
-                  </h2>
-                  <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-700">
-                    <li>• All Class 1–8 subjects</li>
-                    <li>• Full lessons and quizzes</li>
-                    <li>• Bilingual explanations</li>
-                    <li>• Parent progress tracking</li>
-                  </ul>
-                </div>
-              </Reveal>
-
-              {/* Card 4 */}
-              <Reveal delayMs={240}>
-                <div className="rounded-2xl border border-slate-200 p-6 hover:-translate-y-1 hover:shadow-lg transition-all duration-200">
-                  <h2 className="text-lg font-semibold">Pricing</h2>
-                  <p className="mt-2 text-sm leading-6 text-slate-700">
-                    Phase 1 beta is free. Full Phase 1 will be paid after beta
-                    stabilizes. No ads.
-                  </p>
-                </div>
-              </Reveal>
-            </div>
-          </Reveal>
-        </div>
-      </section>
+      </div>
     </main>
   );
 }
