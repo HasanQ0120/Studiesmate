@@ -186,7 +186,7 @@ export default function HomePage() {
               </div>
             </Reveal>
 
-            <div style={{ alignSelf: 'stretch', height: '100%' }}>
+            <div style={{ alignSelf: 'flex-start', marginTop: '2rem' }}>
             <Reveal delayMs={120}>
               <div className="relative" style={{ height: '100%' }}>
                 <div className="overflow-hidden rounded-2xl border border-white/15 bg-white/5 shadow-lg transition-all duration-300 hover:shadow-xl" style={{ height: '100%' }}>
