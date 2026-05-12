@@ -148,7 +148,7 @@ export default function HomePage() {
       {/* FOCUS (Blue section + image on right) */}
       <section className="bg-[#0B2B5A] text-white">
         <div className="mx-auto max-w-6xl px-4 py-16">
-          <div className="grid items-start gap-10 md:grid-cols-2">
+          <div className="grid items-center gap-10 md:grid-cols-2">
             <Reveal>
               <div>
                 <h3 className="text-2xl font-semibold tracking-tight md:text-3xl">
@@ -187,8 +187,8 @@ export default function HomePage() {
             </Reveal>
 
             <Reveal delayMs={120}>
-              <div className="relative mt-6 md:mt-16">
-                <div className="mt-12 overflow-hidden rounded-2xl border border-white/15 bg-white/5 shadow-lg transition-all duration-300 hover:shadow-xl">
+              <div className="relative">
+                <div className="overflow-hidden rounded-2xl border border-white/15 bg-white/5 shadow-lg transition-all duration-300 hover:shadow-xl">
                   <Image
                     src="/images/picture.png"
                     alt="Student learning"
