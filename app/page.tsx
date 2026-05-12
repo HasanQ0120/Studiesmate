@@ -196,7 +196,7 @@ export default function HomePage() {
                     width={1200}
                     height={900}
                     className="w-full transition-transform duration-500 hover:scale-[1.02]"
-                    style={{ height: '100%', alignSelf: 'stretch', objectFit: 'cover' }}
+                    style={{ marginTop: '40px', height: 'calc(100% - 40px)', alignSelf: 'flex-start', objectFit: 'cover' }}
                     priority
                   />
                 </div>
