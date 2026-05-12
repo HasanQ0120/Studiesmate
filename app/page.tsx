@@ -55,7 +55,7 @@ export default function HomePage() {
                 "Parent-friendly",
                 "Urdu + English support",
                 "Short daily lessons",
-                "What's included",
+                "Bilingual Learning",
               ].map((t) => (
                 <span
                   key={t}

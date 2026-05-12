@@ -23,9 +23,6 @@ export default function Footer() {
             <Link href="/subjects" className="text-white/85 hover:text-white">
               Subjects
             </Link>
-            <Link href="/parent" className="text-white/85 hover:text-white">
-              Parent
-            </Link>
             <Link href="/login" className="text-white/85 hover:text-white">
               Login
             </Link>
@@ -40,7 +37,7 @@ export default function Footer() {
               If you’re testing Phase 1 and spot confusion, send feedback.
             </p>
             <p className="mt-3 text-xs text-white/65">
-              For feedback and support: studiesmate.pk@gmail.com
+              Contact: studiesmate.org@gmail.com
             </p>
           </div>
         </div>

@@ -126,20 +126,12 @@ export default function Header() {
             Phase 1
           </Link>
 
-          <Link href="/ai-support" className="opacity-95 hover:opacity-100">
-            StudiesMate AI (Beta)
-          </Link>
-
           <Link href="/feedback" className="opacity-95 hover:opacity-100">
             Feedback (Beta)
           </Link>
 
           <Link href="/about" className="opacity-95 hover:opacity-100">
             About
-          </Link>
-
-          <Link href="/parent" className="opacity-95 hover:opacity-100">
-            Parent
           </Link>
 
           {isLoggedIn && (
@@ -182,27 +174,11 @@ export default function Header() {
                     </Link>
 
                     <Link
-                      href="/ai-support"
-                      onClick={closeMobileNav}
-                      className="rounded-lg px-3 py-2 hover:bg-white/10"
-                    >
-                      StudiesMate AI (Beta)
-                    </Link>
-
-                    <Link
                       href="/feedback"
                       onClick={closeMobileNav}
                       className="rounded-lg px-3 py-2 hover:bg-white/10"
                     >
                       Feedback (Beta)
-                    </Link>
-
-                    <Link
-                      href="/parent"
-                      onClick={closeMobileNav}
-                      className="rounded-lg px-3 py-2 hover:bg-white/10"
-                    >
-                      Parent
                     </Link>
 
                     <Link
