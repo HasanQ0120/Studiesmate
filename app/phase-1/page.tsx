@@ -3,21 +3,15 @@
 import Link from "next/link";
 
 const GRADES = [
-  {
-    name: "Beta",
-    desc: "2 Math lessons + 2 quizzes. Free forever.",
-    price: "Free",
-    blurPrice: false,
-    isBeta: true,
-  },
-  { name: "Grade 1", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 800/month",  blurPrice: true, isBeta: false },
-  { name: "Grade 2", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 1,000/month", blurPrice: true, isBeta: false },
-  { name: "Grade 3", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 1,200/month", blurPrice: true, isBeta: false },
-  { name: "Grade 4", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 1,500/month", blurPrice: true, isBeta: false },
-  { name: "Grade 5", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 2,000/month", blurPrice: true, isBeta: false },
-  { name: "Grade 6", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 2,500/month", blurPrice: true, isBeta: false },
-  { name: "Grade 7", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 3,000/month", blurPrice: true, isBeta: false },
-  { name: "Grade 8", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 3,500/month", blurPrice: true, isBeta: false },
+  { name: "Beta",    desc: "2 Math lessons + 2 quizzes. Free forever.",        price: "Free",            blurPrice: false, isBeta: true,  status: null },
+  { name: "Grade 1", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 800/month",   blurPrice: true,  isBeta: false, status: "coming-soon" },
+  { name: "Grade 2", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 1,000/month", blurPrice: true,  isBeta: false, status: "coming-soon" },
+  { name: "Grade 3", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 1,200/month", blurPrice: true,  isBeta: false, status: "coming-soon" },
+  { name: "Grade 4", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 1,500/month", blurPrice: true,  isBeta: false, status: "in-progress" },
+  { name: "Grade 5", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 2,000/month", blurPrice: true,  isBeta: false, status: "coming-soon" },
+  { name: "Grade 6", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 2,500/month", blurPrice: true,  isBeta: false, status: "coming-soon" },
+  { name: "Grade 7", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 3,000/month", blurPrice: true,  isBeta: false, status: "coming-soon" },
+  { name: "Grade 8", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 3,500/month", blurPrice: true,  isBeta: false, status: "coming-soon" },
 ];
 
 export default function GradesPage() {
@@ -38,9 +32,17 @@ export default function GradesPage() {
           {GRADES.map((g) => (
             <div
               key={g.name}
-              className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+              className={`rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ${g.status === "in-progress" ? "border-t-[3px] border-t-[#0B2B5A]" : ""}`}
             >
-              <h2 className="text-lg font-semibold text-slate-900">{g.name}</h2>
+              <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+                {g.name}
+                {g.status === "in-progress" && (
+                  <span className="text-sm font-semibold text-[#0B2B5A]">In Progress</span>
+                )}
+                {g.status === "coming-soon" && (
+                  <span className="text-sm font-semibold text-[#0B2B5A]">Coming Soon</span>
+                )}
+              </h2>
               <p className="mt-2 text-sm text-slate-600">{g.desc}</p>
 
               <div className={`mt-4 text-2xl font-bold text-slate-900 ${g.blurPrice ? "blur-sm select-none" : ""}`}>
