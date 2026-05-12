@@ -34,9 +34,6 @@ export default function Footer() {
           <div>
             <div className="text-sm font-semibold">Contact</div>
             <p className="mt-2 text-sm text-white/80">
-              If you’re testing Phase 1 and spot confusion, send feedback.
-            </p>
-            <p className="mt-3 text-xs text-white/65">
               Contact: studiesmate.org@gmail.com
             </p>
           </div>
