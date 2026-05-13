@@ -35,7 +35,7 @@ export const QUIZZES: Quiz[] = [
       {
         id: "npv2",
         type: "mcq",
-        question: "Which digit is in the Hundred Thousands place in 3,45,891?",
+        question: "Which digit is in the Hundred Thousands place in 345,891?",
         options: ["3", "4", "5", "8"],
         correctIndex: 0,
       },
@@ -49,21 +49,21 @@ export const QUIZZES: Quiz[] = [
       {
         id: "npv4",
         type: "mcq",
-        question: "In 2,75,461 — what is the value of 5?",
+        question: "In 275,461 — what is the value of 5?",
         options: ["5", "500", "5,000", "50,000"],
         correctIndex: 2,
       },
       {
         id: "npv5",
         type: "fill",
-        question: "The number 4,00,000 + 30,000 + 200 + 7 in standard form is ______",
-        correctAnswers: ["430207", "4,30,207"],
+        question: "The number 400,000 + 30,000 + 200 + 7 in standard form is ______",
+        correctAnswers: ["430207", "430,207"],
       },
       {
         id: "npv6",
         type: "fill",
         question: "In 8,563 — the digit 8 is in the ______ place",
-        correctAnswers: ["thousands"],
+        correctAnswers: ["thousands", "thousand"],
       },
       {
         id: "npv7",
@@ -101,8 +101,8 @@ export const QUIZZES: Quiz[] = [
       {
         id: "rwn2",
         type: "mcq",
-        question: 'Which number equals "Two lakh fifty three thousand four hundred"?',
-        options: ["25,3400", "2,53,400", "25,34,00", "2,534,00"],
+        question: 'Which number equals "Two hundred fifty three thousand four hundred"?',
+        options: ["25,3400", "253,400", "25,34,00", "2,534,00"],
         correctIndex: 1,
       },
       {
@@ -127,8 +127,8 @@ export const QUIZZES: Quiz[] = [
       {
         id: "rwn5",
         type: "fill",
-        question: "Write 1,00,000 in words",
-        correctAnswers: ["one lakh"],
+        question: "Write 100,000 in words",
+        correctAnswers: ["one hundred thousand", "100000", "100,000"],
       },
       {
         id: "rwn6",
@@ -139,14 +139,14 @@ export const QUIZZES: Quiz[] = [
       {
         id: "rwn7",
         type: "fill",
-        question: "Write 9,08,006 in words",
-        correctAnswers: ["nine lakh eight thousand six"],
+        question: "Write 908,006 in words",
+        correctAnswers: ["nine hundred eight thousand six", "nine hundred and eight thousand six"],
       },
       {
         id: "rwn8",
         type: "fill",
-        question: 'The standard form of "Six lakh five" is ______',
-        correctAnswers: ["600005", "6,00,005"],
+        question: 'The standard form of "Six hundred thousand five" is ______',
+        correctAnswers: ["600005", "600,005"],
       },
     ],
   },
