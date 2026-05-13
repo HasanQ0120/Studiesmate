@@ -163,9 +163,9 @@ export default function QuizPlayPage() {
           <h2 className="mt-2 text-lg font-semibold leading-snug">{question.question}</h2>
 
           {/* MCQ options */}
-          {!isFill && (
+          {question.options && question.options.length > 0 && (
             <div className="mt-5 grid gap-3">
-              {(question.options ?? []).map((opt, i) => {
+              {question.options.map((opt, i) => {
                 let cls =
                   "w-full rounded-xl border px-4 py-3 text-left text-sm font-medium transition-all duration-150";
 
@@ -192,7 +192,7 @@ export default function QuizPlayPage() {
           )}
 
           {/* Fill-in-blank */}
-          {isFill && (
+          {(!question.options || question.options.length === 0) && (
             <div className="mt-5 space-y-3">
               <input
                 value={fillInput}
