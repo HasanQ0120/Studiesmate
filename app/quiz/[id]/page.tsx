@@ -15,7 +15,7 @@ const SYLLABUS: Record<string, { title: string; topics: string[] }> = {
     title: "Mathematics Syllabus",
     topics: [
       "Numbers & Place Value",
-      "Addition & Subtraction",
+      "Reading & Writing Whole Numbers",
     ],
   },
   english: {

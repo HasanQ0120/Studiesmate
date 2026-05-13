@@ -2,12 +2,26 @@
 
 import BackButton from "@/components/BackButton";
 import { useParams } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+declare global {
+  interface Window {
+    YT: { Player: any };
+    onYouTubeIframeAPIReady: () => void;
+  }
+}
 
 const SUBJECT_TITLE = "Maths";
 
+// Placeholder video IDs — update Urdu ID when ready
+const VIDEO_IDS: Record<string, { en: string; ur: string }> = {
+  numbers:             { en: "PLACEHOLDER_VIDEO_ID", ur: "PLACEHOLDER_VIDEO_ID" },
+  "addition-subtraction": { en: "PLACEHOLDER_VIDEO_ID", ur: "PLACEHOLDER_VIDEO_ID" },
+};
+
 const CHAPTER_META: Record<string, { title: string; desc: string }> = {
   numbers: { title: "Numbers & Place Value", desc: "Understanding numbers, counting, and place value." },
-  "addition-subtraction": { title: "Addition & Subtraction", desc: "Basic operations with real-life examples." },
+  "addition-subtraction": { title: "Reading & Writing Whole Numbers", desc: "Reading, writing and understanding whole numbers in standard and expanded form." },
   "multiplication-division": { title: "Multiplication & Division", desc: "Repeated addition, sharing, and grouping." },
   fractions: { title: "Fractions", desc: "Parts of a whole using simple visuals." },
   decimals: { title: "Decimals", desc: "Introduction to decimal numbers." },
@@ -22,11 +36,70 @@ export default function ChapterPage() {
   const params = useParams<{ chapterId: string }>();
   const chapterId = params.chapterId;
 
-  const meta =
-    CHAPTER_META[chapterId] ?? {
-      title: "Chapter",
-      desc: "This chapter will be added soon.",
+  const meta = CHAPTER_META[chapterId] ?? {
+    title: "Chapter",
+    desc: "This chapter will be added soon.",
+  };
+
+  const [lang, setLang] = useState<"en" | "ur">("en");
+  const langRef = useRef<"en" | "ur">("en");
+  const playerRef = useRef<any>(null);
+  const ytReadyRef = useRef(false);
+
+  const videoIds = VIDEO_IDS[chapterId] ?? { en: "PLACEHOLDER_VIDEO_ID", ur: "PLACEHOLDER_VIDEO_ID" };
+
+  const initPlayer = useCallback(
+    (startSeconds = 0) => {
+      playerRef.current?.destroy?.();
+      playerRef.current = new window.YT.Player("yt-player", {
+        height: "100%",
+        width: "100%",
+        videoId: videoIds[langRef.current],
+        playerVars: {
+          enablejsapi: 1,
+          start: Math.floor(startSeconds),
+          rel: 0,
+          modestbranding: 1,
+        },
+        events: {
+          onReady: (e: any) => {
+            if (startSeconds > 0) e.target.seekTo(startSeconds, true);
+          },
+        },
+      });
+    },
+    [videoIds]
+  );
+
+  useEffect(() => {
+    const setup = () => {
+      ytReadyRef.current = true;
+      initPlayer(0);
     };
+
+    if (window.YT?.Player) {
+      setup();
+    } else {
+      window.onYouTubeIframeAPIReady = setup;
+      if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
+        const tag = document.createElement("script");
+        tag.src = "https://www.youtube.com/iframe_api";
+        document.head.appendChild(tag);
+      }
+    }
+
+    return () => {
+      playerRef.current?.destroy?.();
+    };
+  }, [initPlayer]);
+
+  function handleLangSwitch(newLang: "en" | "ur") {
+    if (newLang === lang) return;
+    const time: number = playerRef.current?.getCurrentTime?.() ?? 0;
+    langRef.current = newLang;
+    setLang(newLang);
+    if (ytReadyRef.current) initPlayer(time);
+  }
 
   return (
     <main className="min-h-screen bg-white text-slate-900">
@@ -37,6 +110,39 @@ export default function ChapterPage() {
           {SUBJECT_TITLE} • {meta.title}
         </h1>
         <p className="mt-2 text-sm text-slate-700">{meta.desc}</p>
+
+        {/* Video player + bilingual slider */}
+        <div className="mt-10">
+          <div className="aspect-video w-full overflow-hidden rounded-2xl border border-slate-200 bg-black">
+            <div id="yt-player" className="h-full w-full" />
+          </div>
+
+          {/* Bilingual slider */}
+          <div className="mt-3 flex w-fit items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 p-1">
+            <button
+              type="button"
+              onClick={() => handleLangSwitch("en")}
+              className={`rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-150 ${
+                lang === "en"
+                  ? "bg-[#0B2B5A] text-white shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              English
+            </button>
+            <button
+              type="button"
+              onClick={() => handleLangSwitch("ur")}
+              className={`rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-150 ${
+                lang === "ur"
+                  ? "bg-[#0B2B5A] text-white shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              اردو (Urdu)
+            </button>
+          </div>
+        </div>
 
         <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-6">
           <h2 className="text-base font-semibold">Lessons</h2>

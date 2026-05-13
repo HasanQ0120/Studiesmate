@@ -14,7 +14,7 @@ const LAST_ACTIVITY_KEY = "studiesmate_last_activity_v1";
 const TRACKER_STEPS = [
   "Lesson 1 — Numbers & Place Value",
   "Quiz 1",
-  "Lesson 2 — Addition & Subtraction",
+  "Lesson 2 — Reading & Writing Whole Numbers",
   "Quiz 2",
 ];
 

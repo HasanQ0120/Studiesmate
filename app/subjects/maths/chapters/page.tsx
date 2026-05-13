@@ -8,7 +8,7 @@ const SUBJECT_ID = "maths";
 
 const CHAPTERS = [
   { id: "numbers", title: "Numbers & Place Value", desc: "Understanding numbers and place value up to hundred thousands." },
-  { id: "addition-subtraction", title: "Addition & Subtraction", desc: "Multi-digit addition and subtraction with real-life examples." },
+  { id: "addition-subtraction", title: "Reading & Writing Whole Numbers", desc: "Reading, writing and understanding whole numbers in standard and expanded form." },
 ];
 
 export default function MathsChaptersPage() {
