@@ -7,6 +7,9 @@ import PageTransition from "@/components/PageTransition";
 export const metadata: Metadata = {
   title: "StudiesMate",
   description: "Learn smart. Simple. Bilingual.",
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({
