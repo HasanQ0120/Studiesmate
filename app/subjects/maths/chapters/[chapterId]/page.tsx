@@ -41,6 +41,25 @@ export default function ChapterPage() {
     desc: "This chapter will be added soon.",
   };
 
+  // Track lesson visit for dashboard progress
+  useEffect(() => {
+    if (!CHAPTER_META[chapterId]) return;
+    try {
+      const completions = JSON.parse(
+        localStorage.getItem("studiesmate_lesson_completions") || "{}"
+      );
+      completions[chapterId] = new Date().toISOString();
+      localStorage.setItem("studiesmate_lesson_completions", JSON.stringify(completions));
+      localStorage.setItem(
+        "studiesmate_last_activity_v2",
+        JSON.stringify({
+          action: `Started ${CHAPTER_META[chapterId].title} lesson`,
+          timestamp: new Date().toISOString(),
+        })
+      );
+    } catch {}
+  }, [chapterId]);
+
   const [lang, setLang] = useState<"en" | "ur">("en");
   const langRef = useRef<"en" | "ur">("en");
   const playerRef = useRef<any>(null);

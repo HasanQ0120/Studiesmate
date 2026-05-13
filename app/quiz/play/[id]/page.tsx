@@ -77,6 +77,13 @@ export default function QuizPlayPage() {
         );
         if (quiz) {
           completions[quiz.id] = true;
+          localStorage.setItem(
+            "studiesmate_last_activity_v2",
+            JSON.stringify({
+              action: `Completed ${quiz.title} Quiz`,
+              timestamp: new Date().toISOString(),
+            })
+          );
         }
         localStorage.setItem("studiesmate_quiz_completions", JSON.stringify(completions));
       } catch {}
