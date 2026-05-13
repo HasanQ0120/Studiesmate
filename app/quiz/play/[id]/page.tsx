@@ -75,7 +75,9 @@ export default function QuizPlayPage() {
         const completions = JSON.parse(
           localStorage.getItem("studiesmate_quiz_completions") || "{}"
         );
-        completions[quiz.id] = true;
+        if (quiz) {
+          completions[quiz.id] = true;
+        }
         localStorage.setItem("studiesmate_quiz_completions", JSON.stringify(completions));
       } catch {}
       setDone(true);
