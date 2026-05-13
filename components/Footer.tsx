@@ -9,7 +9,7 @@ export default function Footer() {
             <div className="text-lg font-semibold">StudiesMate</div>
             <p className="mt-2 text-sm text-white/80">Calm learning. Clear progress.</p>
             <p className="mt-4 text-xs text-white/65">
-              Phase 1 focuses on trust and clarity, not hype.
+              Beta — building trust and clarity first.
             </p>
           </div>
 

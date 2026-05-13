@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
@@ -113,7 +114,7 @@ export default function Header() {
     <header className="sticky top-0 z-50 border-b border-white/10 bg-[#0B2B5A] text-white">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
         <Link href="/" className="flex items-center gap-2">
-          <span className="text-lg font-semibold tracking-tight">StudiesMate</span>
+          <Image src="/logo.png" alt="StudiesMate" width={160} height={40} />
         </Link>
 
         {/* Desktop nav */}
@@ -218,7 +219,7 @@ export default function Header() {
                 href="/signup"
                 className="rounded-lg bg-white px-3 py-2 text-sm font-semibold text-[#0B2B5A] hover:bg-white/95"
               >
-                Start with Phase 1
+                Start Free Beta
               </Link>
             </>
           ) : (

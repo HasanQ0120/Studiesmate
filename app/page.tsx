@@ -47,7 +47,7 @@ export default function HomePage() {
                 href={isLoggedIn ? "/dashboard" : "/signup"}
                 className="rounded-xl bg-white px-5 py-3 text-sm font-semibold text-[#0B2B5A] transition-all duration-200 hover:bg-white/95 hover:-translate-y-0.5 active:translate-y-0"
               >
-                Start with Phase 1
+                Start Free Beta
               </Link>
               <Link
                 href="/subjects"
@@ -321,7 +321,7 @@ export default function HomePage() {
                     Start with calm, consistent learning
                   </h3>
                   <p className="mt-2 text-sm leading-6 text-white/80">
-                    Try Phase 1 and help us spot confusion. We’re building trust
+                    Try Beta and help us spot confusion. We’re building trust
                     and clarity first.
                   </p>
                 </div>
@@ -358,7 +358,7 @@ export default function HomePage() {
                 </p>
               </div>
               <div className="mt-5 md:mt-0">
-                <p className="text-sm text-slate-500">Available with Grade 4 launch — coming soon.</p>
+                <p className="text-sm text-slate-500">Available with Grade 4 launch — In Progress.</p>
               </div>
             </div>
           </Reveal>
