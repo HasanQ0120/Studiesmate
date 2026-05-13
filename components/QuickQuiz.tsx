@@ -105,37 +105,48 @@ export default function QuickQuiz({ quiz, storageKey }: Props) {
                 {idx + 1}. {q.question}
               </div>
 
-              <div className="mt-3 grid gap-2">
-                {q.options.map((opt, i) => {
-                  const isPicked = picked === i;
-                  const showState = submitted;
-                  const isCorrect = i === correct;
-                  const isWrongPicked = showState && isPicked && i !== correct;
+              {q.options ? (
+                <div className="mt-3 grid gap-2">
+                  {q.options.map((opt, i) => {
+                    const isPicked = picked === i;
+                    const showState = submitted;
+                    const isCorrect = i === correct;
+                    const isWrongPicked = showState && isPicked && i !== correct;
 
-                  let cls = "w-full rounded-lg border px-3 py-2 text-left text-sm transition";
+                    let cls = "w-full rounded-lg border px-3 py-2 text-left text-sm transition";
 
-                  if (!showState) {
-                    cls += isPicked
-                      ? " border-[#0B2B5A] bg-slate-50"
-                      : " border-slate-200 hover:bg-slate-50";
-                  } else {
-                    if (isCorrect) cls += " border-green-300 bg-green-50";
-                    else if (isWrongPicked) cls += " border-red-300 bg-red-50";
-                    else cls += " border-slate-200 bg-white";
-                  }
+                    if (!showState) {
+                      cls += isPicked
+                        ? " border-[#0B2B5A] bg-slate-50"
+                        : " border-slate-200 hover:bg-slate-50";
+                    } else {
+                      if (isCorrect) cls += " border-green-300 bg-green-50";
+                      else if (isWrongPicked) cls += " border-red-300 bg-red-50";
+                      else cls += " border-slate-200 bg-white";
+                    }
 
-                  return (
-                    <button
-                      key={opt}
-                      type="button"
-                      className={cls}
-                      onClick={() => pick(q.id, i)}
-                    >
-                      {opt}
-                    </button>
-                  );
-                })}
-              </div>
+                    return (
+                      <button
+                        key={opt}
+                        type="button"
+                        className={cls}
+                        onClick={() => pick(q.id, i)}
+                      >
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="mt-3">
+                  <input
+                    type="text"
+                    className="border rounded px-3 py-2 w-full"
+                    placeholder="Type your answer..."
+                    disabled={submitted}
+                  />
+                </div>
+              )}
 
               {submitted && q.explanation && (
                 <div className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-700">
