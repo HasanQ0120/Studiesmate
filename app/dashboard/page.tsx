@@ -1,14 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight } from "lucide-react";
-
-import { QUIZZES, type Quiz } from "@/data/quizzes";
+import { ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
 
 const PROGRESS_KEY = "studiesmate_progress_v1";
 const LAST_ACTIVITY_KEY = "studiesmate_last_activity_v1";
+const QUIZ_COMPLETIONS_KEY = "studiesmate_quiz_completions";
 
 const TRACKER_STEPS = [
   "Lesson 1 — Numbers & Place Value",
@@ -16,6 +15,12 @@ const TRACKER_STEPS = [
   "Lesson 2 — Reading & Writing Whole Numbers",
   "Quiz 2",
 ];
+
+// Map quiz IDs to the tracker step index they complete
+const QUIZ_STEP_MAP: Record<string, number> = {
+  "math-npv": 1,
+  "math-rwn": 3,
+};
 
 const FIXED_SUBJECTS = [
   {
@@ -46,10 +51,6 @@ function safeParseJSON<T>(raw: string | null, fallback: T): T {
   }
 }
 
-function normalizeTitle(s: string) {
-  return s.trim().toLowerCase();
-}
-
 type SubjectProgress = Record<string, { completed: number; total: number }>;
 type ProgressPayload = { weeklyCompleted: number; subjects: SubjectProgress };
 
@@ -58,6 +59,8 @@ export default function DashboardPage() {
 
   const [lastActivity, setLastActivity] = useState<string>("");
   const [subjectProgress, setSubjectProgress] = useState<SubjectProgress>({});
+  const [quizCompletions, setQuizCompletions] = useState<Record<string, boolean>>({});
+  const [mathOpen, setMathOpen] = useState(false);
 
   useEffect(() => {
     const progress = safeParseJSON<ProgressPayload>(localStorage.getItem(PROGRESS_KEY), {
@@ -66,14 +69,18 @@ export default function DashboardPage() {
     });
     setSubjectProgress(progress.subjects || {});
     setLastActivity(localStorage.getItem(LAST_ACTIVITY_KEY) || "");
+    setQuizCompletions(
+      safeParseJSON<Record<string, boolean>>(localStorage.getItem(QUIZ_COMPLETIONS_KEY), {})
+    );
 
     const onStorage = (e: StorageEvent) => {
       if (e.key === PROGRESS_KEY) {
         const next = safeParseJSON<ProgressPayload>(e.newValue, { weeklyCompleted: 0, subjects: {} });
         setSubjectProgress(next.subjects || {});
       }
-      if (e.key === LAST_ACTIVITY_KEY) {
-        setLastActivity(e.newValue || "");
+      if (e.key === LAST_ACTIVITY_KEY) setLastActivity(e.newValue || "");
+      if (e.key === QUIZ_COMPLETIONS_KEY) {
+        setQuizCompletions(safeParseJSON<Record<string, boolean>>(e.newValue, {}));
       }
     };
 
@@ -81,13 +88,15 @@ export default function DashboardPage() {
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
-  const dashboardQuizzes: Quiz[] = useMemo(() => {
-    return (Array.isArray(QUIZZES) ? QUIZZES : [])
-      .filter((q) => normalizeTitle(q.subjectTitle) === "mathematics")
-      .slice(0, 9);
-  }, []);
+  // Which tracker step indices are completed
+  const completedStepSet = new Set(
+    Object.entries(quizCompletions)
+      .filter(([, done]) => done)
+      .map(([id]) => QUIZ_STEP_MAP[id])
+      .filter((idx): idx is number => idx !== undefined)
+  );
 
-  const trackerCompleted = 0;
+  const trackerDoneCount = completedStepSet.size;
 
   return (
     <div className="min-h-screen bg-white px-6 py-10">
@@ -136,60 +145,83 @@ export default function DashboardPage() {
                     </button>
                   </>
                 ) : (
-                  <p className="mt-4 text-sm text-slate-500">Available in Full Phase 1</p>
+                  <p className="mt-4 text-sm text-slate-500">Available in Full Launch</p>
                 )}
               </div>
             );
           })}
         </div>
 
-        {/* Quick Quizzes */}
+        {/* Quick Quizzes — 3 modules */}
         <div className="mt-10 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">Quick Quizzes</h3>
-              <p className="mt-1 text-sm text-gray-600">
-                Short practice to build confidence. Pick any quiz and go.
-              </p>
-            </div>
+          <h3 className="text-lg font-semibold text-gray-900">Quick Quizzes</h3>
+          <p className="mt-1 text-sm text-gray-600">
+            Short practice to build confidence. Pick a subject to begin.
+          </p>
 
-            {dashboardQuizzes.length > 0 && (
-              <div className="text-xs text-gray-500">
-                Showing <span className="font-semibold text-gray-700">{dashboardQuizzes.length}</span> quizzes
-              </div>
-            )}
-          </div>
+          <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {/* Math module — expandable */}
+            <div className="rounded-xl border border-gray-200 bg-white p-4">
+              <button
+                type="button"
+                onClick={() => setMathOpen((v) => !v)}
+                className="flex w-full items-center justify-between"
+              >
+                <div className="text-left">
+                  <div className="text-sm font-semibold text-gray-900">Mathematics</div>
+                  <div className="mt-0.5 text-xs text-gray-500">2 quizzes available</div>
+                </div>
+                {mathOpen ? (
+                  <ChevronUp className="h-4 w-4 text-gray-400 shrink-0" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 text-gray-400 shrink-0" />
+                )}
+              </button>
 
-          {dashboardQuizzes.length === 0 ? (
-            <div className="mt-4 rounded-xl bg-gray-50 px-4 py-3 text-sm text-gray-600">
-              Quizzes will appear here soon.
-            </div>
-          ) : (
-            <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {dashboardQuizzes.map((q) => {
-                const levelLabel = normalizeTitle(q.subjectTitle) === "mathematics" ? "Beta" : q.level;
-
-                return (
+              {mathOpen && (
+                <div className="mt-3 space-y-2">
                   <Link
-                    key={q.id}
-                    href={q.playable ? `/quiz/play/${q.id}` : `/quiz/${q.id}`}
-                    className="rounded-xl border border-gray-200 bg-white p-4 hover:bg-gray-50 transition"
+                    href="/quiz/play/math-npv"
+                    className="block rounded-lg border border-gray-100 bg-gray-50 px-3 py-2.5 hover:bg-slate-100 transition"
                   >
-                    <div className="text-sm font-semibold text-gray-900 line-clamp-2">{q.title}</div>
-
-                    <div className="mt-2 text-xs text-gray-600">
-                      <span className="font-semibold">{q.subjectTitle}</span>
-                      {levelLabel ? <span> • {levelLabel}</span> : null}
-                    </div>
-
-                    <div className="mt-3 flex items-center justify-end">
-                      <span className="text-xs font-semibold text-[#0B2B5A]">Start →</span>
+                    <div className="text-sm font-medium text-gray-900">Numbers & Place Value</div>
+                    <div className="mt-0.5 text-xs text-gray-500">
+                      8 questions
+                      {quizCompletions["math-npv"] && (
+                        <span className="ml-2 text-green-600 font-semibold">✓ Done</span>
+                      )}
                     </div>
                   </Link>
-                );
-              })}
+                  <Link
+                    href="/quiz/play/math-rwn"
+                    className="block rounded-lg border border-gray-100 bg-gray-50 px-3 py-2.5 hover:bg-slate-100 transition"
+                  >
+                    <div className="text-sm font-medium text-gray-900">
+                      Reading & Writing Whole Numbers
+                    </div>
+                    <div className="mt-0.5 text-xs text-gray-500">
+                      8 questions
+                      {quizCompletions["math-rwn"] && (
+                        <span className="ml-2 text-green-600 font-semibold">✓ Done</span>
+                      )}
+                    </div>
+                  </Link>
+                </div>
+              )}
             </div>
-          )}
+
+            {/* English — locked */}
+            <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 cursor-not-allowed opacity-60">
+              <div className="text-sm font-semibold text-gray-500">English</div>
+              <div className="mt-1 text-xs text-gray-400">Available in Full Launch</div>
+            </div>
+
+            {/* Science — locked */}
+            <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 cursor-not-allowed opacity-60">
+              <div className="text-sm font-semibold text-gray-500">Science</div>
+              <div className="mt-1 text-xs text-gray-400">Available in Full Launch</div>
+            </div>
+          </div>
 
           <div className="mt-4 text-xs text-gray-500">Tip: finish one quiz daily. Small wins add up.</div>
         </div>
@@ -202,7 +234,9 @@ export default function DashboardPage() {
             {TRACKER_STEPS.map((_, i) => (
               <div key={i} className="flex-1">
                 <div
-                  className={`h-3 rounded-full ${i < trackerCompleted ? "bg-[#0B2B5A]" : "bg-gray-200"}`}
+                  className={`h-3 rounded-full transition-all duration-300 ${
+                    completedStepSet.has(i) ? "bg-[#0B2B5A]" : "bg-gray-200"
+                  }`}
                 />
               </div>
             ))}
@@ -218,7 +252,7 @@ export default function DashboardPage() {
             ))}
           </div>
 
-          <p className="mt-4 text-sm font-semibold text-gray-700">{trackerCompleted}/4 completed</p>
+          <p className="mt-4 text-sm font-semibold text-gray-700">{trackerDoneCount}/2 quizzes completed</p>
         </div>
       </div>
     </div>

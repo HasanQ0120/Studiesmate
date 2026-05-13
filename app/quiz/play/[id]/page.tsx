@@ -50,11 +50,15 @@ export default function QuizPlayPage() {
     }
   }
 
+  function normalizeFill(s: string) {
+    return s.trim().replace(/,/g, "").replace(/\s+/g, " ").toLowerCase();
+  }
+
   function handleFillSubmit() {
     if (isCorrect !== null || !fillInput.trim()) return;
-    const input = fillInput.trim().replace(/,/g, "").toLowerCase();
+    const input = normalizeFill(fillInput);
     const correct = (question.correctAnswers ?? []).some(
-      (a) => a.replace(/,/g, "").toLowerCase() === input
+      (a) => normalizeFill(a) === input
     );
     setIsCorrect(correct);
     if (correct) {
@@ -67,6 +71,13 @@ export default function QuizPlayPage() {
 
   function advance() {
     if (current + 1 >= total) {
+      try {
+        const completions = JSON.parse(
+          localStorage.getItem("studiesmate_quiz_completions") || "{}"
+        );
+        completions[quiz.id] = true;
+        localStorage.setItem("studiesmate_quiz_completions", JSON.stringify(completions));
+      } catch {}
       setDone(true);
     } else {
       setCurrent((c) => c + 1);
