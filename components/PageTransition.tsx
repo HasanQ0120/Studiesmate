@@ -21,7 +21,7 @@ export default function PageTransition({
     <div
       key={pathname}
       className={[
-        "transition-all duration-500 ease-out", // was 300
+        "page-wrapper transition-all duration-500 ease-out",
         show ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3",
       ].join(" ")}
     >
