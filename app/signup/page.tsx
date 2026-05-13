@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, Suspense } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { signUpParentAccount, supabase } from "@/lib/auth";
 
@@ -12,7 +12,7 @@ function isValidEmail(email: string) {
   return e.includes("@") && e.includes(".") && e.length >= 6;
 }
 
-export default function SignupPage() {
+function SignupForm() {
   const router = useRouter();
 
   const searchParams = useSearchParams();
@@ -225,5 +225,13 @@ export default function SignupPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={null}>
+      <SignupForm />
+    </Suspense>
   );
 }
