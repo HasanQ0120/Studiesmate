@@ -226,7 +226,7 @@ export default function HomePage() {
                 <Stat label="Learning style" value="Short" note="Daily-friendly lessons" />
               </Reveal>
               <Reveal delayMs={160}>
-                <Stat label="AI usage" value="Limited" note="Guided, not unlimited" />
+                <Stat label="Bilingual Slider" value="" note="Switch between English and Urdu mid-lesson instantly." />
               </Reveal>
             </div>
           </Reveal>
