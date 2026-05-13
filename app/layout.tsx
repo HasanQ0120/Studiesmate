@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: "StudiesMate",
   description: "Learn smart. Simple. Bilingual.",
   icons: {
-    icon: '/favicon.ico',
+    icon: '/favicon.png',
   },
 };
 
