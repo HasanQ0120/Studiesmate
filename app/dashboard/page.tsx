@@ -172,7 +172,7 @@ export default function DashboardPage() {
                 return (
                   <Link
                     key={q.id}
-                    href={`/quiz/${q.id}`}
+                    href={q.playable ? `/quiz/play/${q.id}` : `/quiz/${q.id}`}
                     className="rounded-xl border border-gray-200 bg-white p-4 hover:bg-gray-50 transition"
                   >
                     <div className="text-sm font-semibold text-gray-900 line-clamp-2">{q.title}</div>
