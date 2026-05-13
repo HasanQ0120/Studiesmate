@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { signUpParentAccount } from "@/lib/auth";
+import { signUpParentAccount, supabase } from "@/lib/auth";
 
 function isValidEmail(email: string) {
   const e = email.trim().toLowerCase();
@@ -15,7 +15,19 @@ function isValidEmail(email: string) {
 export default function SignupPage() {
   const router = useRouter();
 
+  const searchParams = useSearchParams();
   const [tab, setTab] = useState<"student" | "parent">("student");
+
+  useEffect(() => {
+    const role = searchParams.get("role");
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) {
+        router.replace(role === "parent" ? "/parent" : "/dashboard");
+      } else if (role === "parent") {
+        setTab("parent");
+      }
+    });
+  }, [searchParams]);
 
   const [studentName, setStudentName] = useState("");
   const [parentEmail, setParentEmail] = useState("");
