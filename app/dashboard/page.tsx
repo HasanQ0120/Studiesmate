@@ -86,7 +86,7 @@ export default function DashboardPage() {
       safeParseJSON<Record<string, string>>(localStorage.getItem(LESSON_COMPLETIONS_KEY), {})
     );
     setLastActivityData(
-      safeParseJSON<LastActivityData>(localStorage.getItem(LAST_ACTIVITY_V2_KEY), null)
+      safeParseJSON<LastActivityData | null>(localStorage.getItem(LAST_ACTIVITY_V2_KEY), null)
     );
 
     const onStorage = (e: StorageEvent) => {
@@ -101,7 +101,7 @@ export default function DashboardPage() {
         setLessonCompletions(safeParseJSON<Record<string, string>>(e.newValue, {}));
       }
       if (e.key === LAST_ACTIVITY_V2_KEY) {
-        setLastActivityData(safeParseJSON<LastActivityData>(e.newValue, null));
+        setLastActivityData(safeParseJSON<LastActivityData | null>(e.newValue, null));
       }
     };
 
