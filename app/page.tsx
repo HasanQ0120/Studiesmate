@@ -359,7 +359,7 @@ export default function HomePage() {
               </div>
               <div className="mt-5 md:mt-0">
                 <Link
-                  href="/parent"
+                  href="/signup?role=parent"
                   className="inline-flex rounded-xl bg-[#0B2B5A] px-5 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-[#0A2550] hover:-translate-y-0.5"
                 >
                   Open Parent View

@@ -2,8 +2,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo, useState, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { signUpParentAccount } from "@/lib/auth";
 
