@@ -138,7 +138,7 @@ function resultH(){
     </div>
     <div style="display:flex;gap:10px">
       <button class="btn btn-outline" id="rBtn">↺ Try again</button>
-      <button class="btn btn-primary" id="hBtn">Back to videos →</button>
+      <button class="btn btn-primary" id="hBtn">Back to Dashboard →</button>
     </div>
   </div>`;
 }
@@ -158,7 +158,7 @@ function bind(){
     } else set({qi:S.qi+1,sel:null});
   });
   const rb=document.getElementById("rBtn");if(rb)rb.addEventListener("click",()=>set({qi:0,score:0,sel:null,done:false}));
-  const hb=document.getElementById("hBtn");if(hb)hb.addEventListener("click",()=>alert("Link to your StudiesMate videos page here!"));
+  const hb=document.getElementById("hBtn");if(hb)hb.addEventListener("click",()=>window.top.location.href="/dashboard");
 }
 
 render();
