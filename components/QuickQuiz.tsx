@@ -74,6 +74,28 @@ export default function QuickQuiz({ quiz, storageKey }: Props) {
     setAnswers({});
   }
 
+  const IFRAME_SRCS: Record<string, string> = {
+    "math-npv": "/StudiesMate_Quiz_PlaceValue.html",
+    "math-rwn": "/StudiesMate_Quiz_3Forms.html",
+  };
+
+  if (IFRAME_SRCS[quiz.id]) {
+    return (
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h3 className="text-lg font-semibold text-slate-900">{quiz.title}</h3>
+        <div className="mt-4">
+          <iframe
+            src={IFRAME_SRCS[quiz.id]}
+            width="100%"
+            height="700px"
+            style={{ border: "none", borderRadius: "12px" }}
+            title={quiz.title}
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
