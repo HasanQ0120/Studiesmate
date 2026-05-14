@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 
-const PROGRESS_KEY = "studiesmate_progress_v1";
 const QUIZ_COMPLETIONS_KEY = "studiesmate_quiz_completions";
 const LESSON_COMPLETIONS_KEY = "studiesmate_lesson_completions";
 const LAST_ACTIVITY_V2_KEY = "studiesmate_last_activity_v2";
@@ -20,6 +19,11 @@ const TRACKER_STEPS = [
 const QUIZ_STEP_MAP: Record<string, number> = {
   "math-npv": 1,
   "math-rwn": 3,
+};
+
+const LESSON_STEP_MAP: Record<string, number> = {
+  "numbers": 0,
+  "addition-subtraction": 2,
 };
 
 const FIXED_SUBJECTS = [
@@ -61,24 +65,16 @@ function timeAgo(iso: string): string {
   return `${Math.floor(hrs / 24)}d ago`;
 }
 
-type SubjectProgress = Record<string, { completed: number; total: number }>;
-type ProgressPayload = { weeklyCompleted: number; subjects: SubjectProgress };
 type LastActivityData = { action: string; timestamp: string };
 
 export default function DashboardPage() {
   const router = useRouter();
 
-  const [subjectProgress, setSubjectProgress] = useState<SubjectProgress>({});
   const [quizCompletions, setQuizCompletions] = useState<Record<string, boolean>>({});
   const [lessonCompletions, setLessonCompletions] = useState<Record<string, string>>({});
   const [lastActivityData, setLastActivityData] = useState<LastActivityData | null>(null);
 
   useEffect(() => {
-    const progress = safeParseJSON<ProgressPayload>(localStorage.getItem(PROGRESS_KEY), {
-      weeklyCompleted: 0,
-      subjects: {},
-    });
-    setSubjectProgress(progress.subjects || {});
     setQuizCompletions(
       safeParseJSON<Record<string, boolean>>(localStorage.getItem(QUIZ_COMPLETIONS_KEY), {})
     );
@@ -90,10 +86,6 @@ export default function DashboardPage() {
     );
 
     const onStorage = (e: StorageEvent) => {
-      if (e.key === PROGRESS_KEY) {
-        const next = safeParseJSON<ProgressPayload>(e.newValue, { weeklyCompleted: 0, subjects: {} });
-        setSubjectProgress(next.subjects || {});
-      }
       if (e.key === QUIZ_COMPLETIONS_KEY) {
         setQuizCompletions(safeParseJSON<Record<string, boolean>>(e.newValue, {}));
       }
@@ -138,24 +130,43 @@ export default function DashboardPage() {
     return { text: "Great job! All lessons completed." };
   })();
 
-  // Progress tracker — which step indices are completed
-  const completedStepSet = new Set(
-    Object.entries(quizCompletions)
+  // Progress tracker — quiz steps + lesson steps
+  const completedStepSet = new Set([
+    ...Object.entries(quizCompletions)
       .filter(([, done]) => done)
       .map(([id]) => QUIZ_STEP_MAP[id])
-      .filter((idx): idx is number => idx !== undefined)
-  );
-
-  const trackerDoneCount = completedStepSet.size;
+      .filter((idx): idx is number => idx !== undefined),
+    ...Object.entries(lessonCompletions)
+      .filter(([, date]) => !!date)
+      .map(([id]) => LESSON_STEP_MAP[id])
+      .filter((idx): idx is number => idx !== undefined),
+  ]);
 
   // Quiz completions count for the Math module card
   const mathDoneCount = [quizCompletions["math-npv"], quizCompletions["math-rwn"]].filter(Boolean).length;
+
+  const trackerDoneCount = mathDoneCount;
+
+  // Math subject progress: 2 lessons + 2 quizzes = 4 items
+  const mathPct = Math.round(
+    ([
+      lessonCompletions["numbers"],
+      lessonCompletions["addition-subtraction"],
+      quizCompletions["math-npv"],
+      quizCompletions["math-rwn"],
+    ].filter(Boolean).length /
+      4) *
+      100
+  );
 
   return (
     <div className="min-h-screen bg-white px-6 py-10">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome 👋</h1>
         <p className="text-gray-600 mb-6">Your subjects are shown below.</p>
+
+        {/* Grade Progress Bar */}
+        <GradeProgressBar />
 
         {/* Focus + Activity */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -186,8 +197,7 @@ export default function DashboardPage() {
         {/* Subject cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {FIXED_SUBJECTS.map((subject) => {
-            const p = subjectProgress[subject.title];
-            const pct = p && p.total > 0 ? Math.round((p.completed / p.total) * 100) : 0;
+            const pct = subject.title === "Mathematics" ? mathPct : 0;
 
             return (
               <div
@@ -287,6 +297,70 @@ export default function DashboardPage() {
           <p className="mt-4 text-sm font-semibold text-gray-700">{trackerDoneCount}/2 quizzes completed</p>
         </div>
       </div>
+    </div>
+  );
+}
+
+const GRADE_ITEMS = [
+  { label: "Beta",    status: "active" as const },
+  { label: "Grade 1", status: "locked" as const },
+  { label: "Grade 2", status: "locked" as const },
+  { label: "Grade 3", status: "locked" as const },
+  { label: "Grade 4", status: "next"   as const },
+  { label: "Grade 5", status: "locked" as const },
+  { label: "Grade 6", status: "locked" as const },
+  { label: "Grade 7", status: "locked" as const },
+  { label: "Grade 8", status: "locked" as const },
+];
+
+function GradeProgressBar() {
+  const [tooltip, setTooltip] = useState<string | null>(null);
+
+  function handleClick(status: "active" | "locked" | "next") {
+    if (status === "active") return;
+    if (status === "next") {
+      setTooltip("In Progress — launching soon!");
+    } else {
+      setTooltip("Coming soon. Purchase when launched to unlock.");
+    }
+    setTimeout(() => setTooltip(null), 3000);
+  }
+
+  return (
+    <div className="mb-8 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+      <div className="flex items-center gap-1 overflow-x-auto pb-1">
+        {GRADE_ITEMS.map((g, i) => (
+          <div key={g.label} className="flex items-center shrink-0">
+            <button
+              type="button"
+              onClick={() => handleClick(g.status)}
+              className={`rounded-full px-3 py-1 text-xs font-semibold transition-all select-none ${
+                g.status === "active"
+                  ? "bg-[#0B2B5A] text-white cursor-default"
+                  : g.status === "next"
+                  ? "border-2 border-[#0B2B5A] bg-white text-[#0B2B5A] cursor-pointer hover:bg-blue-50"
+                  : "bg-gray-100 text-gray-400 cursor-pointer hover:bg-gray-200"
+              }`}
+            >
+              {g.status !== "active" && (
+                <span className="mr-1 text-[10px]">🔒</span>
+              )}
+              {g.label}
+            </button>
+            {i < GRADE_ITEMS.length - 1 && (
+              <div className="mx-1 h-px w-4 shrink-0 bg-gray-200" />
+            )}
+          </div>
+        ))}
+      </div>
+
+      {tooltip && (
+        <p className="mt-3 text-xs font-medium text-[#0B2B5A]">{tooltip}</p>
+      )}
+
+      <p className="mt-3 text-xs italic text-gray-400">
+        Purchase a grade when launched to travel seamlessly across grades.
+      </p>
     </div>
   );
 }

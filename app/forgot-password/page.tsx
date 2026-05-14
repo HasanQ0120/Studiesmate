@@ -2,16 +2,31 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { supabase } from "@/lib/auth";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!email.includes("@")) return;
+    setError("");
+    setSubmitting(true);
 
-    // Phase 1: no real email sent
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+      email.trim().toLowerCase()
+    );
+
+    setSubmitting(false);
+
+    if (resetError) {
+      setError(resetError.message);
+      return;
+    }
+
     setSubmitted(true);
   }
 
@@ -43,12 +58,18 @@ export default function ForgotPasswordPage() {
                   />
                 </div>
 
+                {error && (
+                  <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
+                    {error}
+                  </div>
+                )}
+
                 <button
                   type="submit"
-                  disabled={!email.includes("@")}
+                  disabled={!email.includes("@") || submitting}
                   className="mt-2 w-full rounded-xl bg-[#0B2B5A] px-5 py-3 text-sm font-semibold text-white hover:bg-[#0A2550] disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  Request password reset →
+                  {submitting ? "Sending..." : "Request password reset →"}
                 </button>
 
                 <div className="rounded-xl bg-slate-50 p-4 text-xs text-slate-600">

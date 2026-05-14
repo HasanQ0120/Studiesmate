@@ -94,9 +94,9 @@ export default function AuthPage() {
           <div className="mt-6 rounded-xl bg-slate-50 p-4 text-xs text-slate-600">
             <div className="font-medium text-slate-800">Note</div>
             <ul className="mt-2 list-disc space-y-1 pl-5">
-              <li>Student login works now (basic Phase 1).</li>
-              <li>Parent dashboard is UI-only for now.</li>
-              <li>We will connect real accounts and admin reporting in Phase 2.</li>
+              <li>Student login works now.</li>
+              <li>Parent dashboard is coming with Grade 4 launch.</li>
+              <li>Real accounts and admin reporting coming soon.</li>
             </ul>
           </div>
         </div>

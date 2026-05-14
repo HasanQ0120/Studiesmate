@@ -188,7 +188,7 @@ function SignupForm() {
                 <ul className="mt-2 list-disc space-y-1 pl-5">
                   <li>Set password helps the student log in quickly next time</li>
                   <li>Parent email is used for recovery if password is forgotten</li>
-                  <li>In Phase 2 we'll add proper accounts and Google sign-in</li>
+                  <li>Proper accounts and Google sign-in coming soon</li>
                 </ul>
               </div>
 

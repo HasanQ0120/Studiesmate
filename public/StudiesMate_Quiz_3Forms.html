@@ -158,7 +158,7 @@ function bind(){
     } else set({qi:S.qi+1,sel:null});
   });
   const rb=document.getElementById("rBtn");if(rb)rb.addEventListener("click",()=>set({qi:0,score:0,sel:null,done:false}));
-  const hb=document.getElementById("hBtn");if(hb)hb.addEventListener("click",()=>window.top.location.href="/dashboard");
+  const hb=document.getElementById("hBtn");if(hb)hb.addEventListener("click",()=>{try{const c=JSON.parse(localStorage.getItem("studiesmate_quiz_completions")||"{}");c["math-rwn"]=true;localStorage.setItem("studiesmate_quiz_completions",JSON.stringify(c));localStorage.setItem("studiesmate_last_activity_v2",JSON.stringify({action:"Completed Reading & Writing Whole Numbers Quiz",timestamp:new Date().toISOString()}));}catch(e){}window.top.location.href="/dashboard";});
 }
 
 render();
