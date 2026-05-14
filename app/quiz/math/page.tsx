@@ -6,13 +6,13 @@ const QUIZZES = [
     id: "math-npv",
     title: "Numbers & Place Value",
     desc: "Place value, expanded form, and digit values.",
-    href: "/quiz/play/math-npv",
+    href: "/quiz/math/place-value",
   },
   {
     id: "math-rwn",
     title: "Reading & Writing Whole Numbers",
     desc: "Reading, writing, and converting whole numbers.",
-    href: "/quiz/play/math-rwn",
+    href: "/quiz/math/3-forms",
   },
 ];
 
