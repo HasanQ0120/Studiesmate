@@ -13,6 +13,17 @@ declare global {
 
 const SUBJECT_TITLE = "Maths";
 
+const CHAPTER_QUIZ_IFRAMES: Record<string, { src: string; title: string }> = {
+  "numbers": {
+    src: "/StudiesMate_Quiz_PlaceValue.html",
+    title: "Place Value Quiz",
+  },
+  "addition-subtraction": {
+    src: "/StudiesMate_Quiz_3Forms.html",
+    title: "3 Forms of Numbers Quiz",
+  },
+};
+
 // Placeholder video IDs — update Urdu ID when ready
 const VIDEO_IDS: Record<string, { en: string; ur: string }> = {
   numbers:             { en: "PLACEHOLDER_VIDEO_ID", ur: "PLACEHOLDER_VIDEO_ID" },
@@ -163,12 +174,24 @@ export default function ChapterPage() {
           </div>
         </div>
 
-        <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-6">
-          <h2 className="text-base font-semibold">Lessons</h2>
-          <p className="mt-2 text-sm text-slate-700">
-            Lessons will be added gradually. For Phase 1, this is a placeholder.
-          </p>
-        </div>
+        {CHAPTER_QUIZ_IFRAMES[chapterId] ? (
+          <div className="mt-10">
+            <iframe
+              src={CHAPTER_QUIZ_IFRAMES[chapterId].src}
+              width="100%"
+              height="700px"
+              style={{ border: "none", borderRadius: "12px" }}
+              title={CHAPTER_QUIZ_IFRAMES[chapterId].title}
+            />
+          </div>
+        ) : (
+          <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-6">
+            <h2 className="text-base font-semibold">Lessons</h2>
+            <p className="mt-2 text-sm text-slate-700">
+              Lessons will be added gradually. For Phase 1, this is a placeholder.
+            </p>
+          </div>
+        )}
       </div>
     </main>
   );
