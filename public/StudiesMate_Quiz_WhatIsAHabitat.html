@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudiesMate — What is a Habitat?</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#E8F5E9;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:24px 16px}
+#root{width:100%;max-width:640px}
+.card{background:#fff;border-radius:14px;border:1px solid #A5D6A7;padding:22px 20px;margin-bottom:14px}
+.btn{padding:13px 20px;border-radius:10px;border:none;cursor:pointer;font-size:15px;font-weight:700;width:100%;transition:opacity .15s}
+.btn:hover{opacity:.87}
+.btn-primary{background:#1B5E20;color:#fff}
+.btn-outline{background:#fff;border:1.5px solid #ccc;color:#333}
+.opt{width:100%;padding:13px 16px;border-radius:10px;border:1.5px solid #ddd;cursor:pointer;font-size:14px;font-weight:500;text-align:left;background:#fff;display:flex;align-items:center;gap:10px;transition:border-color .15s,background .15s;margin-bottom:8px}
+.opt:hover{border-color:#2E7D32;background:#F1F8E9}
+.opt.correct{background:#E8F5E9;border-color:#43A047;color:#2E7D32;animation:pop .35s cubic-bezier(.17,.67,.35,1.4)}
+.opt.wrong{background:#FFEBEE;border-color:#EF5350;color:#C62828;animation:shk .3s ease}
+.opt.faded{background:#F8F8F8;border-color:#e8e8e8;color:#aaa;cursor:default}
+.letter{width:28px;height:28px;border-radius:7px;background:#E8F5E9;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;color:#2E7D32;transition:background .15s,color .15s}
+.fb{border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:14px;border:1px solid}
+.fb.ok{background:#E8F5E9;border-color:#43A047;color:#2E7D32}
+.fb.no{background:#FFF8E1;border-color:#FFB300;color:#CC7700}
+.progress-bar{height:7px;background:#C8E6C9;border-radius:4px;overflow:hidden;margin:5px 0}
+.progress-fill{height:100%;background:#2E7D32;border-radius:4px;transition:width .4s}
+.confetti-piece{position:fixed;border-radius:2px;animation:fall linear forwards;pointer-events:none;z-index:9999}
+@keyframes fall{0%{transform:translateY(-10px) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.04)}100%{transform:scale(1)}}
+@keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes scoreIn{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const COLOR="#1B5E20",ACCENT="#2E7D32",LIGHT="#E8F5E9";
+const QS=[
+  {q:"What is a habitat?",opts:["A type of food animals eat","The natural home where an animal or plant lives","A kind of weather condition","A special type of animal"],ans:1,hint:"A habitat is the natural PLACE where a living thing finds everything it needs to survive!"},
+  {q:"Which of the following is a habitat?",opts:["A school classroom","A shopping mall","A tropical rainforest","A motorway"],ans:2,hint:"A habitat is found in NATURE — it is where wild animals and plants actually live."},
+  {q:"What do animals need from their habitat to survive?",opts:["Books, pencils, and paper","Electricity and internet","Food, water, shelter, and space","Cars and roads"],ans:2,hint:"Every animal needs the basics: something to eat, drink, somewhere safe, and room to live!"},
+  {q:"Which animal is best suited to a DESERT habitat?",opts:["Penguin","Polar bear","Camel","Whale"],ans:2,hint:"Camels store fat in their hump and can go a long time without water — perfect for a hot, dry desert!"},
+  {q:"Which animal lives in an OCEAN habitat?",opts:["Lion","Shark","Giraffe","Eagle"],ans:1,hint:"Sharks breathe through gills and swim using fins — perfectly adapted to ocean life."},
+  {q:"A penguin lives in which type of habitat?",opts:["Tropical rainforest","Hot desert","Polar / Arctic region","Freshwater river"],ans:2,hint:"Penguins have thick blubber and waterproof feathers to survive the freezing cold!"},
+  {q:"What do we call it when an animal is perfectly suited to its habitat?",opts:["Migrated","Domestic","Extinct","Adapted"],ans:3,hint:"When an animal has special features that help it survive in its home, we say it is ADAPTED."},
+  {q:"Which habitat receives the MOST rainfall each year?",opts:["Desert","Arctic tundra","Tropical rainforest","Grassland"],ans:2,hint:"Tropical rainforests get over 2,000mm of rain a year — that is why they are so lush and green!"},
+  {q:"Fish have gills to breathe underwater. This is an example of:",opts:["Migration","Extinction","Adaptation","Hibernation"],ans:2,hint:"Gills allow fish to breathe in water — a perfect ADAPTATION for their watery habitat!"},
+  {q:"If an animal's habitat is destroyed, what is most likely to happen?",opts:["The animal becomes much stronger","Absolutely nothing changes","The animal may struggle or fail to survive","The animal builds a new city"],ans:2,hint:"Without food, water, and shelter from its home, an animal cannot survive. Protecting habitats matters!"},
+];
+
+let aC=null;
+function gc(){if(!aC)aC=new(window.AudioContext||window.webkitAudioContext)();return aC;}
+function playOk(){try{const c=gc();[523.25,659.25,783.99].forEach((f,i)=>{const t=c.currentTime+i*.13;const o=c.createOscillator(),g=c.createGain(),o2=c.createOscillator(),g2=c.createGain();o.type="sine";o.frequency.value=f;o2.type="sine";o2.frequency.value=f*2;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.28,t+.02);g.gain.exponentialRampToValueAtTime(.001,t+.45);g2.gain.setValueAtTime(0,t);g2.gain.linearRampToValueAtTime(.06,t+.02);g2.gain.exponentialRampToValueAtTime(.001,t+.3);o.connect(g);g.connect(c.destination);o2.connect(g2);g2.connect(c.destination);o.start(t);o.stop(t+.5);o2.start(t);o2.stop(t+.35);});}catch(e){}}
+function playNo(){try{const c=gc();[293.66,220].forEach((f,i)=>{const t=c.currentTime+i*.15;const o=c.createOscillator(),g=c.createGain();o.type="sine";o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.18,t+.03);g.gain.exponentialRampToValueAtTime(.001,t+.35);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.4);});}catch(e){}}
+function playWin(){try{const c=gc();[523.25,659.25,783.99,1046.5].forEach((f,i)=>{const t=c.currentTime+i*.07;const o=c.createOscillator(),g=c.createGain();o.type="sine";o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.2,t+.03);g.gain.exponentialRampToValueAtTime(.001,t+.8);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.9);});}catch(e){}}
+function boom(){const cols=["#FFB300","#2E7D32","#FF5252","#00BFA5","#43A047","#1B5E20","#81C784","#FFF176"];for(let i=0;i<65;i++){const el=document.createElement("div");el.className="confetti-piece";const s=Math.random()*9+5;el.style.cssText=`width:${s}px;height:${s}px;background:${cols[i%cols.length]};left:${Math.random()*100}vw;top:-10px;animation-duration:${Math.random()*1.5+1.2}s;animation-delay:${Math.random()*.5}s;border-radius:${Math.random()>.5?"50%":"2px"}`;document.body.appendChild(el);setTimeout(()=>el.remove(),2800);}}
+
+let S={qi:0,score:0,sel:null,done:false};
+function set(u){S={...S,...u};render();}
+function render(){document.getElementById("root").innerHTML=S.done?resultH():quizH();bind();}
+
+function header(){
+  const pct=Math.round(S.qi/QS.length*100);
+  return`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="background:#0F2744;border-radius:8px;padding:6px 14px"><span style="color:#FFB300;font-weight:700;font-size:13px">StudiesMate</span></div>
+      <div><div style="font-size:13px;font-weight:700;color:${COLOR}">Chapter 2 · Video 2.1</div><div style="font-size:11px;color:#888">What is a Habitat?</div></div>
+    </div>
+    <div style="text-align:right"><div style="font-size:11px;color:#888;margin-bottom:2px">Question</div><div style="font-size:18px;font-weight:700;color:${COLOR}">${S.qi+1}<span style="font-size:13px;color:#aaa;font-weight:400">/${QS.length}</span></div></div>
+  </div>
+  <div class="progress-bar" style="margin-bottom:20px"><div class="progress-fill" style="width:${pct}%"></div></div>`;
+}
+
+function quizH(){
+  const q=QS[S.qi],done=S.sel!==null;
+  const opts=q.opts.map((o,i)=>{
+    let cls="opt"+(done?i===q.ans?" correct":i===S.sel?" wrong":" faded":"");
+    const icon=done?(i===q.ans?`<span style="font-size:16px;color:#43A047;flex-shrink:0;font-weight:700">✓</span>`:i===S.sel?`<span style="font-size:16px;color:#EF5350;flex-shrink:0;font-weight:700">✗</span>`:""):"";
+    return`<button class="${cls}" data-opt="${i}" onmouseover="if(!${done}){this.style.borderColor='${COLOR}';this.querySelector('.letter').style.background='${COLOR}';this.querySelector('.letter').style.color='#fff'}" onmouseout="if(!${done}){this.style.borderColor='#ddd';this.querySelector('.letter').style.background='${LIGHT}';this.querySelector('.letter').style.color='${ACCENT}'}">
+      <span class="letter">${["A","B","C","D"][i]}</span><span style="flex:1">${o}</span>${icon}</button>`;
+  }).join("");
+  const fb=done?`<div class="fb ${S.sel===q.ans?"ok":"no"}">${S.sel===q.ans?`<strong>✓ Correct!</strong> Excellent!`:`<strong>Not quite.</strong> The right answer is: <strong>${q.opts[q.ans]}</strong>${q.hint?`<br><span style="font-size:13px;opacity:.85;margin-top:4px;display:block">🌿 ${q.hint}</span>`:""}`}</div>`:"";
+  const nxt=done?`<button class="btn btn-primary" id="nBtn" style="margin-top:4px">${S.qi+1>=QS.length?"See my score 🏆":"Next question →"}</button>`:"";
+  return`<div>${header()}<div class="card"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:${ACCENT};margin-bottom:10px">Question ${S.qi+1}</div><div style="font-size:18px;font-weight:600;color:#0F2744;line-height:1.55">${q.q}</div></div>${opts}${fb}${nxt}</div>`;
+}
+
+function resultH(){
+  const pct=Math.round(S.score/QS.length*100);
+  const stars=S.score===QS.length?3:S.score>=Math.round(QS.length*.75)?2:S.score>=Math.round(QS.length*.5)?1:0;
+  const starStr=[...Array(3)].map((_,i)=>i<stars?"⭐":"☆").join("");
+  const msg=S.score===QS.length?"Perfect! You're a habitat hero! 🌍":S.score>=Math.round(QS.length*.75)?"Fantastic! Almost perfect!":S.score>=Math.round(QS.length*.5)?"Good effort! A little more practice!":"Watch the video again then retry!";
+  return`<div style="text-align:center;padding:10px 0">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:${ACCENT};text-transform:uppercase;margin-bottom:18px">What is a Habitat? — Results</div>
+    <div style="font-size:46px;margin-bottom:8px;animation:scoreIn .5s cubic-bezier(.17,.67,.35,1.4)">${starStr}</div>
+    <div style="animation:scoreIn .5s .1s both">
+      <div style="font-size:56px;font-weight:800;color:${COLOR};line-height:1">${S.score}<span style="font-size:24px;color:#bbb;font-weight:400">/${QS.length}</span></div>
+      <div style="font-size:14px;color:#888;margin:4px 0 6px">${pct}% correct</div>
+      <div style="font-size:15px;font-weight:600;color:#444;margin-bottom:22px">${msg}</div>
+    </div>
+    <div style="background:#E8F5E9;border:1px solid #A5D6A7;border-radius:12px;padding:16px 18px;margin-bottom:14px;text-align:left">
+      <div style="font-weight:700;color:${COLOR};margin-bottom:10px">🌿 Key Takeaways</div>
+      <div style="font-size:14px;color:#1B5E20;line-height:1.85">
+        🏡 A <strong>habitat</strong> is the natural home of an animal or plant<br>
+        🍃 Animals need <strong>food, water, shelter &amp; space</strong> from their habitat<br>
+        🐪 <strong>Adaptation</strong> = special features that help an animal survive<br>
+        🌧️ <strong>Rainforests</strong> are the wettest habitats on Earth<br>
+        ⚠️ Destroying a habitat <strong>threatens the animals</strong> that live there
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+      ${[["🏜️","Desert","Camels, scorpions"],["🌊","Ocean","Sharks, dolphins"],["🧊","Arctic","Penguins, polar bears"],["🌴","Rainforest","Parrots, frogs"]].map(([e,h,a])=>`<div style="background:#fff;border:1px solid #C8E6C9;border-radius:10px;padding:12px;text-align:left"><div style="font-size:22px;margin-bottom:4px">${e}</div><div style="font-weight:700;color:${COLOR};font-size:13px">${h}</div><div style="font-size:12px;color:#666;margin-top:2px">${a}</div></div>`).join("")}
+    </div>
+    <div style="background:#0F2744;border-radius:12px;padding:16px 18px;margin-bottom:18px;display:flex;align-items:center;gap:14px;text-align:left">
+      <span style="font-size:24px;color:#FFB300;flex-shrink:0">↓</span>
+      <div><div style="color:#FFB300;font-weight:700;font-size:14px">Download your worksheet</div><div style="color:rgba(255,255,255,.6);font-size:12px;margin-top:2px">Chapter 2 · Video 2.1 — What is a Habitat?</div></div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-outline" id="rBtn">↺ Try again</button>
+      <button class="btn btn-primary" id="hBtn">Back to topics →</button>
+    </div>
+  </div>`;
+}
+
+function bind(){
+  document.querySelectorAll("[data-opt]").forEach(el=>el.addEventListener("click",()=>{
+    if(S.sel!==null)return;
+    const i=+el.dataset.opt,correct=i===QS[S.qi].ans;
+    set({sel:i,score:S.score+(correct?1:0)});
+    correct?playOk():playNo();
+  }));
+  const nb=document.getElementById("nBtn");
+  if(nb)nb.addEventListener("click",()=>{
+    if(S.qi+1>=QS.length){if(S.score>=Math.round(QS.length*.75)){playWin();boom();}set({done:true});window.parent.postMessage({ type: "quizComplete", quizId: "science-intro" }, "*");}
+    else set({qi:S.qi+1,sel:null});
+  });
+  const rb=document.getElementById("rBtn");if(rb)rb.addEventListener("click",()=>set({qi:0,score:0,sel:null,done:false}));
+  const hb=document.getElementById("hBtn");if(hb)hb.addEventListener("click",()=>alert("Link to your StudiesMate topics page here!"));
+}
+render();
+</script>
+</body>
+</html>

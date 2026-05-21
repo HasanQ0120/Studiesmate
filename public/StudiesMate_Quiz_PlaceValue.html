@@ -155,6 +155,7 @@ function bind(){
     if(S.qi+1>=QS.length){
       if(S.score>=Math.round(QS.length*.75)){playWin();boom();}
       set({done:true});
+      window.parent.postMessage({ type: "quizComplete", quizId: "math-npv" }, "*");
     } else set({qi:S.qi+1,sel:null});
   });
   const rb=document.getElementById("rBtn");if(rb)rb.addEventListener("click",()=>set({qi:0,score:0,sel:null,done:false}));

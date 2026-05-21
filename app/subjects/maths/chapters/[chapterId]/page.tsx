@@ -1,6 +1,7 @@
 "use client";
 
 import BackButton from "@/components/BackButton";
+import DashboardLayout from "@/components/DashboardLayout";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -12,17 +13,6 @@ declare global {
 }
 
 const SUBJECT_TITLE = "Maths";
-
-const CHAPTER_QUIZ_IFRAMES: Record<string, { src: string; title: string }> = {
-  "numbers": {
-    src: "/StudiesMate_Quiz_PlaceValue.html",
-    title: "Place Value Quiz",
-  },
-  "addition-subtraction": {
-    src: "/StudiesMate_Quiz_3Forms.html",
-    title: "3 Forms of Numbers Quiz",
-  },
-};
 
 // Placeholder video IDs — update Urdu ID when ready
 const VIDEO_IDS: Record<string, { en: string; ur: string }> = {
@@ -52,22 +42,23 @@ export default function ChapterPage() {
     desc: "This chapter will be added soon.",
   };
 
-  // Track lesson visit for dashboard progress
+  const [lessonCompletions, setLessonCompletions] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    try {
+      const completions = JSON.parse(localStorage.getItem("studiesmate_lesson_completions") || "{}");
+      setLessonCompletions(completions);
+    } catch {}
+  }, []);
+
   useEffect(() => {
     if (!CHAPTER_META[chapterId]) return;
     try {
-      const completions = JSON.parse(
-        localStorage.getItem("studiesmate_lesson_completions") || "{}"
-      );
-      completions[chapterId] = new Date().toISOString();
-      localStorage.setItem("studiesmate_lesson_completions", JSON.stringify(completions));
-      localStorage.setItem(
-        "studiesmate_last_activity_v2",
-        JSON.stringify({
-          action: `Started ${CHAPTER_META[chapterId].title} lesson`,
-          timestamp: new Date().toISOString(),
-        })
-      );
+      localStorage.setItem("studiesmate_last_activity_v2", JSON.stringify({
+        action: `Opened ${CHAPTER_META[chapterId].title} lesson`,
+        href: `/subjects/maths/chapters/${chapterId}`,
+        timestamp: new Date().toISOString(),
+      }));
     } catch {}
   }, [chapterId]);
 
@@ -132,9 +123,10 @@ export default function ChapterPage() {
   }
 
   return (
+    <DashboardLayout>
     <main className="min-h-screen bg-white text-slate-900">
       <div className="mx-auto max-w-4xl px-6 py-10">
-        <BackButton href="/subjects/maths/chapters" label="Back to Chapters" />
+        <BackButton href="/dashboard" label="Back to Dashboard" />
 
         <h1 className="mt-6 text-3xl font-semibold tracking-tight">
           {SUBJECT_TITLE} • {meta.title}
@@ -174,25 +166,35 @@ export default function ChapterPage() {
           </div>
         </div>
 
-        {CHAPTER_QUIZ_IFRAMES[chapterId] ? (
-          <div className="mt-10">
-            <iframe
-              src={CHAPTER_QUIZ_IFRAMES[chapterId].src}
-              width="100%"
-              height="700px"
-              style={{ border: "none", borderRadius: "12px" }}
-              title={CHAPTER_QUIZ_IFRAMES[chapterId].title}
-            />
-          </div>
-        ) : (
-          <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-6">
-            <h2 className="text-base font-semibold">Lessons</h2>
-            <p className="mt-2 text-sm text-slate-700">
-              Lessons will be added gradually. For Phase 1, this is a placeholder.
-            </p>
-          </div>
-        )}
+        <div className="mt-6">
+          {lessonCompletions[chapterId] ? (
+            <div className="inline-flex items-center gap-2 rounded-xl bg-[#ECFDF5] border border-[#6EE7B7] px-4 py-2 text-sm font-semibold text-[#10B981]">
+              ✓ Lesson Completed
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                try {
+                  const completions = JSON.parse(localStorage.getItem("studiesmate_lesson_completions") || "{}");
+                  completions[chapterId] = new Date().toISOString();
+                  localStorage.setItem("studiesmate_lesson_completions", JSON.stringify(completions));
+                  localStorage.setItem("studiesmate_last_activity_v2", JSON.stringify({
+                    action: `Completed ${CHAPTER_META[chapterId]?.title || chapterId} lesson`,
+                    href: `/subjects/maths/chapters/${chapterId}`,
+                    timestamp: new Date().toISOString(),
+                  }));
+                  setLessonCompletions(completions);
+                } catch {}
+              }}
+              className="inline-flex items-center gap-2 rounded-xl bg-[#F97316] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#EA580C] transition-colors shadow-sm"
+            >
+              ✓ Mark as Complete
+            </button>
+          )}
+        </div>
       </div>
     </main>
+    </DashboardLayout>
   );
 }

@@ -50,10 +50,10 @@ export default function HomePage() {
                 Start Free Beta
               </Link>
               <Link
-                href="/subjects"
+                href="/phase-1"
                 className="rounded-xl border border-white/30 px-5 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-white/10 hover:-translate-y-0.5 active:translate-y-0"
               >
-                View subjects
+                View Plans
               </Link>
             </div>
 
@@ -128,23 +128,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* VISION (MERGED) */}
-      <section className="bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-14">
-          <Reveal className="max-w-3xl">
-            <div className="rounded-2xl border border-slate-200 bg-white p-7 transition-all duration-200 hover:shadow-md">
-              <h2 className="text-lg font-semibold">Our vision</h2>
-              <p className="mt-3 text-sm leading-6 text-slate-700">
-                StudiesMate is built to make learning clear, calm, and consistent.
-                Students understand concepts, practice briefly, and build
-                confidence without stress. The experience stays safe, focused, and
-                parent-friendly from day one.
-              </p>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
       {/* FOCUS (Blue section + image on right) */}
       <section className="bg-[#0B2B5A] text-white">
         <div className="mx-auto max-w-6xl px-4 py-16">
@@ -204,29 +187,57 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* IMPACT / NUMBERS (White) */}
+      {/* PRICING (White) */}
       <section className="bg-white">
         <div className="mx-auto max-w-6xl px-4 py-14">
           <Reveal>
             <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
               <div>
-                <h3 className="text-xl font-semibold">What's included</h3>
+                <h2 className="text-xl font-semibold">Simple, affordable pricing</h2>
                 <p className="mt-2 max-w-2xl text-sm text-slate-700">
-                  We are building trust first. Everything stays controlled and
-                  simple.
+                  Start free with Beta. Upgrade when you are ready.
                 </p>
               </div>
             </div>
 
             <div className="mt-8 grid gap-5 md:grid-cols-3">
               <Reveal delayMs={0}>
-                <Stat label="Core subjects" value="" note="Math, English, Science" />
+                <div className="rounded-2xl border-2 border-[#0B2B5A] bg-white p-6">
+                  <div className="text-xs font-semibold text-[#0B2B5A] uppercase tracking-widest mb-2">Beta</div>
+                  <div className="text-3xl font-semibold tracking-tight text-slate-900">Free</div>
+                  <p className="mt-2 text-sm text-slate-600">Math, English & Science — 1 lesson and quiz each. Forever free.</p>
+                  <Link
+                    href={isLoggedIn ? "/dashboard" : "/signup"}
+                    className="mt-5 inline-flex rounded-xl bg-[#0B2B5A] px-4 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:bg-[#0F3D7D] hover:-translate-y-0.5"
+                  >
+                    Start Free Beta
+                  </Link>
+                </div>
               </Reveal>
+
               <Reveal delayMs={80}>
-                <Stat label="Learning style" value="Short" note="Daily-friendly lessons" />
+                <div className="rounded-2xl border border-slate-200 bg-white p-6">
+                  <div className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-2">Grade 4</div>
+                  <div className="text-3xl font-semibold tracking-tight text-slate-900">Rs. 1,500<span className="text-base font-normal text-slate-500">/month</span></div>
+                  <p className="mt-2 text-sm text-slate-600">Full Math, English & Science course. All topics covered.</p>
+                  <Link
+                    href="/phase-1"
+                    className="mt-5 inline-flex rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-900 transition-all duration-200 hover:bg-slate-50 hover:-translate-y-0.5"
+                  >
+                    View Details
+                  </Link>
+                </div>
               </Reveal>
+
               <Reveal delayMs={160}>
-                <Stat label="Bilingual Slider" value="" note="Switch between English and Urdu mid-lesson instantly." />
+                <div className="rounded-2xl border border-slate-200 bg-[#F8FAFC] p-6">
+                  <div className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-2">Grade 5 – 8</div>
+                  <div className="text-3xl font-semibold tracking-tight text-slate-400">Coming Soon</div>
+                  <p className="mt-2 text-sm text-slate-500">More grades launching after Grade 4 is stable.</p>
+                  <div className="mt-5 inline-flex rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-400 cursor-not-allowed">
+                    Not yet available
+                  </div>
+                </div>
               </Reveal>
             </div>
           </Reveal>
@@ -295,12 +306,6 @@ export default function HomePage() {
                   Start with the basics. Build consistency first.
                 </p>
               </div>
-              <Link
-                href="/subjects"
-                className="hidden rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-900 transition-all duration-200 hover:bg-slate-50 hover:-translate-y-0.5 md:inline-flex"
-              >
-                View all
-              </Link>
             </div>
 
             {/* Subject preview (small add, no section re-order) */}
@@ -321,22 +326,21 @@ export default function HomePage() {
                     Start with calm, consistent learning
                   </h3>
                   <p className="mt-2 text-sm leading-6 text-white/80">
-                    Try Beta and help us spot confusion. We’re building trust
-                    and clarity first.
+                    Free beta access — Math, English, and Science. One lesson and quiz per subject. No card needed.
                   </p>
                 </div>
                 <div className="mt-5 flex flex-wrap gap-3 md:mt-0">
                   <Link
-                    href="/signup"
+                    href={isLoggedIn ? "/dashboard" : "/signup"}
                     className="inline-flex rounded-xl bg-white px-5 py-3 text-sm font-semibold text-[#0B2B5A] transition-all duration-200 hover:bg-white/95 hover:-translate-y-0.5"
                   >
                     Get started
                   </Link>
                   <Link
-                    href="/subjects"
+                    href="/phase-1"
                     className="inline-flex rounded-xl border border-white/30 px-5 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-white/10 hover:-translate-y-0.5"
                   >
-                    See subjects
+                    View Plans
                   </Link>
                 </div>
               </div>
@@ -349,39 +353,38 @@ export default function HomePage() {
       <section className="bg-white">
         <div className="mx-auto max-w-6xl px-4 py-14">
           <Reveal>
-            <div className="rounded-2xl border border-slate-200 bg-white p-7 transition-all duration-200 hover:shadow-md md:flex md:items-center md:justify-between">
-              <div className="max-w-2xl">
-                <h3 className="text-xl font-semibold">For Parents (Beta)</h3>
-                <p className="mt-2 text-sm leading-6 text-slate-700">
-                  A simple preview to help parents understand progress and support
-                  daily learning. This expands after Phase 1 stabilizes.
-                </p>
-              </div>
-              <div className="mt-5 md:mt-0">
-                <p className="text-sm text-slate-500">Available with Grade 4 launch — In Progress.</p>
+            <div className="rounded-2xl border border-slate-200 bg-white p-7 transition-all duration-200 hover:shadow-md">
+              <h3 className="text-xl font-semibold">For Parents</h3>
+              <p className="mt-3 text-sm leading-6 text-slate-700 max-w-2xl">
+                StudiesMate is designed with parents in mind. No ads, no
+                distractions — just calm, focused learning your child can do
+                independently. You stay in control of what they access.
+              </p>
+              <div className="mt-6 grid gap-4 sm:grid-cols-3">
+                {[
+                  {
+                    title: "Safe by design",
+                    desc: "No external links, no ads, no social features.",
+                  },
+                  {
+                    title: "Short sessions",
+                    desc: "Lessons take under 10 minutes. Easy to fit in daily.",
+                  },
+                  {
+                    title: "Bilingual support",
+                    desc: "Urdu support built in so language isn't a barrier.",
+                  },
+                ].map((c) => (
+                  <div key={c.title} className="rounded-xl border border-slate-200 p-4">
+                    <div className="text-sm font-semibold">{c.title}</div>
+                    <p className="mt-1 text-sm text-slate-600">{c.desc}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </Reveal>
         </div>
       </section>
     </main>
-  );
-}
-
-function Stat({
-  label,
-  value,
-  note,
-}: {
-  label: string;
-  value: string;
-  note: string;
-}) {
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
-      <div className="text-sm font-medium text-slate-600">{label}</div>
-      <div className="mt-2 text-3xl font-semibold tracking-tight">{value}</div>
-      <div className="mt-2 text-sm text-slate-700">{note}</div>
-    </div>
   );
 }

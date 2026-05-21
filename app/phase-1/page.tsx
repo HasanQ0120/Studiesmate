@@ -9,7 +9,7 @@ const GRADES = [
   { name: "Grade 1", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 800/month",   blurPrice: true,  isBeta: false, status: "coming-soon" },
   { name: "Grade 2", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 1,000/month", blurPrice: true,  isBeta: false, status: "coming-soon" },
   { name: "Grade 3", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 1,200/month", blurPrice: true,  isBeta: false, status: "coming-soon" },
-  { name: "Grade 4", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 1,500/month", blurPrice: true,  isBeta: false, status: "in-progress" },
+  { name: "Grade 4", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 1,500/month", blurPrice: false, isBeta: false, status: "in-progress" },
   { name: "Grade 5", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 2,000/month", blurPrice: true,  isBeta: false, status: "coming-soon" },
   { name: "Grade 6", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 2,500/month", blurPrice: true,  isBeta: false, status: "coming-soon" },
   { name: "Grade 7", desc: "Full syllabus included. Math, English & Science.", price: "Rs. 3,000/month", blurPrice: true,  isBeta: false, status: "coming-soon" },

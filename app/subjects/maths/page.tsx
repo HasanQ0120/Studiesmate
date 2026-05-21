@@ -21,7 +21,7 @@ export default function MathSubjectPage() {
           </p>
 
           <Link
-            href="/subjects/maths/chapters"
+            href="/dashboard"
             className="mt-5 inline-flex items-center justify-center rounded-xl bg-[#0B2B5A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0A2550]"
           >
             Open Maths Chapters →

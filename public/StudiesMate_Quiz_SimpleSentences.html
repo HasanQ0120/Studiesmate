@@ -3,28 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>StudiesMate — 3 Forms of Numbers Quiz</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.14.0/tabler-icons.min.css">
+<title>StudiesMate — Simple Sentences Quiz</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#EEF4FF;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:24px 16px}
-#root{width:100%;max-width:620px}
-.card{background:#fff;border-radius:14px;border:1px solid #d0dcf8;padding:22px 20px;margin-bottom:14px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#F0FFF4;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:24px 16px}
+#root{width:100%;max-width:640px}
+.card{background:#fff;border-radius:14px;border:1px solid #C8E6C9;padding:22px 20px;margin-bottom:14px}
 .btn{padding:13px 20px;border-radius:10px;border:none;cursor:pointer;font-size:15px;font-weight:700;width:100%;transition:opacity .15s}
 .btn:hover{opacity:.87}
-.btn-primary{background:#2A5298;color:#fff}
+.btn-primary{background:#1B5E20;color:#fff}
 .btn-outline{background:#fff;border:1.5px solid #ccc;color:#333}
 .opt{width:100%;padding:13px 16px;border-radius:10px;border:1.5px solid #ddd;cursor:pointer;font-size:14px;font-weight:500;text-align:left;background:#fff;display:flex;align-items:center;gap:10px;transition:border-color .15s,background .15s;margin-bottom:8px}
-.opt:hover{border-color:#2A5298;background:#EEF4FF}
+.opt:hover{border-color:#2E7D32;background:#F1F8E9}
 .opt.correct{background:#E8F5E9;border-color:#43A047;color:#2E7D32;animation:pop .35s cubic-bezier(.17,.67,.35,1.4)}
 .opt.wrong{background:#FFEBEE;border-color:#EF5350;color:#C62828;animation:shk .3s ease}
 .opt.faded{background:#F8F8F8;border-color:#e8e8e8;color:#aaa;cursor:default}
-.letter{width:28px;height:28px;border-radius:7px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;color:#2A5298;transition:background .15s,color .15s}
+.letter{width:28px;height:28px;border-radius:7px;background:#E8F5E9;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;color:#2E7D32;transition:background .15s,color .15s}
 .fb{border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:14px;border:1px solid}
 .fb.ok{background:#E8F5E9;border-color:#43A047;color:#2E7D32}
 .fb.no{background:#FFF8E1;border-color:#FFB300;color:#CC7700}
-.progress-bar{height:7px;background:#d0dcf8;border-radius:4px;overflow:hidden;margin:5px 0}
-.progress-fill{height:100%;background:#2A5298;border-radius:4px;transition:width .4s}
+.progress-bar{height:7px;background:#C8E6C9;border-radius:4px;overflow:hidden;margin:5px 0}
+.progress-fill{height:100%;background:#2E7D32;border-radius:4px;transition:width .4s}
 .confetti-piece{position:fixed;border-radius:2px;animation:fall linear forwards;pointer-events:none;z-index:9999}
 @keyframes fall{0%{transform:translateY(-10px) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
 @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.04)}100%{transform:scale(1)}}
@@ -35,17 +34,69 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 <body>
 <div id="root"></div>
 <script>
-const COLOR="#2A5298", ACCENT="#1A3A7A", LIGHT="#EEF2FF";
+const COLOR="#1B5E20", ACCENT="#2E7D32", LIGHT="#E8F5E9";
 
 const QS=[
-  {q:"What is the expanded form of 46,235?",opts:["40,000+6,000+200+30+5","46,000+200+35","4,000+6,000+200+30+5","40,000+6,235"],ans:0},
-  {q:"Which form is this? → 46,235",opts:["Word Form","Expanded Form","Standard Form","Picture Form"],ans:2},
-  {q:"What is 32,104 in expanded form?",opts:["30,000+2,000+100+4","30,000+2,100+4","32,000+104","3,000+2,000+100+40"],ans:0},
-  {q:"When you see the comma in 46,235, what do you say?",opts:["hundred","thousand","million","comma"],ans:1},
-  {q:"'Forty-six thousand, two hundred thirty-five' is which form?",opts:["Standard Form","Expanded Form","Number Form","Word Form"],ans:3},
-  {q:"What is 83,294 in expanded form?",opts:["80,000+3,000+200+90+4","83,000+294","8,000+3,000+200+90+4","80,000+3,294"],ans:0},
-  {q:"In expanded form, we show the _____ of every digit.",opts:["shape","colour","value","position"],ans:2},
-  {q:"Which is the word form of 12,050?",opts:["Twelve thousand, fifty","Twelve thousand, five hundred","One thousand, two hundred fifty","Twelve, zero, five, zero"],ans:0},
+  {
+    q:"A simple sentence must have at least:",
+    opts:["Three words","A subject and a verb","An adjective and a noun","A comma and a full stop"],
+    ans:1,
+    hint:"Every complete sentence needs someone doing something!"
+  },
+  {
+    q:"Which part of a sentence tells us WHO or WHAT the sentence is about?",
+    opts:["Verb","Predicate","Subject","Object"],
+    ans:2,
+    hint:"The Subject is the star of the sentence — it's who or what we're talking about."
+  },
+  {
+    q:"Which part of a sentence tells us WHAT the subject does?",
+    opts:["Article","Adjective","Subject","Verb"],
+    ans:3,
+    hint:"The Verb is the action word — it shows what the subject is doing."
+  },
+  {
+    q:"Which is a COMPLETE simple sentence?",
+    opts:["The big brown dog","Runs very fast","The cat sleeps.","Playing outside"],
+    ans:2,
+    hint:"A complete sentence needs BOTH a subject AND a verb!"
+  },
+  {
+    q:"In the sentence \"Ali runs fast.\" — what is the SUBJECT?",
+    opts:["runs","fast","Ali","Ali runs"],
+    ans:2,
+    hint:"Ask yourself: WHO is doing the running? That's your subject!"
+  },
+  {
+    q:"In the sentence \"The birds sing.\" — what is the VERB?",
+    opts:["The","birds","sing","The birds"],
+    ans:2,
+    hint:"Ask yourself: What are the birds DOING? That's your verb!"
+  },
+  {
+    q:"Which sentence is INCOMPLETE (missing subject or verb)?",
+    opts:["Sara laughs.","The dog barks.","Jumping very high.","We play cricket."],
+    ans:2,
+    hint:"A fragment is missing either a subject or a verb — or both!"
+  },
+  {
+    q:"In \"The children play in the park.\" — which is the SUBJECT?",
+    opts:["play","in the park","The children","the park"],
+    ans:2,
+    hint:"Find who or what the sentence is ABOUT — that's the subject!"
+  },
+  {
+    q:"Which sentence has BOTH a subject and a verb?",
+    opts:["Beautiful flowers.","Over the hill.","The teacher writes.","Very quickly indeed."],
+    ans:2,
+    hint:"Look for a sentence with someone (subject) DOING something (verb)."
+  },
+  {
+    q:"In \"My dog barks loudly.\" — what is the VERB?",
+    opts:["My","dog","barks","loudly"],
+    ans:2,
+    hint:"The verb tells us what my dog is DOING."
+  },
 ];
 
 let aC=null;
@@ -53,7 +104,7 @@ function gc(){if(!aC)aC=new(window.AudioContext||window.webkitAudioContext)();re
 function playOk(){try{const c=gc();[523.25,659.25,783.99].forEach((f,i)=>{const t=c.currentTime+i*.13;const o=c.createOscillator(),g=c.createGain(),o2=c.createOscillator(),g2=c.createGain();o.type="sine";o.frequency.value=f;o2.type="sine";o2.frequency.value=f*2;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.28,t+.02);g.gain.exponentialRampToValueAtTime(.001,t+.45);g2.gain.setValueAtTime(0,t);g2.gain.linearRampToValueAtTime(.06,t+.02);g2.gain.exponentialRampToValueAtTime(.001,t+.3);o.connect(g);g.connect(c.destination);o2.connect(g2);g2.connect(c.destination);o.start(t);o.stop(t+.5);o2.start(t);o2.stop(t+.35);});}catch(e){}}
 function playNo(){try{const c=gc();[293.66,220].forEach((f,i)=>{const t=c.currentTime+i*.15;const o=c.createOscillator(),g=c.createGain();o.type="sine";o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.18,t+.03);g.gain.exponentialRampToValueAtTime(.001,t+.35);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.4);});}catch(e){}}
 function playWin(){try{const c=gc();[523.25,659.25,783.99,1046.5].forEach((f,i)=>{const t=c.currentTime+i*.07;const o=c.createOscillator(),g=c.createGain();o.type="sine";o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.2,t+.03);g.gain.exponentialRampToValueAtTime(.001,t+.8);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.9);});}catch(e){}}
-function boom(){const cols=["#FFB300","#2A5298","#FF5252","#00BFA5","#43A047"];for(let i=0;i<60;i++){const el=document.createElement("div");el.className="confetti-piece";const s=Math.random()*9+5;el.style.cssText=`width:${s}px;height:${s}px;background:${cols[i%5]};left:${Math.random()*100}vw;top:-10px;animation-duration:${Math.random()*1.5+1.2}s;animation-delay:${Math.random()*.5}s;border-radius:${Math.random()>.5?"50%":"2px"}`;document.body.appendChild(el);setTimeout(()=>el.remove(),2800);}}
+function boom(){const cols=["#FFB300","#2E7D32","#FF5252","#00BFA5","#43A047","#1B5E20"];for(let i=0;i<60;i++){const el=document.createElement("div");el.className="confetti-piece";const s=Math.random()*9+5;el.style.cssText=`width:${s}px;height:${s}px;background:${cols[i%6]};left:${Math.random()*100}vw;top:-10px;animation-duration:${Math.random()*1.5+1.2}s;animation-delay:${Math.random()*.5}s;border-radius:${Math.random()>.5?"50%":"2px"}`;document.body.appendChild(el);setTimeout(()=>el.remove(),2800);}}
 
 let S={qi:0,score:0,sel:null,done:false};
 function set(u){S={...S,...u};render();}
@@ -64,14 +115,15 @@ function render(){
 }
 
 function header(){
+  const pct=Math.round(S.qi/QS.length*100);
   return`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
     <div style="display:flex;align-items:center;gap:10px">
-      <div style="background:${COLOR};border-radius:8px;padding:6px 12px">
+      <div style="background:#0F2744;border-radius:8px;padding:6px 14px">
         <span style="color:#FFB300;font-weight:700;font-size:13px">StudiesMate</span>
       </div>
       <div>
-        <div style="font-size:14px;font-weight:700;color:${COLOR}">3 Forms of Numbers</div>
-        <div style="font-size:11px;color:#888">Standard · Expanded · Word</div>
+        <div style="font-size:14px;font-weight:700;color:${COLOR}">Simple Sentences</div>
+        <div style="font-size:11px;color:#888">Subject + Verb</div>
       </div>
     </div>
     <div style="text-align:right">
@@ -80,7 +132,7 @@ function header(){
     </div>
   </div>
   <div class="progress-bar" style="margin-bottom:20px">
-    <div class="progress-fill" style="width:${Math.round(S.qi/QS.length*100)}%"></div>
+    <div class="progress-fill" style="width:${pct}%"></div>
   </div>`;
 }
 
@@ -91,20 +143,24 @@ function quizH(){
     const icon=done?(i===q.ans?`<span style="font-size:16px;color:#43A047;flex-shrink:0;font-weight:700">✓</span>`:i===S.sel?`<span style="font-size:16px;color:#EF5350;flex-shrink:0;font-weight:700">✗</span>`:""):"";
     return`<button class="${cls}" data-opt="${i}"
       onmouseover="if(!${done}){this.style.borderColor='${COLOR}';this.querySelector('.letter').style.background='${COLOR}';this.querySelector('.letter').style.color='#fff'}"
-      onmouseout="if(!${done}){this.style.borderColor='#ddd';this.querySelector('.letter').style.background='${LIGHT}';this.querySelector('.letter').style.color='${COLOR}'}">
+      onmouseout="if(!${done}){this.style.borderColor='#ddd';this.querySelector('.letter').style.background='${LIGHT}';this.querySelector('.letter').style.color='${ACCENT}'}">
       <span class="letter">${["A","B","C","D"][i]}</span>
       <span style="flex:1">${o}</span>${icon}</button>`;
   }).join("");
+
   const fb=done?`<div class="fb ${S.sel===q.ans?"ok":"no"}">
-    ${S.sel===q.ans?"<strong>✓ Correct!</strong> Great job!":
-    `<strong>Not quite.</strong> The right answer is: <strong>${q.opts[q.ans]}</strong>`}
+    ${S.sel===q.ans
+      ?`<strong>✓ Correct!</strong> Well done!`
+      :`<strong>Not quite.</strong> The right answer is: <strong>${q.opts[q.ans]}</strong>${q.hint?`<br><span style="font-size:13px;opacity:.85;margin-top:4px;display:block">💡 ${q.hint}</span>`:""}`}
   </div>`:"";
+
   const nxt=done?`<button class="btn btn-primary" id="nBtn" style="margin-top:4px">
     ${S.qi+1>=QS.length?"See my score 🏆":"Next question →"}
   </button>`:"";
+
   return`<div>${header()}
     <div class="card">
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:${COLOR};margin-bottom:10px">Question ${S.qi+1}</div>
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:${ACCENT};margin-bottom:10px">Question ${S.qi+1}</div>
       <div style="font-size:18px;font-weight:600;color:#0F2744;line-height:1.55">${q.q}</div>
     </div>
     ${opts}${fb}${nxt}
@@ -114,31 +170,39 @@ function quizH(){
 function resultH(){
   const pct=Math.round(S.score/QS.length*100);
   const passed=pct>=60;
-  const stars=S.score===QS.length?3:S.score>=QS.length*.75?2:S.score>=QS.length*.5?1:0;
+  const stars=S.score===QS.length?3:S.score>=Math.round(QS.length*.75)?2:S.score>=Math.round(QS.length*.5)?1:0;
   const starStr=[...Array(3)].map((_,i)=>i<stars?"⭐":"☆").join("");
-  const msg=S.score===QS.length?"Perfect! 3 Forms master! 🌟":S.score>=QS.length*.75?"Amazing! Almost perfect!":S.score>=QS.length*.5?"Good job! Keep at it!":"Review the video and try again!";
+  const msg=S.score===QS.length?"Perfect! Sentence superstar! 🌟":S.score>=Math.round(QS.length*.75)?"Amazing! Almost perfect!":S.score>=Math.round(QS.length*.5)?"Good effort! Keep practising!":"Review the topic and try again!";
   return`<div style="text-align:center;padding:10px 0">
-    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:${COLOR};text-transform:uppercase;margin-bottom:18px">3 Forms of Numbers — Results</div>
+    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:${ACCENT};text-transform:uppercase;margin-bottom:18px">Simple Sentences — Results</div>
     <div style="font-size:46px;margin-bottom:8px;animation:scoreIn .5s cubic-bezier(.17,.67,.35,1.4)">${starStr}</div>
     <div style="animation:scoreIn .5s .1s both">
       <div style="font-size:56px;font-weight:800;color:${COLOR};line-height:1">${S.score}<span style="font-size:24px;color:#bbb;font-weight:400">/${QS.length}</span></div>
       <div style="font-size:14px;color:#888;margin:4px 0 6px">${pct}% correct</div>
       <div style="font-size:15px;font-weight:600;color:#444;margin-bottom:22px">${msg}</div>
     </div>
-    <div style="border-radius:12px;padding:15px 18px;margin-bottom:16px;font-size:14px;border:1px solid;text-align:left;${passed?"background:#E8F5E9;border-color:#43A047;color:#2E7D32":"background:#FFF3E0;border-color:#FF9100;color:#CC7700"}">
-      <strong>${passed?"You passed! ✓":"Almost there!"}</strong><br>
-      <span style="font-size:13px;opacity:.85">${passed?"Download your worksheet for extra 3 Forms practice.":"Re-watch the 3 Forms video and retry!"}</span>
+
+    <div style="background:#E8F5E9;border:1px solid #43A047;border-radius:12px;padding:14px 18px;margin-bottom:16px;text-align:left">
+      <div style="font-weight:700;color:#2E7D32;margin-bottom:6px">📖  Key Reminder</div>
+      <div style="font-size:14px;color:#1B5E20;line-height:1.6">
+        A <strong>Simple Sentence</strong> = <strong>Subject</strong> + <strong>Verb</strong><br>
+        • <strong>Subject</strong> = WHO or WHAT the sentence is about<br>
+        • <strong>Verb</strong> = WHAT the subject does<br>
+        • Without both, it's just a fragment — not a sentence!
+      </div>
     </div>
-    <div style="background:${COLOR};border-radius:12px;padding:16px 18px;margin-bottom:18px;display:flex;align-items:center;gap:14px;text-align:left">
+
+    <div style="background:#0F2744;border-radius:12px;padding:16px 18px;margin-bottom:18px;display:flex;align-items:center;gap:14px;text-align:left">
       <span style="font-size:24px;color:#FFB300;flex-shrink:0">↓</span>
       <div>
         <div style="color:#FFB300;font-weight:700;font-size:14px">Download your worksheet</div>
-        <div style="color:rgba(255,255,255,.6);font-size:12px;margin-top:2px">3 Forms of Numbers — practice problems</div>
+        <div style="color:rgba(255,255,255,.6);font-size:12px;margin-top:2px">Simple Sentences — practice exercises</div>
       </div>
     </div>
+
     <div style="display:flex;gap:10px">
       <button class="btn btn-outline" id="rBtn">↺ Try again</button>
-      <button class="btn btn-primary" id="hBtn">Back to Dashboard →</button>
+      <button class="btn btn-primary" id="hBtn" style="background:${COLOR}">Back to topics →</button>
     </div>
   </div>`;
 }
@@ -155,10 +219,11 @@ function bind(){
     if(S.qi+1>=QS.length){
       if(S.score>=Math.round(QS.length*.75)){playWin();boom();}
       set({done:true});
+      window.parent.postMessage({ type: "quizComplete", quizId: "english-intro" }, "*");
     } else set({qi:S.qi+1,sel:null});
   });
   const rb=document.getElementById("rBtn");if(rb)rb.addEventListener("click",()=>set({qi:0,score:0,sel:null,done:false}));
-  const hb=document.getElementById("hBtn");if(hb)hb.addEventListener("click",()=>{try{const c=JSON.parse(localStorage.getItem("studiesmate_quiz_completions")||"{}");c["math-rwn"]=true;localStorage.setItem("studiesmate_quiz_completions",JSON.stringify(c));localStorage.setItem("studiesmate_last_activity_v2",JSON.stringify({action:"Completed Reading & Writing Whole Numbers Quiz",timestamp:new Date().toISOString()}));}catch(e){}window.top.location.href="/dashboard";});
+  const hb=document.getElementById("hBtn");if(hb)hb.addEventListener("click",()=>alert("Link to your StudiesMate topics page here!"));
 }
 
 render();

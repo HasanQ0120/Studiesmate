@@ -17,11 +17,8 @@ export default function Footer() {
             <Link href="/about" className="text-white/85 hover:text-white">
               About & Privacy
             </Link>
-            <Link href="/vision" className="text-white/85 hover:text-white">
-              Vision
-            </Link>
-            <Link href="/subjects" className="text-white/85 hover:text-white">
-              Subjects
+<Link href="/phase-1" className="text-white/85 hover:text-white">
+              Grades
             </Link>
             <Link href="/login" className="text-white/85 hover:text-white">
               Login
