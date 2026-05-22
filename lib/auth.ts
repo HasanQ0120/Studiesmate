@@ -29,6 +29,7 @@ export async function signUpParentAccount(params: {
     email: parentEmail.trim().toLowerCase(),
     password: password.trim(),
     options: {
+      emailRedirectTo: 'https://studiesmate-web.vercel.app/dashboard',
       data: {
         studentName: studentName.trim(),
         studentClass: studentClass.trim(),
