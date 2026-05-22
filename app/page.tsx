@@ -187,58 +187,29 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* PRICING (White) */}
+      {/* FOUNDERS NOTE (White) */}
       <section className="bg-white">
         <div className="mx-auto max-w-6xl px-4 py-14">
           <Reveal>
-            <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-              <div>
-                <h2 className="text-xl font-semibold">Simple, affordable pricing</h2>
-                <p className="mt-2 max-w-2xl text-sm text-slate-700">
-                  Start free with Beta. Upgrade when you are ready.
+            <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+              <h2 className="text-xl font-semibold text-slate-900">A note from the founders</h2>
+              <div className="mt-5 space-y-4 text-sm leading-7 text-slate-700">
+                <p>
+                  My name is Muhammad Hasan. I am 18 years old, from Karachi. I built StudiesMate because I saw students around me struggling — not because they weren't smart, but because concepts were being taught in a language they hadn't fully mastered yet.
+                </p>
+                <p>
+                  Muhammad Umer handles all the content — every video is made with care to make sure your child actually understands, not just memorizes.
+                </p>
+                <p>
+                  StudiesMate is our answer to that problem. Bilingual lessons, no distractions, built honestly for Pakistani students.
+                </p>
+                <p>
+                  We are just getting started. But we are building this the right way — slowly, with your child's understanding as the only goal.
                 </p>
               </div>
-            </div>
-
-            <div className="mt-8 grid gap-5 md:grid-cols-3">
-              <Reveal delayMs={0}>
-                <div className="rounded-2xl border-2 border-[#0B2B5A] bg-white p-6">
-                  <div className="text-xs font-semibold text-[#0B2B5A] uppercase tracking-widest mb-2">Beta</div>
-                  <div className="text-3xl font-semibold tracking-tight text-slate-900">Free</div>
-                  <p className="mt-2 text-sm text-slate-600">Math, English & Science — 1 lesson and quiz each. Forever free.</p>
-                  <Link
-                    href={isLoggedIn ? "/dashboard" : "/signup"}
-                    className="mt-5 inline-flex rounded-xl bg-[#0B2B5A] px-4 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:bg-[#0F3D7D] hover:-translate-y-0.5"
-                  >
-                    Start Free Beta
-                  </Link>
-                </div>
-              </Reveal>
-
-              <Reveal delayMs={80}>
-                <div className="rounded-2xl border border-slate-200 bg-white p-6">
-                  <div className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-2">Grade 4</div>
-                  <div className="text-3xl font-semibold tracking-tight text-slate-900">Rs. 1,500<span className="text-base font-normal text-slate-500">/month</span></div>
-                  <p className="mt-2 text-sm text-slate-600">Full Math, English & Science course. All topics covered.</p>
-                  <Link
-                    href="/phase-1"
-                    className="mt-5 inline-flex rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-900 transition-all duration-200 hover:bg-slate-50 hover:-translate-y-0.5"
-                  >
-                    View Details
-                  </Link>
-                </div>
-              </Reveal>
-
-              <Reveal delayMs={160}>
-                <div className="rounded-2xl border border-slate-200 bg-[#F8FAFC] p-6">
-                  <div className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-2">Grade 5 – 8</div>
-                  <div className="text-3xl font-semibold tracking-tight text-slate-400">Coming Soon</div>
-                  <p className="mt-2 text-sm text-slate-500">More grades launching after Grade 4 is stable.</p>
-                  <div className="mt-5 inline-flex rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-400 cursor-not-allowed">
-                    Not yet available
-                  </div>
-                </div>
-              </Reveal>
+              <p className="mt-6 text-sm font-medium text-[#0B2B5A]">
+                — Muhammad Hasan &amp; Muhammad Umer, Founders of StudiesMate
+              </p>
             </div>
           </Reveal>
         </div>
