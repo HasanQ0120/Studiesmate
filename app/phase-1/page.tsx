@@ -44,14 +44,8 @@ export default function GradesPage() {
               key={g.name}
               className={`rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ${g.status === "in-progress" ? "border-t-[3px] border-t-[#0B2B5A]" : ""}`}
             >
-              <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+              <h2 className="text-lg font-semibold text-slate-900">
                 {g.name}
-                {g.status === "in-progress" && (
-                  <span className="text-sm font-semibold text-[#0B2B5A]">In Progress</span>
-                )}
-                {g.status === "coming-soon" && (
-                  <span className="text-sm font-semibold text-[#0B2B5A]">Coming Soon</span>
-                )}
               </h2>
               <p className="mt-2 text-sm text-slate-600">{g.desc}</p>
 
@@ -67,23 +61,14 @@ export default function GradesPage() {
                   >
                     Start Free
                   </Link>
+                ) : g.status === "in-progress" ? (
+                  <span className="inline-flex items-center justify-center rounded-xl bg-[#0B2B5A] px-4 py-2 text-sm font-semibold text-white">
+                    In Progress
+                  </span>
                 ) : (
-                  <>
-                    <button
-                      type="button"
-                      disabled
-                      className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-400 cursor-not-allowed"
-                    >
-                      Add to Cart
-                    </button>
-                    <button
-                      type="button"
-                      disabled
-                      className="inline-flex items-center justify-center rounded-xl bg-slate-200 px-4 py-2 text-sm font-semibold text-slate-400 cursor-not-allowed"
-                    >
-                      Buy Now
-                    </button>
-                  </>
+                  <span className="inline-flex items-center justify-center rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-500">
+                    Coming Soon
+                  </span>
                 )}
               </div>
             </div>
