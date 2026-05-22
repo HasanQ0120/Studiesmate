@@ -3,6 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import DashboardLayout from "@/components/DashboardLayout";
+import WelcomeScreen from "@/components/WelcomeScreen";
+import { supabase } from "@/lib/auth";
+
+const SM_WELCOMED_KEY = "sm_welcomed";
 
 const QUIZ_COMPLETIONS_KEY = "studiesmate_quiz_completions";
 const LESSON_COMPLETIONS_KEY = "studiesmate_lesson_completions";
@@ -44,6 +48,24 @@ export default function DashboardPage() {
   const [quizCompletions, setQuizCompletions] = useState<Record<string, boolean>>({});
   const [lessonCompletions, setLessonCompletions] = useState<Record<string, string>>({});
   const [lastActivityData, setLastActivityData] = useState<LastActivityData | null>(null);
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [welcomeName, setWelcomeName] = useState("");
+
+  useEffect(() => {
+    if (localStorage.getItem(SM_WELCOMED_KEY)) return;
+    supabase.auth.getSession().then(({ data }) => {
+      const user = data.session?.user;
+      if (!user) return;
+      const name = (user.user_metadata?.studentName as string | undefined)?.trim() || "Student";
+      setWelcomeName(name);
+      setShowWelcome(true);
+    });
+  }, []);
+
+  function handleWelcomeContinue() {
+    localStorage.setItem(SM_WELCOMED_KEY, "1");
+    setShowWelcome(false);
+  }
 
   useEffect(() => {
     setQuizCompletions(
@@ -94,6 +116,8 @@ export default function DashboardPage() {
   ].filter(Boolean).length;
 
   return (
+    <>
+    {showWelcome && <WelcomeScreen name={welcomeName} onContinue={handleWelcomeContinue} />}
     <DashboardLayout>
     <div className="min-h-screen bg-white px-6 py-10">
       <div className="max-w-6xl mx-auto">
@@ -251,5 +275,6 @@ export default function DashboardPage() {
       </div>
     </div>
     </DashboardLayout>
+    </>
   );
 }

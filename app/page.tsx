@@ -13,12 +13,18 @@ const SUBJECT_PREVIEW = [
 ];
 
 export default function HomePage() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       setIsLoggedIn(!!data.session);
     });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   return (
@@ -44,7 +50,7 @@ export default function HomePage() {
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
-                href={isLoggedIn ? "/dashboard" : "/signup"}
+                href={isLoggedIn === true ? "/dashboard" : "/signup"}
                 className="rounded-xl bg-white px-5 py-3 text-sm font-semibold text-[#0B2B5A] transition-all duration-200 hover:bg-white/95 hover:-translate-y-0.5 active:translate-y-0"
               >
                 Start Free Beta
@@ -302,7 +308,7 @@ export default function HomePage() {
                 </div>
                 <div className="mt-5 flex flex-wrap gap-3 md:mt-0">
                   <Link
-                    href={isLoggedIn ? "/dashboard" : "/signup"}
+                    href={isLoggedIn === true ? "/dashboard" : "/signup"}
                     className="inline-flex rounded-xl bg-white px-5 py-3 text-sm font-semibold text-[#0B2B5A] transition-all duration-200 hover:bg-white/95 hover:-translate-y-0.5"
                   >
                     Get started
