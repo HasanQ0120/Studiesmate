@@ -7,7 +7,7 @@ interface WelcomeScreenProps {
 
 export default function WelcomeScreen({ name, onContinue }: WelcomeScreenProps) {
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white px-6">
+    <div className="flex min-h-screen w-full items-center justify-center bg-white px-6">
       <div className="w-full max-w-lg text-center">
         <h1 className="text-4xl font-bold text-[#0B2B5A] md:text-5xl">
           Welcome, {name}! 👋

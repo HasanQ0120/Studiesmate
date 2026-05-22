@@ -6,8 +6,6 @@ import DashboardLayout from "@/components/DashboardLayout";
 import WelcomeScreen from "@/components/WelcomeScreen";
 import { supabase } from "@/lib/auth";
 
-const SM_WELCOMED_KEY = "sm_welcomed";
-
 const QUIZ_COMPLETIONS_KEY = "studiesmate_quiz_completions";
 const LESSON_COMPLETIONS_KEY = "studiesmate_lesson_completions";
 const LAST_ACTIVITY_V2_KEY = "studiesmate_last_activity_v2";
@@ -52,18 +50,19 @@ export default function DashboardPage() {
   const [welcomeName, setWelcomeName] = useState("");
 
   useEffect(() => {
-    if (localStorage.getItem(SM_WELCOMED_KEY)) return;
-    supabase.auth.getSession().then(({ data }) => {
-      const user = data.session?.user;
-      if (!user) return;
-      const name = (user.user_metadata?.studentName as string | undefined)?.trim() || "Student";
-      setWelcomeName(name);
-      setShowWelcome(true);
-    });
+    const checkWelcome = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session && !localStorage.getItem('sm_welcomed')) {
+        const name = (session.user.user_metadata?.studentName as string | undefined)?.trim() || "Student";
+        setWelcomeName(name);
+        setShowWelcome(true);
+      }
+    };
+    checkWelcome();
   }, []);
 
   function handleWelcomeContinue() {
-    localStorage.setItem(SM_WELCOMED_KEY, "1");
+    localStorage.setItem('sm_welcomed', 'true');
     setShowWelcome(false);
   }
 
@@ -115,9 +114,11 @@ export default function DashboardPage() {
     quizCompletions["science-intro"],
   ].filter(Boolean).length;
 
+  if (showWelcome) {
+    return <WelcomeScreen name={welcomeName} onContinue={handleWelcomeContinue} />;
+  }
+
   return (
-    <>
-    {showWelcome && <WelcomeScreen name={welcomeName} onContinue={handleWelcomeContinue} />}
     <DashboardLayout>
     <div className="min-h-screen bg-white px-6 py-10">
       <div className="max-w-6xl mx-auto">
@@ -275,6 +276,5 @@ export default function DashboardPage() {
       </div>
     </div>
     </DashboardLayout>
-    </>
   );
 }
