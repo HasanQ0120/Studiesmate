@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import DashboardLayout from "@/components/DashboardLayout";
-import WelcomeScreen from "@/components/WelcomeScreen";
 import { supabase } from "@/lib/auth";
 
 const QUIZ_COMPLETIONS_KEY = "studiesmate_quiz_completions";
@@ -50,15 +49,21 @@ export default function DashboardPage() {
   const [welcomeName, setWelcomeName] = useState("");
 
   useEffect(() => {
-    const checkWelcome = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+    function applyWelcome(session: { user: { user_metadata?: Record<string, unknown> } } | null) {
       if (session && !localStorage.getItem('sm_welcomed')) {
         const name = (session.user.user_metadata?.studentName as string | undefined)?.trim() || "Student";
         setWelcomeName(name);
         setShowWelcome(true);
       }
-    };
-    checkWelcome();
+    }
+
+    supabase.auth.getSession().then(({ data: { session } }) => applyWelcome(session));
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      applyWelcome(session);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   function handleWelcomeContinue() {
@@ -115,7 +120,39 @@ export default function DashboardPage() {
   ].filter(Boolean).length;
 
   if (showWelcome) {
-    return <WelcomeScreen name={welcomeName} onContinue={handleWelcomeContinue} />;
+    return (
+      <div className="flex min-h-screen w-full flex-col items-center justify-center bg-white px-6 text-center">
+        <div className="w-full max-w-lg">
+          <h1 className="text-4xl font-bold text-[#0B2B5A] md:text-5xl">
+            Welcome, {welcomeName}! 👋
+          </h1>
+          <p className="mt-6 text-base leading-8 text-slate-700 md:text-lg">
+            You have just joined the StudiesMate family. We are proud to have you here.
+            Your learning journey starts today — one small step at a time.
+          </p>
+          <div className="mt-10 flex flex-col items-center gap-4">
+            <button
+              type="button"
+              onClick={() => {
+                localStorage.setItem('sm_welcomed', 'true');
+                setShowWelcome(false);
+              }}
+              className="inline-flex items-center justify-center rounded-xl bg-[#0B2B5A] px-8 py-4 text-base font-semibold text-white transition-all duration-200 hover:bg-[#0A2550] hover:-translate-y-0.5"
+            >
+              Go to Dashboard →
+            </button>
+            <a
+              href="https://chat.whatsapp.com/BgG4sUTHa1z8UXX7n2sKGn"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center rounded-xl border border-[#0B2B5A] px-8 py-4 text-base font-semibold text-[#0B2B5A] transition-all duration-200 hover:bg-slate-50 hover:-translate-y-0.5"
+            >
+              Join our WhatsApp Community →
+            </a>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -33,6 +33,27 @@ export default function Footer() {
             <p className="mt-2 text-sm text-white/80">
               Contact: studiesmate.org@gmail.com
             </p>
+            <div className="mt-4">
+              <div className="text-sm font-semibold">Community</div>
+              <div className="mt-2 flex flex-col gap-1.5">
+                <a
+                  href="https://www.instagram.com/studiesmate.pk"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-white/80 hover:text-white"
+                >
+                  Instagram
+                </a>
+                <a
+                  href="https://chat.whatsapp.com/BgG4sUTHa1z8UXX7n2sKGn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-white/80 hover:text-white"
+                >
+                  WhatsApp Community
+                </a>
+              </div>
+            </div>
           </div>
         </div>
 
