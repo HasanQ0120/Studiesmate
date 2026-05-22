@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Reveal from "@/components/Reveal";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/auth";
 
 const SUBJECT_PREVIEW = [
@@ -13,19 +14,16 @@ const SUBJECT_PREVIEW = [
 ];
 
 export default function HomePage() {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+  const router = useRouter();
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setIsLoggedIn(!!data.session);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsLoggedIn(!!session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+  const handleStartBeta = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      router.push('/dashboard');
+    } else {
+      router.push('/signup');
+    }
+  };
 
   return (
     <main className="min-h-screen bg-white text-slate-900">
@@ -49,12 +47,13 @@ export default function HomePage() {
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Link
-                href={isLoggedIn === true ? "/dashboard" : "/signup"}
+              <button
+                type="button"
+                onClick={handleStartBeta}
                 className="rounded-xl bg-white px-5 py-3 text-sm font-semibold text-[#0B2B5A] transition-all duration-200 hover:bg-white/95 hover:-translate-y-0.5 active:translate-y-0"
               >
                 Start Free Beta
-              </Link>
+              </button>
               <Link
                 href="/phase-1"
                 className="rounded-xl border border-white/30 px-5 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-white/10 hover:-translate-y-0.5 active:translate-y-0"
@@ -307,12 +306,13 @@ export default function HomePage() {
                   </p>
                 </div>
                 <div className="mt-5 flex flex-wrap gap-3 md:mt-0">
-                  <Link
-                    href={isLoggedIn === true ? "/dashboard" : "/signup"}
+                  <button
+                    type="button"
+                    onClick={handleStartBeta}
                     className="inline-flex rounded-xl bg-white px-5 py-3 text-sm font-semibold text-[#0B2B5A] transition-all duration-200 hover:bg-white/95 hover:-translate-y-0.5"
                   >
                     Get started
-                  </Link>
+                  </button>
                   <Link
                     href="/phase-1"
                     className="inline-flex rounded-xl border border-white/30 px-5 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-white/10 hover:-translate-y-0.5"
