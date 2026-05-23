@@ -146,18 +146,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       {/* Mobile bottom tab bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-[#E2E8F0] bg-white flex items-center justify-around px-4 py-2">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-[#E2E8F0] bg-white flex items-center justify-around px-2 py-2">
         <Link href="/dashboard" className="flex flex-col items-center gap-1 text-[10px] font-semibold text-[#475569]">
           <Home className="h-5 w-5" />
           Home
         </Link>
-        <Link href="/dashboard" className="flex flex-col items-center gap-1 text-[10px] font-semibold text-[#475569]">
+        <Link href="/subjects/maths/chapters/numbers" className="flex flex-col items-center gap-1 text-[10px] font-semibold text-[#475569]">
           <Calculator className="h-5 w-5" />
           Math
         </Link>
-        <Link href="/subjects/maths/chapters/numbers/quiz" className="flex flex-col items-center gap-1 text-[10px] font-semibold text-[#475569]">
+        <Link href="/subjects/english/chapters/english-intro" className="flex flex-col items-center gap-1 text-[10px] font-semibold text-[#475569]">
           <BookOpen className="h-5 w-5" />
-          Quiz
+          English
+        </Link>
+        <Link href="/subjects/science/chapters/science-intro" className="flex flex-col items-center gap-1 text-[10px] font-semibold text-[#475569]">
+          <FlaskConical className="h-5 w-5" />
+          Science
         </Link>
       </div>
 
