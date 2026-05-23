@@ -9,7 +9,7 @@ export default function Footer() {
             <div className="text-lg font-semibold">StudiesMate</div>
             <p className="mt-2 text-sm text-white/80">Calm learning. Clear progress.</p>
             <p className="mt-4 text-xs text-white/65">
-              Beta — building trust and clarity first.
+              Affordable. Bilingual. Built for Pakistan.
             </p>
           </div>
 

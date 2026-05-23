@@ -96,9 +96,19 @@ export default function EnglishLessonPage() {
           <h1 className="mt-6 text-3xl font-semibold tracking-tight">English • {CHAPTER_META.title}</h1>
           <p className="mt-2 text-sm text-[#475569]">{CHAPTER_META.desc}</p>
           <div className="mt-10">
-            <div className="aspect-video w-full overflow-hidden rounded-2xl border border-[#E2E8F0] bg-black">
-              <div id="yt-player-english" className="h-full w-full" />
-            </div>
+            {VIDEO_IDS.en === "PLACEHOLDER_VIDEO_ID" ? (
+              <div className="aspect-video w-full overflow-hidden rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] flex items-center justify-center">
+                <div className="text-center">
+                  <div className="text-4xl mb-3">🎬</div>
+                  <p className="text-sm font-semibold text-[#475569]">Video coming soon</p>
+                  <p className="text-xs text-[#94A3B8] mt-1">Check back after full launch</p>
+                </div>
+              </div>
+            ) : (
+              <div className="aspect-video w-full overflow-hidden rounded-2xl border border-[#E2E8F0] bg-black">
+                <div id="yt-player-english" className="h-full w-full" />
+              </div>
+            )}
             <div className="mt-3 flex w-fit items-center gap-1 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-1">
               <button type="button" onClick={() => handleLangSwitch("en")} className={`rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-150 ${lang === "en" ? "bg-[#0B2B5A] text-white shadow-sm" : "text-[#475569] hover:text-[#0F172A]"}`}>English</button>
               <button type="button" onClick={() => handleLangSwitch("ur")} className={`rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-150 ${lang === "ur" ? "bg-[#0B2B5A] text-white shadow-sm" : "text-[#475569] hover:text-[#0F172A]"}`}>اردو (Urdu)</button>

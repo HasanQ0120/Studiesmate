@@ -135,9 +135,19 @@ export default function ChapterPage() {
 
         {/* Video player + bilingual slider */}
         <div className="mt-10">
-          <div className="aspect-video w-full overflow-hidden rounded-2xl border border-slate-200 bg-black">
-            <div id="yt-player" className="h-full w-full" />
-          </div>
+          {videoIds.en === "PLACEHOLDER_VIDEO_ID" ? (
+            <div className="aspect-video w-full overflow-hidden rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] flex items-center justify-center">
+              <div className="text-center">
+                <div className="text-4xl mb-3">🎬</div>
+                <p className="text-sm font-semibold text-[#475569]">Video coming soon</p>
+                <p className="text-xs text-[#94A3B8] mt-1">Check back after full launch</p>
+              </div>
+            </div>
+          ) : (
+            <div className="aspect-video w-full overflow-hidden rounded-2xl border border-[#E2E8F0] bg-black">
+              <div id="yt-player" className="h-full w-full" />
+            </div>
+          )}
 
           {/* Bilingual slider */}
           <div className="mt-3 flex w-fit items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 p-1">

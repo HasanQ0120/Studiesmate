@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import DashboardLayout from "@/components/DashboardLayout";
 import { supabase } from "@/lib/auth";
 
@@ -42,6 +43,7 @@ function safeParseJSON<T>(raw: string | null, fallback: T): T {
 type LastActivityData = { action: string; timestamp: string; href?: string };
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [quizCompletions, setQuizCompletions] = useState<Record<string, boolean>>({});
   const [lessonCompletions, setLessonCompletions] = useState<Record<string, string>>({});
   const [lastActivityData, setLastActivityData] = useState<LastActivityData | null>(null);
@@ -65,6 +67,14 @@ export default function DashboardPage() {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) {
+        router.push("/login");
+      }
+    });
+  }, [router]);
 
   function handleWelcomeContinue() {
     localStorage.setItem('sm_welcomed', 'true');
