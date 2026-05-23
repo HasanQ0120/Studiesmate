@@ -196,8 +196,13 @@ export default function HomePage() {
       <section className="bg-white">
         <div className="mx-auto max-w-6xl px-4 py-14">
           <Reveal>
-            <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-              <h2 className="text-xl font-semibold text-slate-900">A note from the founders</h2>
+            <div style={{border: "1px solid #E2E8F0", borderRadius: "16px", padding: "32px", boxShadow: "0 4px 20px rgba(0,0,0,0.06)"}} className="bg-white">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#0B2B5A] text-sm font-bold text-white">
+                  SM
+                </div>
+                <h2 className="text-xl font-semibold text-slate-900">A note from the founders</h2>
+              </div>
               <div className="mt-5 space-y-4 text-sm leading-7 text-slate-700">
                 <p>
                   My name is Muhammad Hasan. I am 18 years old, from Karachi. I built StudiesMate because I saw students around me struggling — not because they weren't smart, but because concepts were being taught in a language they hadn't fully mastered yet.

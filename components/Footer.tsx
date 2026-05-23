@@ -15,7 +15,10 @@ export default function Footer() {
 
           <div className="grid grid-cols-2 gap-3 text-sm">
             <Link href="/about" className="text-white/85 hover:text-white">
-              About & Privacy
+              About
+            </Link>
+            <Link href="/privacy" className="text-white/85 hover:text-white">
+              Privacy Policy
             </Link>
 <Link href="/phase-1" className="text-white/85 hover:text-white">
               Grades
