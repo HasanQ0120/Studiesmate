@@ -124,7 +124,7 @@ export default function ChapterPage() {
 
   return (
     <DashboardLayout>
-    <main className="min-h-screen bg-white text-slate-900">
+    <main className="min-h-screen bg-white text-slate-900 pb-20 md:pb-0">
       <div className="mx-auto max-w-4xl px-6 py-10">
         <BackButton href="/dashboard" label="Back to Dashboard" />
 

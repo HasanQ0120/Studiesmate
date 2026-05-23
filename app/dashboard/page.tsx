@@ -167,7 +167,7 @@ export default function DashboardPage() {
 
   return (
     <DashboardLayout>
-    <div className="min-h-screen bg-white px-6 py-10">
+    <div className="min-h-screen bg-white px-6 py-10 pb-20 md:pb-0">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome 👋</h1>
         <p className="text-gray-600 mb-6">Your subjects are shown below.</p>
