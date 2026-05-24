@@ -113,7 +113,8 @@ export default function Header() {
     <header className="sticky top-0 z-50 border-b border-white/10 bg-[#0B2B5A] text-white">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
         <Link href="/" className="flex items-center gap-2">
-          <span className="text-xl font-bold text-white">StudiesMate</span>
+          <img src="/logo.png" alt="StudiesMate" className="h-10 w-auto" onError={(e) => { e.currentTarget.style.display='none'; }} />
+          <span className="text-xl font-bold text-white" id="logo-fallback">Studies<span className="text-[#F97316]">Mate</span></span>
         </Link>
 
         {/* Desktop nav */}

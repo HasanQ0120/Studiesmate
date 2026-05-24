@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="mx-auto max-w-6xl px-4 py-10">
         <div className="grid gap-8 md:grid-cols-3">
           <div>
-            <div className="text-lg font-semibold">StudiesMate</div>
+            <img src="/logo.png" alt="StudiesMate" className="h-8 w-auto" style={{ filter: 'brightness(0) invert(1)' }} />
             <p className="mt-2 text-sm text-white/80">Calm learning. Clear progress.</p>
             <p className="mt-4 text-xs text-white/65">
               Affordable. Bilingual. Built for Pakistan.
