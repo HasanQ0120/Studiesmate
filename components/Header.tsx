@@ -154,13 +154,13 @@ export default function Header() {
             </button>
 
             {mobileNavOpen && (
-              <div className="absolute left-0 right-0 top-full border-t border-white/10 bg-[#0B2B5A]">
+              <div className="absolute left-0 right-0 top-full border-t border-[#E2E8F0] bg-white shadow-lg">
                 <div className="mx-auto max-w-6xl px-4 py-3">
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <Link
                       href="/"
                       onClick={closeMobileNav}
-                      className="rounded-lg px-3 py-2 hover:bg-white/10"
+                      className="rounded-lg px-3 py-2 text-[#475569] hover:text-[#F97316]"
                     >
                       Home
                     </Link>
@@ -168,7 +168,7 @@ export default function Header() {
                     <Link
                       href="/phase-1"
                       onClick={closeMobileNav}
-                      className="rounded-lg px-3 py-2 hover:bg-white/10"
+                      className="rounded-lg px-3 py-2 text-[#475569] hover:text-[#F97316]"
                     >
                       Grades
                     </Link>
@@ -176,7 +176,7 @@ export default function Header() {
                     <Link
                       href="/feedback"
                       onClick={closeMobileNav}
-                      className="rounded-lg px-3 py-2 hover:bg-white/10"
+                      className="rounded-lg px-3 py-2 text-[#475569] hover:text-[#F97316]"
                     >
                       Feedback (Beta)
                     </Link>
@@ -184,7 +184,7 @@ export default function Header() {
                     <Link
                       href="/about"
                       onClick={closeMobileNav}
-                      className="rounded-lg px-3 py-2 hover:bg-white/10"
+                      className="rounded-lg px-3 py-2 text-[#475569] hover:text-[#F97316]"
                     >
                       About
                     </Link>
@@ -193,7 +193,7 @@ export default function Header() {
                       <Link
                         href="/dashboard"
                         onClick={closeMobileNav}
-                        className="col-span-2 rounded-lg px-3 py-2 hover:bg-white/10"
+                        className="col-span-2 rounded-lg px-3 py-2 text-[#475569] hover:text-[#F97316]"
                       >
                         Dashboard
                       </Link>
