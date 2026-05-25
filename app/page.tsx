@@ -198,9 +198,7 @@ export default function HomePage() {
           <Reveal>
             <div style={{border: "1px solid #E2E8F0", borderRadius: "16px", padding: "32px", boxShadow: "0 4px 20px rgba(0,0,0,0.06)"}} className="bg-white">
               <div className="flex items-center gap-4 mb-6">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#0B2B5A] text-sm font-bold text-white">
-                  SM
-                </div>
+                <img src="/owl-icon.png" alt="StudiesMate" className="h-12 w-12 rounded-full" />
                 <h2 className="text-xl font-semibold text-slate-900">A note from the founders</h2>
               </div>
               <div className="mt-5 space-y-4 text-sm leading-7 text-slate-700">
