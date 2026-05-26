@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+html {
+  scroll-behavior: smooth;
+}
+
 html,
 body {
   height: 100%;
@@ -16,8 +20,17 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes pageFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 main, .page-wrapper, [class*="page"] {
   animation: fadeIn 0.3s ease-in-out;
+}
+
+.page-wrapper {
+  animation: pageFadeIn 0.3s ease-out;
 }
 
 /* ---- Animated square "particle" background ---- */

@@ -119,7 +119,7 @@ export default function HomePage() {
                 },
               ].map((c, idx) => (
                 <Reveal key={c.step} delayMs={idx * 80}>
-                  <div className="rounded-2xl border border-slate-200 bg-white p-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
+                  <div className="rounded-2xl border border-slate-200 bg-white p-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)] hover:border-[#0F1F3D]">
                     <div className="text-sm font-medium text-slate-600">{c.step}</div>
                     <div className="mt-2 text-lg font-semibold tracking-tight">
                       {c.title}
@@ -162,7 +162,7 @@ export default function HomePage() {
                     },
                   ].map((c, idx) => (
                     <Reveal key={c.title} delayMs={idx * 90}>
-                      <div className="rounded-2xl border border-white/15 bg-white/10 p-6 transition-all duration-200 hover:bg-white/15 hover:-translate-y-1 hover:shadow-lg">
+                      <div className="rounded-2xl border border-white/15 bg-white/10 p-6 transition-all duration-200 hover:bg-white/15 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)] hover:border-[#0F1F3D]">
                         <h4 className="text-lg font-semibold md:text-xl">{c.title}</h4>
                         <p className="mt-2 text-sm leading-6 text-white/80 md:text-base">
                           {c.desc}
@@ -196,7 +196,7 @@ export default function HomePage() {
       <section className="bg-white">
         <div className="mx-auto max-w-6xl px-4 py-14">
           <Reveal>
-            <div style={{border: "1px solid #E2E8F0", borderRadius: "16px", padding: "32px", boxShadow: "0 4px 20px rgba(0,0,0,0.06)"}} className="bg-white">
+            <div style={{border: "1px solid #E2E8F0", borderRadius: "16px", padding: "32px", boxShadow: "0 4px 20px rgba(0,0,0,0.06)"}} className="bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)]">
               <div className="flex items-center gap-4 mb-6">
                 <img src="/owl-icon.png" alt="StudiesMate" className="h-12 w-12 rounded-full" />
                 <h2 className="text-xl font-semibold text-slate-900">A note from the founders</h2>
@@ -223,6 +223,25 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* WHAT HAPPENS AFTER BETA (White) */}
+      <section className="bg-white">
+        <div className="mx-auto max-w-6xl px-4 pb-14">
+          <Reveal>
+            <div style={{border: "1px solid #E2E8F0", borderRadius: "16px", padding: "32px", boxShadow: "0 4px 20px rgba(0,0,0,0.06)"}} className="bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)]">
+              <h2 className="text-xl font-semibold text-slate-900">What happens after Beta?</h2>
+              <div className="mt-5 space-y-4 text-sm leading-7 text-slate-700">
+                <p>
+                  Beta is just the beginning. Grade 4 full course launches in July. After that we expand one grade at a time only when content is ready and quality is confirmed. No rushing. No compromise on quality.
+                </p>
+                <p>
+                  Your child's understanding is the only thing that matters to us.
+                </p>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
       {/* WHY DIFFERENT (Blue) */}
       <section className="bg-[#0B2B5A] text-white">
         <div className="mx-auto max-w-6xl px-4 py-16">
@@ -236,7 +255,7 @@ export default function HomePage() {
 
             <div className="mt-10 grid gap-5 md:grid-cols-2">
               <Reveal delayMs={0}>
-                <div className="rounded-2xl border border-white/15 bg-white/10 p-6 transition-all duration-200 hover:bg-white/15 hover:-translate-y-1 hover:shadow-lg">
+                <div className="rounded-2xl border border-white/15 bg-white/10 p-6 transition-all duration-200 hover:bg-white/15 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)] hover:border-[#0F1F3D]">
                   <h4 className="text-lg font-semibold md:text-xl">Built for trust</h4>
                   <p className="mt-2 text-sm leading-6 text-white/80 md:text-base">
                     Parent-friendly layout, calm tone, and clear expectations.
@@ -245,7 +264,7 @@ export default function HomePage() {
               </Reveal>
 
               <Reveal delayMs={80}>
-                <div className="rounded-2xl border border-white/15 bg-white/10 p-6 transition-all duration-200 hover:bg-white/15 hover:-translate-y-1 hover:shadow-lg">
+                <div className="rounded-2xl border border-white/15 bg-white/10 p-6 transition-all duration-200 hover:bg-white/15 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)] hover:border-[#0F1F3D]">
                   <h4 className="text-lg font-semibold md:text-xl">
                     No ads, no distractions
                   </h4>
@@ -258,7 +277,7 @@ export default function HomePage() {
               {/* Card 3 - centered under the first two (no other layout changes) */}
               <div className="md:col-span-2 flex justify-center">
                 <Reveal delayMs={140} className="w-full max-w-3xl">
-                  <div className="rounded-2xl border border-white/15 bg-white/10 p-6 transition-all duration-200 hover:bg-white/15 hover:-translate-y-1 hover:shadow-lg">
+                  <div className="rounded-2xl border border-white/15 bg-white/10 p-6 transition-all duration-200 hover:bg-white/15 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)] hover:border-[#0F1F3D]">
                     <h4 className="text-lg font-semibold md:text-xl">
                       Bilingual support
                     </h4>
@@ -333,7 +352,7 @@ export default function HomePage() {
       <section className="bg-white">
         <div className="mx-auto max-w-6xl px-4 py-14">
           <Reveal>
-            <div className="rounded-2xl border border-slate-200 bg-white p-7 transition-all duration-200 hover:shadow-md">
+            <div className="rounded-2xl border border-slate-200 bg-white p-7 transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)] hover:border-[#0F1F3D]">
               <h3 className="text-xl font-semibold">For Parents</h3>
               <p className="mt-3 text-sm leading-6 text-slate-700 max-w-2xl">
                 StudiesMate is designed with parents in mind. No ads, no
@@ -355,7 +374,7 @@ export default function HomePage() {
                     desc: "Urdu support built in so language isn't a barrier.",
                   },
                 ].map((c) => (
-                  <div key={c.title} className="rounded-xl border border-slate-200 p-4">
+                  <div key={c.title} className="rounded-xl border border-slate-200 p-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)] hover:border-[#0F1F3D]">
                     <div className="text-sm font-semibold">{c.title}</div>
                     <p className="mt-1 text-sm text-slate-600">{c.desc}</p>
                   </div>

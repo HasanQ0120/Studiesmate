@@ -36,7 +36,7 @@ export default function ScienceQuizPage() {
 
   return (
     <DashboardLayout>
-      <main className="min-h-screen bg-white text-[#0F172A] pb-20 md:pb-0">
+      <main className="min-h-screen bg-white text-[#0F172A] pb-20 md:pb-16">
         <div className="mx-auto max-w-4xl px-6 py-10">
           <BackButton href="/dashboard" label="Back to Dashboard" />
           <h1 className="mt-6 text-3xl font-semibold tracking-tight">Science • What is a Habitat? Quiz</h1>

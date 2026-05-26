@@ -26,7 +26,7 @@ export default function GradesPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-white text-slate-900">
+    <main className="min-h-screen bg-white text-slate-900 pb-16">
       <div className="mx-auto max-w-6xl px-4 py-14">
         <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
           Choose Your Grade
@@ -42,7 +42,7 @@ export default function GradesPage() {
           {GRADES.map((g) => (
             <div
               key={g.name}
-              className={`rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ${g.status === "in-progress" ? "border-t-[3px] border-t-[#0B2B5A]" : ""}`}
+              className={`rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)] hover:border-[#0F1F3D] ${g.status === "in-progress" ? "border-t-[3px] border-t-[#0B2B5A]" : ""}`}
             >
               <h2 className="text-lg font-semibold text-slate-900">
                 {g.name}

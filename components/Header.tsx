@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { supabase, signOutAccount } from "@/lib/auth";
 
@@ -14,6 +14,14 @@ type SbMeta = {
 
 export default function Header() {
   const router = useRouter();
+  const pathname = usePathname();
+
+  function navClass(href: string) {
+    const active = pathname === href;
+    return active
+      ? "font-bold text-white border-b-2 border-[#F97316]"
+      : "opacity-95 hover:opacity-100";
+  }
 
   // Supabase session state (single source of truth)
   const [sbStudentName, setSbStudentName] = useState("");
@@ -118,19 +126,19 @@ export default function Header() {
 
         {/* Desktop nav */}
         <nav className="hidden items-center gap-6 text-sm md:flex">
-          <Link href="/" className="opacity-95 hover:opacity-100">
+          <Link href="/" className={navClass("/")}>
             Home
           </Link>
 
-          <Link href="/phase-1" className="opacity-95 hover:opacity-100">
+          <Link href="/phase-1" className={navClass("/phase-1")}>
             Grades
           </Link>
 
-          <Link href="/feedback" className="opacity-95 hover:opacity-100">
+          <Link href="/feedback" className={navClass("/feedback")}>
             Feedback (Beta)
           </Link>
 
-          <Link href="/about" className="opacity-95 hover:opacity-100">
+          <Link href="/about" className={navClass("/about")}>
             About
           </Link>
 

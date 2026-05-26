@@ -167,13 +167,13 @@ export default function DashboardPage() {
 
   return (
     <DashboardLayout>
-    <div className="min-h-screen bg-white px-6 py-10 pb-20 md:pb-0">
+    <div className="min-h-screen bg-white px-6 py-10 pb-20 md:pb-16">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome 👋</h1>
         <p className="text-gray-600 mb-6">Your subjects are shown below.</p>
 
         {lastActivityData && (
-          <div className="rounded-2xl border border-[#E2E8F0] bg-[#FFF7ED] p-5 shadow-sm mb-6 flex items-center justify-between gap-4">
+          <div className="rounded-2xl border border-[#E2E8F0] bg-[#FFF7ED] p-5 shadow-sm mb-6 flex items-center justify-between gap-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)] hover:border-[#0F1F3D]">
             <div className="flex items-center gap-3">
               <span className="text-2xl">▶️</span>
               <div>
@@ -191,7 +191,7 @@ export default function DashboardPage() {
         )}
 
         {/* Daily Goal */}
-        <div className="rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm mb-8">
+        <div className="rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm mb-8 transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)] hover:border-[#0F1F3D]">
           <div className="mb-5">
             <h2 className="text-lg font-bold text-[#0F172A]">🎯 Your Daily Goal</h2>
             <p className="text-sm text-[#475569] mt-1">Pick what you want to do today</p>
@@ -199,7 +199,7 @@ export default function DashboardPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {/* Math Box */}
-            <div className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4">
+            <div className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)] hover:border-[#0F1F3D]">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-xl">📐</span>
                 <span className="text-sm font-bold text-[#0F172A]">Mathematics</span>
@@ -221,7 +221,7 @@ export default function DashboardPage() {
             </div>
 
             {/* English Box */}
-            <div className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4">
+            <div className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)] hover:border-[#0F1F3D]">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-xl">📖</span>
                 <span className="text-sm font-bold text-[#0F172A]">English</span>
@@ -241,7 +241,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Science Box */}
-            <div className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4">
+            <div className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)] hover:border-[#0F1F3D]">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-xl">🔬</span>
                 <span className="text-sm font-bold text-[#0F172A]">Science</span>
@@ -276,7 +276,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Progress Tracker */}
-        <div className="mt-10 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
+        <div className="mt-10 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)] hover:border-[#0F1F3D]">
           <h3 className="text-lg font-semibold text-gray-900">Progress Tracker</h3>
 
           <div className="mt-5 flex gap-2">
