@@ -152,7 +152,7 @@ export default function DashboardPage() {
               Go to Dashboard →
             </button>
             <a
-              href="https://chat.whatsapp.com/BgG4sUTHa1z8UXX7n2sKGn"
+              href="https://chat.whatsapp.com/H8q5PBchpRNC4TWIeWp49I"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center rounded-xl border border-[#0B2B5A] px-8 py-4 text-base font-semibold text-[#0B2B5A] transition-all duration-200 hover:bg-slate-50 hover:-translate-y-0.5"

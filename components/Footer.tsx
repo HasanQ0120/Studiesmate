@@ -48,7 +48,7 @@ export default function Footer() {
                   Instagram
                 </a>
                 <a
-                  href="https://chat.whatsapp.com/BgG4sUTHa1z8UXX7n2sKGn"
+                  href="https://chat.whatsapp.com/H8q5PBchpRNC4TWIeWp49I"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-white/80 hover:text-white"

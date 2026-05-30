@@ -97,12 +97,26 @@ export default function EnglishLessonPage() {
           <p className="mt-2 text-sm text-[#475569]">{CHAPTER_META.desc}</p>
           <div className="mt-10">
             {VIDEO_IDS.en === "PLACEHOLDER_VIDEO_ID" ? (
-              <div className="aspect-video w-full overflow-hidden rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] flex items-center justify-center">
-                <div className="text-center">
-                  <div className="text-4xl mb-3">🎬</div>
-                  <p className="text-sm font-semibold text-[#475569]">Video coming soon</p>
-                  <p className="text-xs text-[#94A3B8] mt-1">Check back after full launch</p>
-                </div>
+              <div
+                style={{
+                  background: "#ffffff",
+                  border: "1px solid #0B2B5A",
+                  borderRadius: "12px",
+                  padding: "32px",
+                  textAlign: "center",
+                }}
+              >
+                <div className="text-4xl mb-4">🎬</div>
+                <p className="text-lg font-semibold text-[#0B2B5A]">Video launching June 20th</p>
+                <p className="mt-2 text-sm text-[#64748B]">Join our community to get updates on launch day.</p>
+                <a
+                  href="https://chat.whatsapp.com/H8q5PBchpRNC4TWIeWp49I"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-6 inline-flex items-center justify-center rounded-xl bg-[#0B2B5A] px-6 py-3 text-sm font-semibold text-white hover:bg-[#0A2550] transition-colors"
+                >
+                  Join WhatsApp Community →
+                </a>
               </div>
             ) : (
               <div className="aspect-video w-full overflow-hidden rounded-2xl border border-[#E2E8F0] bg-black">
