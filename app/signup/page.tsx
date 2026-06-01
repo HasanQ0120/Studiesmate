@@ -31,6 +31,7 @@ function SignupForm() {
 
   const [studentName, setStudentName] = useState("");
   const [parentEmail, setParentEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
@@ -58,6 +59,7 @@ function SignupForm() {
       password,
       studentName,
       studentClass: "",
+      phone,
     });
 
     setSubmitting(false);
@@ -136,6 +138,20 @@ function SignupForm() {
                 <p className="mt-2 text-xs text-slate-500">
                   Used for recovery and future parent dashboard.
                 </p>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-slate-700">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="03XX-XXXXXXX"
+                  className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-400"
+                />
+                <p className="mt-1 text-xs text-slate-500">Optional — for updates and support</p>
               </div>
 
               <div>

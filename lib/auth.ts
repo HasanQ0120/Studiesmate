@@ -15,6 +15,7 @@ export type StudiesMateUserMeta = {
   studentName?: string;
   studentClass?: string;
   parentEmail?: string;
+  phone?: string;
 };
 
 export async function signUpParentAccount(params: {
@@ -22,8 +23,9 @@ export async function signUpParentAccount(params: {
   password: string;
   studentName: string;
   studentClass: string;
+  phone?: string;
 }) {
-  const { parentEmail, password, studentName, studentClass } = params;
+  const { parentEmail, password, studentName, studentClass, phone } = params;
 
   return supabase.auth.signUp({
     email: parentEmail.trim().toLowerCase(),
@@ -34,6 +36,7 @@ export async function signUpParentAccount(params: {
         studentName: studentName.trim(),
         studentClass: studentClass.trim(),
         parentEmail: parentEmail.trim().toLowerCase(),
+        ...(phone?.trim() ? { phone: phone.trim() } : {}),
       } satisfies StudiesMateUserMeta,
     },
   });

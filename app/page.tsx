@@ -17,10 +17,14 @@ export default function HomePage() {
   const router = useRouter();
 
   const handleStartBeta = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      router.push('/dashboard');
-    } else {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        router.push('/dashboard');
+      } else {
+        router.push('/signup');
+      }
+    } catch {
       router.push('/signup');
     }
   };

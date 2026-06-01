@@ -35,14 +35,16 @@ export default function Header() {
   const mobileRef = useRef<HTMLDivElement | null>(null);
 
   async function syncFromSupabase() {
-    const { data } = await supabase.auth.getUser();
-    const user = data.user;
+    try {
+      const { data } = await supabase.auth.getUser();
+      const user = data.user;
 
-    const meta = (user?.user_metadata || {}) as SbMeta;
+      const meta = (user?.user_metadata || {}) as SbMeta;
 
-    setSbStudentName((meta.studentName || "").trim());
-    setSbStudentClass((meta.studentClass || "").trim());
-    setSbParentEmail((user?.email || meta.parentEmail || "").trim());
+      setSbStudentName((meta.studentName || "").trim());
+      setSbStudentClass((meta.studentClass || "").trim());
+      setSbParentEmail((user?.email || meta.parentEmail || "").trim());
+    } catch {}
   }
 
   useEffect(() => {
@@ -135,7 +137,7 @@ export default function Header() {
           </Link>
 
           <Link href="/feedback" className={navClass("/feedback")}>
-            Feedback (Beta)
+            Feedback
           </Link>
 
           <Link href="/about" className={navClass("/about")}>
@@ -186,7 +188,7 @@ export default function Header() {
                       onClick={closeMobileNav}
                       className="rounded-lg px-3 py-2 text-[#475569] hover:text-[#F97316]"
                     >
-                      Feedback (Beta)
+                      Feedback
                     </Link>
 
                     <Link
