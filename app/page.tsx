@@ -109,7 +109,7 @@ export default function HomePage() {
                 {
                   step: "Step 1",
                   title: "Choose a subject",
-                  desc: "Start with what feels difficult today. Keep it focused and manageable.",
+                  desc: "Math, English, and Science — all unlocked in Beta. One lesson and quiz per subject.",
                 },
                 {
                   step: "Step 2",
@@ -305,7 +305,7 @@ export default function HomePage() {
               <div>
                 <h3 className="text-xl font-semibold">Subjects</h3>
                 <p className="mt-2 text-sm text-slate-700">
-                  Start with the basics. Build consistency first.
+                  All three subjects unlocked in Beta — one lesson and one quiz each.
                 </p>
               </div>
             </div>
@@ -328,7 +328,7 @@ export default function HomePage() {
                     Start with calm, consistent learning
                   </h3>
                   <p className="mt-2 text-sm leading-6 text-white/80">
-                    Free beta access — Math, English, and Science. One lesson and quiz per subject. No card needed.
+                    Free Beta — all three subjects unlocked. One lesson and one quiz per subject. No payment needed.
                   </p>
                 </div>
                 <div className="mt-5 flex flex-wrap gap-3 md:mt-0">
