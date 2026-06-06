@@ -192,13 +192,14 @@ function resultH(){
       </div>
     </div>
 
-    <div style="background:#0F2744;border-radius:12px;padding:16px 18px;margin-bottom:18px;display:flex;align-items:center;gap:14px;text-align:left">
-      <span style="font-size:24px;color:#FFB300;flex-shrink:0">↓</span>
+    <div style="background:#0F2744;border-radius:12px;padding:16px 18px;margin-bottom:8px;display:flex;align-items:center;gap:14px;text-align:left;pointer-events:none;opacity:0.75">
+      <span style="font-size:24px;color:#FFB300;flex-shrink:0">🔒</span>
       <div>
-        <div style="color:#FFB300;font-weight:700;font-size:14px">Download your worksheet</div>
+        <div style="color:#FFB300;font-weight:700;font-size:14px">Download Worksheet 🔒 — Extra Practice</div>
         <div style="color:rgba(255,255,255,.6);font-size:12px;margin-top:2px">Simple Sentences — practice exercises</div>
       </div>
     </div>
+    <div style="font-size:12px;color:#888;margin-bottom:14px;text-align:center">Available in paid grades. Purchase to unlock extra practice.</div>
 
     <div style="display:flex;gap:10px">
       <button class="btn btn-outline" id="rBtn">↺ Try again</button>
@@ -223,7 +224,7 @@ function bind(){
     } else set({qi:S.qi+1,sel:null});
   });
   const rb=document.getElementById("rBtn");if(rb)rb.addEventListener("click",()=>set({qi:0,score:0,sel:null,done:false}));
-  const hb=document.getElementById("hBtn");if(hb)hb.addEventListener("click",()=>alert("Link to your StudiesMate topics page here!"));
+  const hb=document.getElementById("hBtn");if(hb)hb.addEventListener("click",()=>{try{window.top.location.href="/dashboard";}catch(e){}});
 }
 
 render();

@@ -55,7 +55,7 @@ function playNo(){try{const c=gc();[293.66,220].forEach((f,i)=>{const t=c.curren
 function playWin(){try{const c=gc();[523.25,659.25,783.99,1046.5].forEach((f,i)=>{const t=c.currentTime+i*.07;const o=c.createOscillator(),g=c.createGain();o.type="sine";o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.2,t+.03);g.gain.exponentialRampToValueAtTime(.001,t+.8);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.9);});}catch(e){}}
 function boom(){const cols=["#FFB300","#2A5298","#FF5252","#00BFA5","#43A047"];for(let i=0;i<60;i++){const el=document.createElement("div");el.className="confetti-piece";const s=Math.random()*9+5;el.style.cssText=`width:${s}px;height:${s}px;background:${cols[i%5]};left:${Math.random()*100}vw;top:-10px;animation-duration:${Math.random()*1.5+1.2}s;animation-delay:${Math.random()*.5}s;border-radius:${Math.random()>.5?"50%":"2px"}`;document.body.appendChild(el);setTimeout(()=>el.remove(),2800);}}
 
-let S={qi:0,score:0,sel:null,done:false};
+let S=(function(){try{var p=JSON.parse(localStorage.getItem("quiz_progress_place_value")||"null");if(p&&typeof p.qi==="number"&&p.qi>0&&p.qi<QS.length){return{qi:p.qi,score:p.score||0,sel:null,done:false};}}catch(e){}return{qi:0,score:0,sel:null,done:false};})();
 function set(u){S={...S,...u};render();}
 
 function render(){
@@ -129,14 +129,13 @@ function resultH(){
       <strong>${passed?"You passed! ✓":"Keep going!"}</strong><br>
       <span style="font-size:13px;opacity:.85">${passed?"Download your Place Value worksheet for extra practice.":"Re-watch the Place Value video and try again!"}</span>
     </div>
-    <div style="background:${COLOR};border-radius:12px;padding:16px 18px;margin-bottom:8px;display:flex;align-items:center;gap:14px;text-align:left;pointer-events:none;cursor:default;opacity:0.85">
-      <span style="font-size:24px;color:#FFB300;flex-shrink:0">🔒</span>
+    <button id="wsBtn" style="width:100%;background:${COLOR};border-radius:12px;padding:16px 18px;margin-bottom:18px;display:flex;align-items:center;gap:14px;text-align:left;cursor:pointer;border:none" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+      <span style="font-size:24px;color:#FFB300;flex-shrink:0">📄</span>
       <div>
-        <div style="color:#FFB300;font-weight:700;font-size:14px">Download Worksheet 🔒 — Extra Practice</div>
-        <div style="color:rgba(255,255,255,.6);font-size:12px;margin-top:2px">Place Value — practice problems</div>
+        <div style="color:#FFB300;font-weight:700;font-size:14px">📄 View Worksheet — Extra Practice</div>
+        <div style="color:rgba(255,255,255,.6);font-size:12px;margin-top:2px">Place Value practice problems — unlocked!</div>
       </div>
-    </div>
-    <div style="font-size:12px;color:#888;margin-bottom:14px;text-align:center">Available in paid grades. Purchase to unlock extra practice.</div>
+    </button>
     <div style="display:flex;gap:10px">
       <button class="btn btn-outline" id="rBtn">↺ Try again</button>
       <button class="btn btn-primary" id="hBtn">Back to Dashboard →</button>
@@ -154,12 +153,17 @@ function bind(){
   const nb=document.getElementById("nBtn");
   if(nb)nb.addEventListener("click",()=>{
     if(S.qi+1>=QS.length){
+      try{localStorage.setItem("worksheet_unlocked_place_value","true");localStorage.removeItem("quiz_progress_place_value");}catch(e){}
       if(S.score>=Math.round(QS.length*.75)){playWin();boom();}
       set({done:true});
       window.parent.postMessage({ type: "quizComplete", quizId: "math-npv" }, "*");
-    } else set({qi:S.qi+1,sel:null});
+    } else {
+      try{localStorage.setItem("quiz_progress_place_value",JSON.stringify({qi:S.qi+1,score:S.score}));}catch(e){}
+      set({qi:S.qi+1,sel:null});
+    }
   });
-  const rb=document.getElementById("rBtn");if(rb)rb.addEventListener("click",()=>set({qi:0,score:0,sel:null,done:false}));
+  const rb=document.getElementById("rBtn");if(rb)rb.addEventListener("click",()=>{try{localStorage.removeItem("quiz_progress_place_value");}catch(e){}set({qi:0,score:0,sel:null,done:false});});
+  const wb=document.getElementById("wsBtn");if(wb)wb.addEventListener("click",()=>{try{window.top.location.href="/subjects/maths/chapters/numbers/worksheet";}catch(e){}});
   const hb=document.getElementById("hBtn");if(hb)hb.addEventListener("click",()=>{try{const c=JSON.parse(localStorage.getItem("studiesmate_quiz_completions")||"{}");c["math-npv"]=true;localStorage.setItem("studiesmate_quiz_completions",JSON.stringify(c));localStorage.setItem("studiesmate_last_activity_v2",JSON.stringify({action:"Completed Numbers & Place Value Quiz",timestamp:new Date().toISOString()}));}catch(e){}window.top.location.href="/dashboard";});
 }
 

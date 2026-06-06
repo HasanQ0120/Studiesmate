@@ -231,12 +231,14 @@ export default function DashboardPage() {
                 className="flex items-center gap-2 rounded-lg border border-[#E2E8F0] bg-white p-2.5 mb-2 hover:border-[#F97316] hover:shadow-sm transition-all group"
               >
                 <span className="text-xs font-semibold text-[#475569] group-hover:text-[#F97316] flex-1">Simple Sentences</span>
+                {lessonCompletions["english-intro"] && <span className="text-[10px] text-[#10B981] font-bold">✓</span>}
               </Link>
               <Link
                 href="/subjects/english/chapters/english-intro/quiz"
                 className="flex items-center gap-2 rounded-lg border border-[#E2E8F0] bg-white p-2.5 hover:border-[#F97316] hover:shadow-sm transition-all group"
               >
                 <span className="text-xs font-semibold text-[#475569] group-hover:text-[#F97316] flex-1">Simple Sentences Quiz</span>
+                {quizCompletions["english-intro"] && <span className="text-[10px] text-[#10B981] font-bold">✓</span>}
               </Link>
             </div>
 
@@ -251,12 +253,14 @@ export default function DashboardPage() {
                 className="flex items-center gap-2 rounded-lg border border-[#E2E8F0] bg-white p-2.5 mb-2 hover:border-[#F97316] hover:shadow-sm transition-all group"
               >
                 <span className="text-xs font-semibold text-[#475569] group-hover:text-[#F97316] flex-1">What is a Habitat?</span>
+                {lessonCompletions["science-intro"] && <span className="text-[10px] text-[#10B981] font-bold">✓</span>}
               </Link>
               <Link
                 href="/subjects/science/chapters/science-intro/quiz"
                 className="flex items-center gap-2 rounded-lg border border-[#E2E8F0] bg-white p-2.5 hover:border-[#F97316] hover:shadow-sm transition-all group"
               >
                 <span className="text-xs font-semibold text-[#475569] group-hover:text-[#F97316] flex-1">What is a Habitat? Quiz</span>
+                {quizCompletions["science-intro"] && <span className="text-[10px] text-[#10B981] font-bold">✓</span>}
               </Link>
             </div>
           </div>

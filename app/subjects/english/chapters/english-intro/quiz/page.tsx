@@ -24,6 +24,7 @@ export default function EnglishQuizPage() {
           localStorage.setItem("studiesmate_quiz_completions", JSON.stringify(completions));
           localStorage.setItem("studiesmate_last_activity_v2", JSON.stringify({
             action: "Completed Simple Sentences Quiz",
+            href: "/subjects/english/chapters/english-intro/quiz",
             timestamp: new Date().toISOString(),
           }));
         } catch {}
@@ -39,6 +40,7 @@ export default function EnglishQuizPage() {
         <div className="mx-auto max-w-4xl px-6 py-10">
           <BackButton href="/dashboard" label="Back to Dashboard" />
           <h1 className="mt-6 text-3xl font-semibold tracking-tight">English • Simple Sentences Quiz</h1>
+          <p className="mt-2 text-sm text-[#475569]">Test your understanding of simple sentences.</p>
           <div className="mt-8">
             <iframe
               src="/StudiesMate_Quiz_SimpleSentences.html"

@@ -55,7 +55,7 @@ function playNo(){try{const c=gc();[293.66,220].forEach((f,i)=>{const t=c.curren
 function playWin(){try{const c=gc();[523.25,659.25,783.99,1046.5].forEach((f,i)=>{const t=c.currentTime+i*.07;const o=c.createOscillator(),g=c.createGain();o.type="sine";o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.2,t+.03);g.gain.exponentialRampToValueAtTime(.001,t+.8);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.9);});}catch(e){}}
 function boom(){const cols=["#FFB300","#2E7D32","#FF5252","#00BFA5","#43A047","#1B5E20","#81C784","#FFF176"];for(let i=0;i<65;i++){const el=document.createElement("div");el.className="confetti-piece";const s=Math.random()*9+5;el.style.cssText=`width:${s}px;height:${s}px;background:${cols[i%cols.length]};left:${Math.random()*100}vw;top:-10px;animation-duration:${Math.random()*1.5+1.2}s;animation-delay:${Math.random()*.5}s;border-radius:${Math.random()>.5?"50%":"2px"}`;document.body.appendChild(el);setTimeout(()=>el.remove(),2800);}}
 
-let S={qi:0,score:0,sel:null,done:false};
+let S=(function(){try{var p=JSON.parse(localStorage.getItem("quiz_progress_habitat")||"null");if(p&&typeof p.qi==="number"&&p.qi>0&&p.qi<QS.length){return{qi:p.qi,score:p.score||0,sel:null,done:false};}}catch(e){}return{qi:0,score:0,sel:null,done:false};})();
 function set(u){S={...S,...u};render();}
 function render(){document.getElementById("root").innerHTML=S.done?resultH():quizH();bind();}
 
@@ -110,10 +110,10 @@ function resultH(){
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
       ${[["🏜️","Desert","Camels, scorpions"],["🌊","Ocean","Sharks, dolphins"],["🧊","Arctic","Penguins, polar bears"],["🌴","Rainforest","Parrots, frogs"]].map(([e,h,a])=>`<div style="background:#fff;border:1px solid #C8E6C9;border-radius:10px;padding:12px;text-align:left"><div style="font-size:22px;margin-bottom:4px">${e}</div><div style="font-weight:700;color:${COLOR};font-size:13px">${h}</div><div style="font-size:12px;color:#666;margin-top:2px">${a}</div></div>`).join("")}
     </div>
-    <div style="background:#0F2744;border-radius:12px;padding:16px 18px;margin-bottom:18px;display:flex;align-items:center;gap:14px;text-align:left">
-      <span style="font-size:24px;color:#FFB300;flex-shrink:0">↓</span>
-      <div><div style="color:#FFB300;font-weight:700;font-size:14px">Download your worksheet</div><div style="color:rgba(255,255,255,.6);font-size:12px;margin-top:2px">Chapter 2 · Video 2.1 — What is a Habitat?</div></div>
-    </div>
+    <button id="wsBtn" style="width:100%;background:#0F2744;border-radius:12px;padding:16px 18px;margin-bottom:18px;display:flex;align-items:center;gap:14px;text-align:left;cursor:pointer;border:none" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+      <span style="font-size:24px;color:#FFB300;flex-shrink:0">📄</span>
+      <div><div style="color:#FFB300;font-weight:700;font-size:14px">📄 View Worksheet — Extra Practice</div><div style="color:rgba(255,255,255,.6);font-size:12px;margin-top:2px">Habitat practice problems — unlocked!</div></div>
+    </button>
     <div style="display:flex;gap:10px">
       <button class="btn btn-outline" id="rBtn">↺ Try again</button>
       <button class="btn btn-primary" id="hBtn">Back to topics →</button>
@@ -130,11 +130,19 @@ function bind(){
   }));
   const nb=document.getElementById("nBtn");
   if(nb)nb.addEventListener("click",()=>{
-    if(S.qi+1>=QS.length){if(S.score>=Math.round(QS.length*.75)){playWin();boom();}set({done:true});window.parent.postMessage({ type: "quizComplete", quizId: "science-intro" }, "*");}
-    else set({qi:S.qi+1,sel:null});
+    if(S.qi+1>=QS.length){
+      try{localStorage.setItem("worksheet_unlocked_habitat","true");localStorage.removeItem("quiz_progress_habitat");}catch(e){}
+      if(S.score>=Math.round(QS.length*.75)){playWin();boom();}
+      set({done:true});
+      window.parent.postMessage({type:"quizComplete",quizId:"science-intro"},"*");
+    } else {
+      try{localStorage.setItem("quiz_progress_habitat",JSON.stringify({qi:S.qi+1,score:S.score}));}catch(e){}
+      set({qi:S.qi+1,sel:null});
+    }
   });
-  const rb=document.getElementById("rBtn");if(rb)rb.addEventListener("click",()=>set({qi:0,score:0,sel:null,done:false}));
-  const hb=document.getElementById("hBtn");if(hb)hb.addEventListener("click",()=>alert("Link to your StudiesMate topics page here!"));
+  const rb=document.getElementById("rBtn");if(rb)rb.addEventListener("click",()=>{try{localStorage.removeItem("quiz_progress_habitat");}catch(e){}set({qi:0,score:0,sel:null,done:false});});
+  const hb=document.getElementById("hBtn");if(hb)hb.addEventListener("click",()=>{try{window.top.location.href="/dashboard";}catch(e){}});
+  const wb=document.getElementById("wsBtn");if(wb)wb.addEventListener("click",()=>{try{window.top.location.href="/subjects/science/chapters/science-intro/worksheet";}catch(e){}});
 }
 render();
 </script>
