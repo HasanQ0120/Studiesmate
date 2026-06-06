@@ -16,7 +16,13 @@ export type StudiesMateUserMeta = {
   studentClass?: string;
   parentEmail?: string;
   phone?: string;
+  connect_code?: string;
 };
+
+function generateConnectCode(): string {
+  const digits = Math.floor(1000 + Math.random() * 9000);
+  return `SM-${digits}`;
+}
 
 export async function signUpParentAccount(params: {
   parentEmail: string;
@@ -26,6 +32,7 @@ export async function signUpParentAccount(params: {
   phone?: string;
 }) {
   const { parentEmail, password, studentName, studentClass, phone } = params;
+  const connectCode = generateConnectCode();
 
   return supabase.auth.signUp({
     email: parentEmail.trim().toLowerCase(),
@@ -36,6 +43,7 @@ export async function signUpParentAccount(params: {
         studentName: studentName.trim(),
         studentClass: studentClass.trim(),
         parentEmail: parentEmail.trim().toLowerCase(),
+        connect_code: connectCode,
         ...(phone?.trim() ? { phone: phone.trim() } : {}),
       } satisfies StudiesMateUserMeta,
     },

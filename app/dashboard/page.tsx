@@ -49,6 +49,8 @@ export default function DashboardPage() {
   const [lastActivityData, setLastActivityData] = useState<LastActivityData | null>(null);
   const [showWelcome, setShowWelcome] = useState(false);
   const [welcomeName, setWelcomeName] = useState("");
+  const [connectCode, setConnectCode] = useState<string>("");
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     function applyWelcome(session: { user: { user_metadata?: Record<string, unknown> } } | null) {
@@ -75,6 +77,21 @@ export default function DashboardPage() {
       }
     });
   }, [router]);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      const code = data.user?.user_metadata?.connect_code as string | undefined;
+      if (code) setConnectCode(code);
+    }).catch(() => {});
+  }, []);
+
+  function copyCode() {
+    if (!connectCode) return;
+    navigator.clipboard.writeText(connectCode).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }).catch(() => {});
+  }
 
   function handleWelcomeContinue() {
     localStorage.setItem('sm_welcomed', 'true');
@@ -324,6 +341,23 @@ export default function DashboardPage() {
             </button>
           </div>
         </div>
+
+        {connectCode && (
+          <div className="mt-6 rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)] hover:border-[#0F1F3D]">
+            <h3 className="text-sm font-bold text-[#0F172A]">Your Connect Code</h3>
+            <div className="mt-3 flex items-center gap-3">
+              <span className="text-2xl font-bold tracking-widest text-[#0B2B5A]">{connectCode}</span>
+              <button
+                type="button"
+                onClick={copyCode}
+                className="rounded-lg bg-[#F1F5F9] px-3 py-1.5 text-xs font-semibold text-[#475569] hover:bg-[#E2E8F0] transition-colors"
+              >
+                {copied ? "Copied! ✓" : "Copy"}
+              </button>
+            </div>
+            <p className="mt-2 text-xs text-[#94A3B8]">Share this code with your parent to connect their dashboard</p>
+          </div>
+        )}
       </div>
     </div>
     </DashboardLayout>

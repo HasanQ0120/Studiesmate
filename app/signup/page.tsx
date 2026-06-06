@@ -222,20 +222,25 @@ function SignupForm() {
           {/* Parent tab */}
           {tab === "parent" && (
             <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-6 text-center">
-              <p className="text-sm leading-6 text-slate-700">
-                Parent dashboard is coming with the Grade 4 launch.
-                <br />
-                Track your child's lessons, quiz scores, and weekly progress — all in one place.
-                <br />
-                Sign up as a student now to get started.
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                Parent Dashboard is launching with Grade 4. Sign up your child as a student first and they will get a unique Connect Code. Use that code to connect your dashboard now — so the moment Grade 4 goes live, you can track their lessons, quiz scores, and weekly progress instantly.
               </p>
-              <button
-                type="button"
-                onClick={() => setTab("student")}
-                className="mt-5 inline-flex items-center justify-center rounded-xl bg-[#0B2B5A] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#0A2550]"
-              >
-                Sign up as Student
-              </button>
+              <div className="mt-5 flex flex-col gap-3">
+                <button
+                  type="button"
+                  onClick={() => router.push("/parent")}
+                  className="w-full inline-flex items-center justify-center rounded-xl bg-[#0B2B5A] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#0A2550] transition-colors"
+                >
+                  Connect Now →
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTab("student")}
+                  className="w-full inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-[#0F172A] hover:bg-slate-50 transition-colors"
+                >
+                  Sign Up as Student
+                </button>
+              </div>
             </div>
           )}
         </div>
