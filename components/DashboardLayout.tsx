@@ -197,6 +197,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                               <Lock className="h-3 w-3 shrink-0" />
                               {child.label}
                             </button>
+                            <p className="px-2 pb-1 text-[11px] text-[#94A3B8] italic font-normal leading-snug">
+                              Complete the quiz above to unlock
+                            </p>
                             {lockedMsg === child.id && (
                               <p className="mt-0.5 mb-1 px-2 text-[11px] text-[#F97316] leading-snug">
                                 Complete the quiz first to unlock this worksheet.
