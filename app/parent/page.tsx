@@ -37,14 +37,12 @@ export default function ParentPage() {
     try {
       const { data, error: queryError } = await supabase
         .from("profiles")
-        .select("id")
+        .select("connect_code")
         .eq("connect_code", code)
-        .maybeSingle();
+        .single();
 
-      if (queryError) {
-        setError("Something went wrong. Please try again.");
-      } else if (!data) {
-        setError("Code not found. Please check the code and try again.");
+      if (queryError || !data) {
+        setError("Invalid code. Please enter the correct Connect Code.");
       } else {
         try {
           localStorage.setItem(PARENT_CODE_KEY, code);
@@ -52,7 +50,7 @@ export default function ParentPage() {
         setConnectedCode(code);
       }
     } catch {
-      setError("Something went wrong. Please try again.");
+      setError("Invalid code. Please enter the correct Connect Code.");
     } finally {
       setConnecting(false);
     }

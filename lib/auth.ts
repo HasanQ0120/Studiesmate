@@ -19,7 +19,7 @@ export type StudiesMateUserMeta = {
   connect_code?: string;
 };
 
-function generateConnectCode(): string {
+export function generateConnectCode(): string {
   const digits = Math.floor(1000 + Math.random() * 9000);
   return `SM-${digits}`;
 }
@@ -34,7 +34,7 @@ export async function signUpParentAccount(params: {
   const { parentEmail, password, studentName, studentClass, phone } = params;
   const connectCode = generateConnectCode();
 
-  return supabase.auth.signUp({
+  const result = await supabase.auth.signUp({
     email: parentEmail.trim().toLowerCase(),
     password: password.trim(),
     options: {
@@ -48,6 +48,17 @@ export async function signUpParentAccount(params: {
       } satisfies StudiesMateUserMeta,
     },
   });
+
+  if (result.data?.user?.id) {
+    try {
+      await supabase.from("profiles").insert({
+        id: result.data.user.id,
+        connect_code: connectCode,
+      });
+    } catch {}
+  }
+
+  return result;
 }
 
 export async function signInParentAccount(params: {
