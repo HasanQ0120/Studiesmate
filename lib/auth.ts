@@ -50,12 +50,21 @@ export async function signUpParentAccount(params: {
   });
 
   if (result.data?.user?.id) {
-    try {
-      await supabase.from("profiles").insert({
+    const newCode = 'SM-' + Math.floor(1000 + Math.random() * 9000);
+
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .upsert({
         id: result.data.user.id,
-        connect_code: connectCode,
+        connect_code: newCode,
+      }, {
+        onConflict: 'id',
+        ignoreDuplicates: true,
       });
-    } catch {}
+
+    if (profileError) {
+      console.log('Profile insert error:', profileError);
+    }
   }
 
   return result;

@@ -49,14 +49,21 @@ export default function DashboardPage() {
   const [lastActivityData, setLastActivityData] = useState<LastActivityData | null>(null);
   const [showWelcome, setShowWelcome] = useState(false);
   const [welcomeName, setWelcomeName] = useState("");
-  const [connectCode, setConnectCode] = useState<string>("");
+  const [connectCode, setConnectCode] = useState<string>('');
   const [connectCodeLoading, setConnectCodeLoading] = useState(true);
-  const [copied, setCopied] = useState(false);
   const [showCode, setShowCode] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    function applyWelcome(session: { user: { user_metadata?: Record<string, unknown> } } | null) {
-      if (session && !localStorage.getItem('sm_welcomed')) {
+    function applyWelcome(session: { user: { user_metadata?: Record<string, unknown>; created_at?: string } } | null) {
+      if (!session) return;
+      if (localStorage.getItem('sm_welcomed')) return;
+
+      const createdAt = session.user.created_at ? new Date(session.user.created_at).getTime() : 0;
+      const ageMs = Date.now() - createdAt;
+      const isNewAccount = ageMs < 5 * 60 * 1000; // less than 5 minutes old
+
+      if (isNewAccount) {
         const name = (session.user.user_metadata?.studentName as string | undefined)?.trim() || "Student";
         setWelcomeName(name);
         setShowWelcome(true);
@@ -81,21 +88,44 @@ export default function DashboardPage() {
   }, [router]);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+    const fetchOrCreateCode = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
 
-        const { data } = await supabase
-          .from("profiles")
-          .select("connect_code")
-          .eq("id", user.id)
-          .single();
+      // Step 1: try to fetch existing row
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('connect_code')
+        .eq('id', session.user.id)
+        .maybeSingle();
 
-        if (data?.connect_code) setConnectCode(data.connect_code);
-      } catch {}
-      finally { setConnectCodeLoading(false); }
-    })();
+      console.log('Fetched data:', data);
+      console.log('Fetch error:', error);
+
+      if (data?.connect_code) {
+        setConnectCode(data.connect_code);
+        setConnectCodeLoading(false);
+        return;
+      }
+
+      // Step 2: no row found — generate and insert
+      const newCode = 'SM-' + Math.floor(1000 + Math.random() * 9000);
+      const { error: insertError } = await supabase
+        .from('profiles')
+        .upsert({ id: session.user.id, connect_code: newCode }, {
+          onConflict: 'id',
+          ignoreDuplicates: true,
+        });
+
+      console.log('Insert error:', insertError);
+
+      if (insertError === null) {
+        setConnectCode(newCode);
+      }
+      setConnectCodeLoading(false);
+    };
+
+    fetchOrCreateCode();
   }, []);
 
   function copyCode() {
@@ -383,10 +413,11 @@ export default function DashboardPage() {
                 )}
               </>
             ) : (
-              <span className="text-xs text-[#94A3B8]">Code not available yet. Please sign out and sign in again.</span>
+              <span className="text-xs text-[#94A3B8]">Code unavailable. Please sign out and sign in again.</span>
             )}
           </div>
           <p className="mt-2 text-xs text-[#94A3B8]">Share this code with your parent to connect their dashboard</p>
+          <p className="mt-1 text-[11px] text-[#94A3B8] italic">Only share this code with your parent or guardian. Anyone with this code can view your full learning progress.</p>
           <button
             type="button"
             onClick={() => router.push("/parent")}
