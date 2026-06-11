@@ -38,10 +38,11 @@ export default function CheckEmailClient({ email }: Props) {
       setStatus("idle");
       setMessage("");
 
-      const { error } = await supabase.auth.signInWithOtp({
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `${window.location.origin}/dashboard`,
         },
       });
 

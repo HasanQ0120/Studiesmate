@@ -192,14 +192,8 @@ function resultH(){
       </div>
     </div>
 
-    <div style="background:#0F2744;border-radius:12px;padding:16px 18px;margin-bottom:8px;display:flex;align-items:center;gap:14px;text-align:left;pointer-events:none;opacity:0.75">
-      <span style="font-size:24px;color:#FFB300;flex-shrink:0">🔒</span>
-      <div>
-        <div style="color:#FFB300;font-weight:700;font-size:14px">Download Worksheet 🔒 — Extra Practice</div>
-        <div style="color:rgba(255,255,255,.6);font-size:12px;margin-top:2px">Simple Sentences — practice exercises</div>
-      </div>
-    </div>
-    <div style="font-size:12px;color:#888;margin-bottom:14px;text-align:center">Available in paid grades. Purchase to unlock extra practice.</div>
+    <button class="btn btn-primary" id="wsBtn" style="background:#2E7D32;width:100%;margin-bottom:8px">📄 Open Simple Sentences Worksheet →</button>
+    <div style="font-size:12px;color:#888;margin-bottom:14px;text-align:center">Your worksheet is unlocked! Extra practice to reinforce your learning.</div>
 
     <div style="display:flex;gap:10px">
       <button class="btn btn-outline" id="rBtn">↺ Try again</button>
@@ -220,11 +214,13 @@ function bind(){
     if(S.qi+1>=QS.length){
       if(S.score>=Math.round(QS.length*.75)){playWin();boom();}
       set({done:true});
+      try{localStorage.setItem("worksheet_unlocked_simple_sentence","true");}catch(e){}
       window.parent.postMessage({ type: "quizComplete", quizId: "english-intro" }, "*");
     } else set({qi:S.qi+1,sel:null});
   });
   const rb=document.getElementById("rBtn");if(rb)rb.addEventListener("click",()=>set({qi:0,score:0,sel:null,done:false}));
-  const hb=document.getElementById("hBtn");if(hb)hb.addEventListener("click",()=>{try{window.top.location.href="/dashboard";}catch(e){}});
+  const wb=document.getElementById("wsBtn");if(wb)wb.addEventListener("click",()=>{try{window.top.location.href="/subjects/english/chapters/english-intro/worksheet";}catch(e){}});
+  const hb=document.getElementById("hBtn");if(hb)hb.addEventListener("click",()=>{try{const c=JSON.parse(localStorage.getItem("studiesmate_quiz_completions")||"{}");c["english-intro"]=true;localStorage.setItem("studiesmate_quiz_completions",JSON.stringify(c));}catch(e){}try{window.top.location.href="/dashboard";}catch(e){}});
 }
 
 render();

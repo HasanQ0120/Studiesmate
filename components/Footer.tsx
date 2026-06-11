@@ -20,7 +20,7 @@ export default function Footer() {
             <Link href="/privacy" className="text-white/85 hover:text-white">
               Privacy Policy
             </Link>
-<Link href="/phase-1" className="text-white/85 hover:text-white">
+            <Link href="/phase-1" className="text-white/85 hover:text-white">
               Grades
             </Link>
             <Link href="/login" className="text-white/85 hover:text-white">

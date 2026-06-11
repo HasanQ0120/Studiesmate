@@ -17,6 +17,7 @@ type SidebarChild = {
 type UnlockState = {
   place_value: boolean;
   habitat: boolean;
+  simple_sentence: boolean;
 };
 
 function loadUnlocks(): UnlockState {
@@ -24,17 +25,28 @@ function loadUnlocks(): UnlockState {
     return {
       place_value: localStorage.getItem("worksheet_unlocked_place_value") === "true",
       habitat: localStorage.getItem("worksheet_unlocked_habitat") === "true",
+      simple_sentence: localStorage.getItem("worksheet_unlocked_simple_sentence") === "true",
     };
   } catch {
-    return { place_value: false, habitat: false };
+    return { place_value: false, habitat: false, simple_sentence: false };
   }
 }
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [expanded, setExpanded] = useState<string[]>([]);
-  const [unlocks, setUnlocks] = useState<UnlockState>({ place_value: false, habitat: false });
+  const [unlocks, setUnlocks] = useState<UnlockState>({ place_value: false, habitat: false, simple_sentence: false });
   const [lockedMsg, setLockedMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    let sectionId: string | null = null;
+    if (pathname.startsWith('/subjects/maths')) sectionId = 'maths';
+    else if (pathname.startsWith('/subjects/english')) sectionId = 'english';
+    else if (pathname.startsWith('/subjects/science')) sectionId = 'science';
+    if (sectionId) {
+      setExpanded(prev => prev.includes(sectionId!) ? prev : [...prev, sectionId!]);
+    }
+  }, [pathname]);
 
   useEffect(() => {
     setUnlocks(loadUnlocks());
@@ -103,6 +115,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       children: [
         { id: "english-lesson", label: "Simple Sentences", href: "/subjects/english/chapters/english-intro", isQuiz: false, isWorksheet: false },
         { id: "english-quiz", label: "Simple Sentences Quiz", href: "/subjects/english/chapters/english-intro/quiz", isQuiz: true, isWorksheet: false },
+        { id: "english-worksheet", label: "Simple Sentences Worksheet", href: unlocks.simple_sentence ? "/subjects/english/chapters/english-intro/worksheet" : null, isQuiz: false, isWorksheet: true, worksheetUnlocked: unlocks.simple_sentence },
       ] as SidebarChild[],
     },
     {

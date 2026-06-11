@@ -136,11 +136,6 @@ export default function DashboardPage() {
     }).catch(() => {});
   }
 
-  function handleWelcomeContinue() {
-    localStorage.setItem('sm_welcomed', 'true');
-    setShowWelcome(false);
-  }
-
   useEffect(() => {
     setQuizCompletions(
       safeParseJSON<Record<string, boolean>>(localStorage.getItem(QUIZ_COMPLETIONS_KEY), {})

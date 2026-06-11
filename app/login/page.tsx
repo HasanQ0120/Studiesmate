@@ -5,9 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { signInParentAccount, supabase } from "@/lib/auth";
-
-const SESSION_KEY = "studiesmate_session";
+import { signInParentAccount } from "@/lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -41,22 +39,6 @@ export default function LoginPage() {
       return;
     }
 
-    const { data } = await supabase.auth.getUser();
-    const meta = (data.user?.user_metadata || {}) as {
-      studentName?: string;
-      studentClass?: string;
-      parentEmail?: string;
-    };
-
-    const session = {
-      studentName: (meta.studentName || "").trim(),
-      studentClass: (meta.studentClass || "").trim(),
-      parentEmail: (meta.parentEmail || parentEmail).trim(),
-      loggedInAt: new Date().toISOString(),
-    };
-    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-
-    window.dispatchEvent(new Event("studiesmate_auth_changed"));
     router.push("/dashboard");
   }
 

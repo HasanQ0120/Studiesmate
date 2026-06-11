@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { useParams } from "next/navigation";
 import BackButton from "@/components/BackButton";
 import DashboardLayout from "@/components/DashboardLayout";
 
