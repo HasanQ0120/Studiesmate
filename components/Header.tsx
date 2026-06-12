@@ -167,46 +167,20 @@ export default function Header() {
               <div className="absolute left-0 right-0 top-full border-t border-[#E2E8F0] bg-white shadow-lg">
                 <div className="mx-auto max-w-6xl px-4 py-3">
                   <div className="grid grid-cols-2 gap-2 text-sm">
-                    <Link
-                      href="/"
-                      onClick={closeMobileNav}
-                      className="rounded-lg px-3 py-2 text-[#475569] hover:text-[#F97316]"
-                    >
-                      Home
-                    </Link>
-
-                    <Link
-                      href="/phase-1"
-                      onClick={closeMobileNav}
-                      className="rounded-lg px-3 py-2 text-[#475569] hover:text-[#F97316]"
-                    >
-                      Grades
-                    </Link>
-
-                    <Link
-                      href="/feedback"
-                      onClick={closeMobileNav}
-                      className="rounded-lg px-3 py-2 text-[#475569] hover:text-[#F97316]"
-                    >
-                      Feedback
-                    </Link>
-
-                    <Link
-                      href="/about"
-                      onClick={closeMobileNav}
-                      className="rounded-lg px-3 py-2 text-[#475569] hover:text-[#F97316]"
-                    >
-                      About
-                    </Link>
-
-                    {isLoggedIn && (
-                      <Link
-                        href="/dashboard"
-                        onClick={closeMobileNav}
-                        className="col-span-2 rounded-lg px-3 py-2 text-[#475569] hover:text-[#F97316]"
-                      >
-                        Dashboard
-                      </Link>
+                    <Link href="/" onClick={closeMobileNav} className="rounded-lg px-3 py-2 text-[#475569] hover:text-[#F97316]">Home</Link>
+                    <Link href="/phase-1" onClick={closeMobileNav} className="rounded-lg px-3 py-2 text-[#475569] hover:text-[#F97316]">Grades</Link>
+                    <Link href="/feedback" onClick={closeMobileNav} className="rounded-lg px-3 py-2 text-[#475569] hover:text-[#F97316]">Feedback</Link>
+                    <Link href="/about" onClick={closeMobileNav} className="rounded-lg px-3 py-2 text-[#475569] hover:text-[#F97316]">About</Link>
+                    {!isLoggedIn ? (
+                      <>
+                        <Link href="/login" onClick={closeMobileNav} className="rounded-lg px-3 py-2 text-[#475569] hover:text-[#F97316]">Login</Link>
+                        <Link href="/signup" onClick={closeMobileNav} className="rounded-lg px-3 py-2 text-[#475569] hover:text-[#F97316]">Sign Up</Link>
+                      </>
+                    ) : (
+                      <>
+                        <Link href="/dashboard" onClick={closeMobileNav} className="rounded-lg px-3 py-2 text-[#475569] hover:text-[#F97316]">Dashboard</Link>
+                        <button type="button" onClick={() => { closeMobileNav(); handleLogout(); }} className="rounded-lg px-3 py-2 text-left text-[#475569] hover:text-[#F97316]">Logout</button>
+                      </>
                     )}
                   </div>
                 </div>
@@ -219,14 +193,14 @@ export default function Header() {
             <>
               <Link
                 href="/login"
-                className="rounded-lg px-3 py-2 text-sm font-medium text-white/90 hover:text-white"
+                className="hidden md:inline rounded-lg px-3 py-2 text-sm font-medium text-white/90 hover:text-white"
               >
                 Log in
               </Link>
 
               <Link
                 href="/signup"
-                className="inline-flex rounded-lg bg-white px-3 py-2 text-sm font-semibold text-[#0B2B5A] hover:bg-white/95"
+                className="hidden md:inline-flex rounded-lg bg-white px-3 py-2 text-sm font-semibold text-[#0B2B5A] hover:bg-white/95"
               >
                 Start Free Beta
               </Link>
