@@ -338,26 +338,38 @@ export default function DashboardPage() {
         <div className="mt-10 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)] hover:border-[#0F1F3D] max-w-full overflow-hidden">
           <h3 className="text-lg font-semibold text-gray-900">Progress Tracker</h3>
 
-          <div className="mt-5 flex gap-2 max-w-full overflow-hidden">
-            {TRACKER_STEPS.map((_, i) => (
-              <div key={i} className="flex-1">
-                <div
-                  className={`h-3 rounded-full transition-all duration-300 ${
-                    completedStepSet.has(i) ? "bg-[#0B2B5A]" : "bg-gray-200"
-                  }`}
-                />
+          {/* Mobile: bar + label paired per step, wraps in 3 columns */}
+          <div className="mt-5 grid grid-cols-3 gap-3 md:hidden">
+            {TRACKER_STEPS.map((label, i) => (
+              <div key={i} className="flex flex-col gap-1">
+                <div className={`h-3 rounded-full transition-all duration-300 ${completedStepSet.has(i) ? "bg-[#0B2B5A]" : "bg-gray-200"}`} />
+                <div className="text-[11px] text-gray-500 leading-tight">
+                  <span className="font-semibold text-gray-700">Step {i + 1}</span>
+                  <br />
+                  {label}
+                </div>
               </div>
             ))}
           </div>
 
-          <div className="mt-3 flex gap-2">
-            {TRACKER_STEPS.map((label, i) => (
-              <div key={i} className="flex-1 text-[11px] text-gray-500 leading-tight">
-                <span className="font-semibold text-gray-700">Step {i + 1}</span>
-                <br />
-                {label}
-              </div>
-            ))}
+          {/* Desktop: bars row + labels row */}
+          <div className="hidden md:block">
+            <div className="mt-5 flex gap-2">
+              {TRACKER_STEPS.map((_, i) => (
+                <div key={i} className="flex-1">
+                  <div className={`h-3 rounded-full transition-all duration-300 ${completedStepSet.has(i) ? "bg-[#0B2B5A]" : "bg-gray-200"}`} />
+                </div>
+              ))}
+            </div>
+            <div className="mt-3 flex gap-2">
+              {TRACKER_STEPS.map((label, i) => (
+                <div key={i} className="flex-1 text-[11px] text-gray-500 leading-tight">
+                  <span className="font-semibold text-gray-700">Step {i + 1}</span>
+                  <br />
+                  {label}
+                </div>
+              ))}
+            </div>
           </div>
 
           <p className="mt-4 text-sm font-semibold text-gray-700">{trackerDoneCount}/6 tasks completed</p>
