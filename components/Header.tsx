@@ -177,11 +177,9 @@ export default function Header() {
                         <Link href="/signup" onClick={closeMobileNav} className="rounded-lg px-3 py-2 text-[#475569] hover:text-[#F97316]">Sign Up</Link>
                       </>
                     ) : (
-                      <>
-                        <Link href="/dashboard" onClick={closeMobileNav} className="rounded-lg px-3 py-2 text-[#475569] hover:text-[#F97316]">Dashboard</Link>
-                        <button type="button" onClick={() => { closeMobileNav(); handleLogout(); }} className="rounded-lg px-3 py-2 text-left text-[#475569] hover:text-[#F97316]">Logout</button>
-                      </>
+                      <Link href="/dashboard" onClick={closeMobileNav} className="rounded-lg px-3 py-2 text-[#475569] hover:text-[#F97316]">Dashboard</Link>
                     )}
+                    <Link href="/privacy" onClick={closeMobileNav} className="rounded-lg px-3 py-2 text-[#475569] hover:text-[#F97316]">Privacy Policy</Link>
                   </div>
                 </div>
               </div>

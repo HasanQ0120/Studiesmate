@@ -335,10 +335,10 @@ export default function DashboardPage() {
         </div>
 
         {/* Progress Tracker */}
-        <div className="mt-10 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)] hover:border-[#0F1F3D]">
+        <div className="mt-10 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)] hover:border-[#0F1F3D] max-w-full overflow-hidden">
           <h3 className="text-lg font-semibold text-gray-900">Progress Tracker</h3>
 
-          <div className="mt-5 flex gap-2">
+          <div className="mt-5 flex gap-2 max-w-full overflow-hidden">
             {TRACKER_STEPS.map((_, i) => (
               <div key={i} className="flex-1">
                 <div
