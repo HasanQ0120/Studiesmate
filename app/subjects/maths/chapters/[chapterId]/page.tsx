@@ -16,7 +16,7 @@ const SUBJECT_TITLE = "Maths";
 
 // Placeholder video IDs — update Urdu ID when ready
 const VIDEO_IDS: Record<string, { en: string; ur: string }> = {
-  numbers:             { en: "PLACEHOLDER_VIDEO_ID", ur: "PLACEHOLDER_VIDEO_ID" },
+  numbers:             { en: "https://studiesmate.b-cdn.net/place_value_english.mp4.mp4", ur: "https://studiesmate.b-cdn.net/place_value_urdu.mp4.mp4" },
   "addition-subtraction": { en: "PLACEHOLDER_VIDEO_ID", ur: "PLACEHOLDER_VIDEO_ID" },
 };
 
@@ -66,6 +66,8 @@ export default function ChapterPage() {
   const langRef = useRef<"en" | "ur">("en");
   const playerRef = useRef<any>(null);
   const ytReadyRef = useRef(false);
+  const videoEnRef = useRef<HTMLVideoElement>(null);
+  const videoUrRef = useRef<HTMLVideoElement>(null);
 
   const videoIds = VIDEO_IDS[chapterId] ?? { en: "PLACEHOLDER_VIDEO_ID", ur: "PLACEHOLDER_VIDEO_ID" };
 
@@ -93,6 +95,8 @@ export default function ChapterPage() {
   );
 
   useEffect(() => {
+    if (videoIds.en.startsWith("https://")) return;
+
     const setup = () => {
       ytReadyRef.current = true;
       initPlayer(0);
@@ -112,14 +116,30 @@ export default function ChapterPage() {
     return () => {
       playerRef.current?.destroy?.();
     };
-  }, [initPlayer]);
+  }, [initPlayer, videoIds.en]);
 
   function handleLangSwitch(newLang: "en" | "ur") {
     if (newLang === lang) return;
-    const time: number = playerRef.current?.getCurrentTime?.() ?? 0;
-    langRef.current = newLang;
-    setLang(newLang);
-    if (ytReadyRef.current) initPlayer(time);
+    if (videoIds.en.startsWith("https://")) {
+      const currentVideo = lang === "en" ? videoEnRef.current : videoUrRef.current;
+      const nextVideo = newLang === "en" ? videoEnRef.current : videoUrRef.current;
+      if (currentVideo && nextVideo) {
+        const currentTime = currentVideo.currentTime;
+        currentVideo.pause();
+        nextVideo.currentTime = currentTime;
+        langRef.current = newLang;
+        setLang(newLang);
+        nextVideo.play().catch(() => {});
+      } else {
+        langRef.current = newLang;
+        setLang(newLang);
+      }
+    } else {
+      const time: number = playerRef.current?.getCurrentTime?.() ?? 0;
+      langRef.current = newLang;
+      setLang(newLang);
+      if (ytReadyRef.current) initPlayer(time);
+    }
   }
 
   return (
@@ -135,7 +155,24 @@ export default function ChapterPage() {
 
         {/* Video player + bilingual slider */}
         <div className="mt-10">
-          {videoIds.en === "PLACEHOLDER_VIDEO_ID" ? (
+          {videoIds.en.startsWith("https://") ? (
+            <div className="aspect-video w-full overflow-hidden rounded-2xl border border-[#E2E8F0] bg-black relative">
+              <video
+                ref={videoEnRef}
+                src={videoIds.ur}
+                controls
+                className="h-full w-full"
+                style={{ display: lang === "en" ? "block" : "none" }}
+              />
+              <video
+                ref={videoUrRef}
+                src={videoIds.en}
+                controls
+                className="h-full w-full"
+                style={{ display: lang === "ur" ? "block" : "none" }}
+              />
+            </div>
+          ) : videoIds.en === "PLACEHOLDER_VIDEO_ID" ? (
             <div
               style={{
                 background: "#ffffff",
