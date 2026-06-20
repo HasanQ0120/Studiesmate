@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { signInParentAccount } from "@/lib/auth";
+import HeroStatCard from "@/components/HeroStatCard";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -43,9 +44,24 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="bg-white text-slate-900">
-      <div className="mx-auto flex min-h-[calc(100vh-140px)] max-w-6xl items-center justify-center px-4 py-14">
-        <div className="w-full max-w-xl rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+    <div className="flex min-h-screen text-slate-900">
+      {/* Left panel — desktop only */}
+      <div className="hidden md:flex md:w-1/2 flex-col items-center justify-center gap-8 bg-[#0B2B5A] px-12 py-16 text-white">
+        <img src="/logo.png" alt="StudiesMate" className="h-16 w-auto animate-float" />
+        <p className="max-w-xs text-center text-xl font-semibold leading-snug">
+          Welcome back. Your learning continues here.
+        </p>
+        <HeroStatCard />
+      </div>
+
+      {/* Right panel */}
+      <div className="flex w-full flex-col items-center justify-center bg-white px-4 py-14 md:w-1/2">
+        {/* Mobile-only logo */}
+        <div className="mb-6 md:hidden">
+          <img src="/logo.png" alt="StudiesMate" className="mx-auto h-12 w-auto animate-float" />
+        </div>
+
+        <div className="w-full max-w-xl rounded-3xl border border-slate-200 border-t-2 border-t-[#F97316] bg-white p-8 shadow-sm">
           <h1 className="text-center text-3xl font-semibold tracking-tight">
             Welcome back
           </h1>

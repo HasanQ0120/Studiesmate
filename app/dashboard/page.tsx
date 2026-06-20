@@ -99,8 +99,6 @@ export default function DashboardPage() {
         .eq('id', session.user.id)
         .maybeSingle();
 
-      console.log('Fetched data:', data);
-      console.log('Fetch error:', error);
 
       if (data?.connect_code) {
         setConnectCode(data.connect_code);
@@ -117,7 +115,6 @@ export default function DashboardPage() {
           ignoreDuplicates: true,
         });
 
-      console.log('Insert error:', insertError);
 
       if (insertError === null) {
         setConnectCode(newCode);

@@ -159,14 +159,14 @@ export default function ChapterPage() {
             <div className="aspect-video w-full overflow-hidden rounded-2xl border border-[#E2E8F0] bg-black relative">
               <video
                 ref={videoEnRef}
-                src={videoIds.ur}
+                src={videoIds.en}
                 controls
                 className="h-full w-full"
                 style={{ display: lang === "en" ? "block" : "none" }}
               />
               <video
                 ref={videoUrRef}
-                src={videoIds.en}
+                src={videoIds.ur}
                 controls
                 className="h-full w-full"
                 style={{ display: lang === "ur" ? "block" : "none" }}

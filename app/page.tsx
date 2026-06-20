@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import Reveal from "@/components/Reveal";
+import HeroStatCard from "@/components/HeroStatCard";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/auth";
@@ -15,6 +16,22 @@ const SUBJECT_PREVIEW = [
 
 export default function HomePage() {
   const router = useRouter();
+
+  const [displayText, setDisplayText] = useState("");
+  const fullText = "Smart learning for school students, without stress.";
+
+  useEffect(() => {
+    let i = 0;
+    const timer = setInterval(() => {
+      if (i < fullText.length) {
+        setDisplayText(fullText.slice(0, i + 1));
+        i++;
+      } else {
+        clearInterval(timer);
+      }
+    }, 40);
+    return () => clearInterval(timer);
+  }, []);
 
   const handleStartBeta = async () => {
     try {
@@ -34,59 +51,64 @@ export default function HomePage() {
       {/* HERO (Blue) */}
       <section className="bg-[#0B2B5A] text-white">
         <div className="mx-auto max-w-6xl px-4 py-16 md:py-20">
-          <Reveal className="max-w-3xl">
-            <p className="text-sm font-medium text-white/80 transition-colors duration-200">
-              Learn calmly, one small step at a time.
-            </p>
+          <div className="flex flex-col md:flex-row md:items-center md:gap-16">
+            <Reveal className="max-w-3xl md:flex-1">
+              <p className="text-sm font-medium text-white/80 transition-colors duration-200">
+                Learn calmly, one small step at a time.
+              </p>
 
-            <h1 className="mt-4 text-4xl font-semibold leading-tight tracking-tight md:text-5xl">
-              Smart learning for school students,
-              <br className="hidden md:block" />
-              without stress.
-            </h1>
+              <h1 className="mt-4 text-4xl font-semibold leading-tight tracking-tight md:text-5xl">
+                {displayText}<span className="animate-pulse">|</span>
+              </h1>
 
-            <p className="mt-5 text-base leading-7 text-white/85 md:text-lg">
-              StudiesMate helps students practice daily with simple, bilingual
-              lessons while parents stay informed and confident.
-            </p>
+              <p className="mt-5 text-base leading-7 text-white/85 md:text-lg">
+                StudiesMate helps students practice daily with simple, bilingual
+                lessons while parents stay informed and confident.
+              </p>
 
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <button
-                type="button"
-                onClick={handleStartBeta}
-                className="rounded-xl bg-white px-5 py-3 text-sm font-semibold text-[#0B2B5A] transition-all duration-200 hover:bg-white/95 hover:-translate-y-0.5 active:translate-y-0"
-              >
-                Start Free Beta
-              </button>
-              <Link
-                href="/phase-1"
-                className="rounded-xl border border-white/30 px-5 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-white/10 hover:-translate-y-0.5 active:translate-y-0"
-              >
-                View Plans
-              </Link>
-            </div>
-
-            <div className="mt-6 inline-flex rounded-lg bg-white/10 px-3 py-2 text-xs text-white/80 transition-colors duration-200 hover:bg-white/15">
-              No ads • Calm experience • Guided learning
-            </div>
-
-            {/* Proof strip (small, no layout shift) */}
-            <div className="mt-4 flex flex-wrap gap-2">
-              {[
-                "Parent-friendly",
-                "Urdu + English support",
-                "Short daily lessons",
-                "Bilingual Learning",
-              ].map((t) => (
-                <span
-                  key={t}
-                  className="rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs text-white/85 transition-all duration-200 hover:bg-white/10 hover:border-white/30"
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={handleStartBeta}
+                  className="rounded-xl bg-white px-5 py-3 text-sm font-semibold text-[#0B2B5A] transition-all duration-200 hover:bg-white/95 hover:-translate-y-0.5 active:translate-y-0 animate-pulse hover:animate-none"
                 >
-                  {t}
-                </span>
-              ))}
+                  Start Free Beta
+                </button>
+                <Link
+                  href="/phase-1"
+                  className="rounded-xl border border-white/30 px-5 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-white/10 hover:-translate-y-0.5 active:translate-y-0"
+                >
+                  View Plans
+                </Link>
+              </div>
+
+              <div className="mt-6 inline-flex rounded-lg bg-white/10 px-3 py-2 text-xs text-white/80 transition-colors duration-200 hover:bg-white/15">
+                No ads • Calm experience • Guided learning
+              </div>
+
+              {/* Proof strip (small, no layout shift) */}
+              <div className="mt-4 flex flex-wrap gap-2">
+                {[
+                  "Parent-friendly",
+                  "Urdu + English support",
+                  "Short daily lessons",
+                  "Bilingual Learning",
+                ].map((t) => (
+                  <span
+                    key={t}
+                    className="rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs text-white/85 transition-all duration-200 hover:bg-white/10 hover:border-white/30"
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </Reveal>
+
+            {/* Floating stat card — desktop only */}
+            <div className="hidden md:flex flex-shrink-0 items-center justify-center">
+              <HeroStatCard />
             </div>
-          </Reveal>
+          </div>
         </div>
       </section>
 
