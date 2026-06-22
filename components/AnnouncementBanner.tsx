@@ -8,7 +8,7 @@ export default function AnnouncementBanner() {
 
   return (
     <div className="flex h-10 w-full items-center justify-center bg-[#F97316] px-4 text-center text-sm font-medium text-white">
-      🎉 Beta launching June 20th — Free access. Join the VIP group now →{" "}
+      🎉 Beta launching June 23rd — Free access. Join the Movement now →{" "}
       <a
         href="https://chat.whatsapp.com/H8q5PBchpRNC4TWIeWp49I"
         target="_blank"
