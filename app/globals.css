@@ -14,6 +14,17 @@ body {
 
 
 
+/* ---- Orange border glow animation ---- */
+@keyframes borderGlow {
+  0%   { box-shadow: 0 0 0px 0px rgba(249, 115, 22, 0); border-color: rgba(249, 115, 22, 0.3); }
+  50%  { box-shadow: 0 0 20px 4px rgba(249, 115, 22, 0.4); border-color: rgba(249, 115, 22, 1); }
+  100% { box-shadow: 0 0 0px 0px rgba(249, 115, 22, 0); border-color: rgba(249, 115, 22, 0.3); }
+}
+
+.animate-border-glow {
+  animation: borderGlow 2s ease-in-out infinite;
+}
+
 /* ---- Floating card animation ---- */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }

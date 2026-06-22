@@ -78,14 +78,19 @@ export default function ParentPage() {
 
         {/* Connected state */}
         {connectedCode ? (
-          <div className="rounded-2xl border border-[#D1FAE5] bg-[#F0FDF4] p-6 text-center shadow-sm">
-            <div className="text-4xl mb-3">✅</div>
-            <p className="text-base font-bold text-[#0F172A]">Connected!</p>
-            <p className="mt-1 text-sm text-[#475569]">You are connected to student code:</p>
-            <p className="mt-3 text-2xl font-bold tracking-widest text-[#0B2B5A]">{connectedCode}</p>
-            <p className="mt-3 text-xs text-[#64748B]">
-              Parent Dashboard features will be available when Grade 4 launches.
-            </p>
+          <div style={{ borderRadius: "16px", border: "2px solid rgba(249, 115, 22, 0.3)" }} className="animate-border-glow bg-white p-8 text-center">
+            {/* Green checkmark */}
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#D1FAE5]">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-[#10B981]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+
+            <h2 className="text-xl font-bold text-[#0B2B5A]">Dashboard Connected! ✓</h2>
+            <p className="mt-2 text-sm text-[#475569]">You are now connected to your child&apos;s dashboard.</p>
+
+            <p className="mt-6 text-xs text-[#94A3B8]">Full parent dashboard launches with Grade 4.</p>
+
             <button
               type="button"
               onClick={handleDisconnect}

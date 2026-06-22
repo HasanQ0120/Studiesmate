@@ -2,25 +2,21 @@
 
 import BackButton from "@/components/BackButton";
 import DashboardLayout from "@/components/DashboardLayout";
-import { useCallback, useEffect, useRef, useState } from "react";
-
-declare global {
-  interface Window {
-    YT: { Player: any };
-    onYouTubeIframeAPIReady: () => void;
-  }
-}
+import { useEffect, useRef, useState } from "react";
 
 const CHAPTER_META = { title: "What is a Habitat?", desc: "Exploring what habitats are and how animals live in them." };
-const VIDEO_IDS = { en: "PLACEHOLDER_VIDEO_ID", ur: "PLACEHOLDER_VIDEO_ID" };
+const VIDEO_IDS = {
+  en: "https://studiesmate.b-cdn.net/StudiesMate_Habitats_Grade4_v2.pptx.mp4",
+  ur: "https://studiesmate.b-cdn.net/Copy%20of%20StudiesMate_Habitats_Grade4_v2.pptx.mp4",
+};
 const CHAPTER_ID = "science-intro";
 
 export default function ScienceLessonPage() {
   const [lang, setLang] = useState<"en" | "ur">("en");
-  const langRef = useRef<"en" | "ur">("en");
-  const playerRef = useRef<any>(null);
-  const ytReadyRef = useRef(false);
+  const videoEnRef = useRef<HTMLVideoElement>(null);
+  const videoUrRef = useRef<HTMLVideoElement>(null);
   const [lessonCompletions, setLessonCompletions] = useState<Record<string, string>>({});
+  const [transcriptOpen, setTranscriptOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -39,39 +35,19 @@ export default function ScienceLessonPage() {
     } catch {}
   }, []);
 
-  const initPlayer = useCallback((startSeconds = 0) => {
-    playerRef.current?.destroy?.();
-    playerRef.current = new window.YT.Player("yt-player-science", {
-      height: "100%",
-      width: "100%",
-      videoId: VIDEO_IDS[langRef.current],
-      playerVars: { enablejsapi: 1, start: Math.floor(startSeconds), rel: 0, modestbranding: 1 },
-      events: {
-        onReady: (e: any) => { if (startSeconds > 0) e.target.seekTo(startSeconds, true); }
-      },
-    });
-  }, []);
-
-  useEffect(() => {
-    const setup = () => { ytReadyRef.current = true; initPlayer(0); };
-    if (window.YT?.Player) { setup(); }
-    else {
-      window.onYouTubeIframeAPIReady = setup;
-      if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
-        const tag = document.createElement("script");
-        tag.src = "https://www.youtube.com/iframe_api";
-        document.head.appendChild(tag);
-      }
-    }
-    return () => { playerRef.current?.destroy?.(); };
-  }, [initPlayer]);
-
   function handleLangSwitch(newLang: "en" | "ur") {
     if (newLang === lang) return;
-    const time: number = playerRef.current?.getCurrentTime?.() ?? 0;
-    langRef.current = newLang;
-    setLang(newLang);
-    if (ytReadyRef.current) initPlayer(time);
+    const currentVideo = lang === "en" ? videoEnRef.current : videoUrRef.current;
+    const nextVideo = newLang === "en" ? videoEnRef.current : videoUrRef.current;
+    if (currentVideo && nextVideo) {
+      const currentTime = currentVideo.currentTime;
+      currentVideo.pause();
+      nextVideo.currentTime = currentTime;
+      setLang(newLang);
+      nextVideo.play().catch(() => {});
+    } else {
+      setLang(newLang);
+    }
   }
 
   function markComplete() {
@@ -96,37 +72,61 @@ export default function ScienceLessonPage() {
           <h1 className="mt-6 text-3xl font-semibold tracking-tight">Science • {CHAPTER_META.title}</h1>
           <p className="mt-2 text-sm text-[#475569]">{CHAPTER_META.desc}</p>
           <div className="mt-10">
-            {VIDEO_IDS.en === "PLACEHOLDER_VIDEO_ID" ? (
-              <div
-                style={{
-                  background: "#ffffff",
-                  border: "1px solid #0B2B5A",
-                  borderRadius: "12px",
-                  padding: "32px",
-                  textAlign: "center",
-                }}
-              >
-                <div className="text-4xl mb-4">🎬</div>
-                <p className="text-lg font-semibold text-[#0B2B5A]">Video launching June 20th</p>
-                <p className="mt-2 text-sm text-[#64748B]">Join our community to get updates on launch day.</p>
-                <a
-                  href="https://chat.whatsapp.com/H8q5PBchpRNC4TWIeWp49I"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-6 inline-flex items-center justify-center rounded-xl bg-[#0B2B5A] px-6 py-3 text-sm font-semibold text-white hover:bg-[#0A2550] transition-colors"
-                >
-                  Join WhatsApp Community →
-                </a>
-              </div>
-            ) : (
-              <div className="aspect-video w-full overflow-hidden rounded-2xl border border-[#E2E8F0] bg-black">
-                <div id="yt-player-science" className="h-full w-full" />
-              </div>
-            )}
+            <div className="aspect-video w-full overflow-hidden rounded-2xl border border-[#E2E8F0] bg-black relative">
+              <video
+                ref={videoEnRef}
+                src={VIDEO_IDS.en}
+                controls
+                className="h-full w-full"
+                style={{ display: lang === "en" ? "block" : "none" }}
+              />
+              <video
+                ref={videoUrRef}
+                src={VIDEO_IDS.ur}
+                controls
+                className="h-full w-full"
+                style={{ display: lang === "ur" ? "block" : "none" }}
+              />
+            </div>
             <div className="mt-3 flex w-fit items-center gap-1 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-1">
               <button type="button" onClick={() => handleLangSwitch("en")} className={`rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-150 ${lang === "en" ? "bg-[#0B2B5A] text-white shadow-sm" : "text-[#475569] hover:text-[#0F172A]"}`}>English</button>
               <button type="button" onClick={() => handleLangSwitch("ur")} className={`rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-150 ${lang === "ur" ? "bg-[#0B2B5A] text-white shadow-sm" : "text-[#475569] hover:text-[#0F172A]"}`}>اردو (Urdu)</button>
             </div>
+            {/* Transcript */}
+            <div className="mt-6">
+              <button
+                type="button"
+                onClick={() => setTranscriptOpen((v) => !v)}
+                className="rounded-xl bg-[#0B2B5A] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#0A2550] transition-colors"
+              >
+                {transcriptOpen ? "Hide Transcript ▲" : "Read Transcript ▼"}
+              </button>
+              <div
+                className="overflow-hidden transition-all duration-300 ease-in-out"
+                style={{ maxHeight: transcriptOpen ? "2000px" : "0px" }}
+              >
+                <div className="mt-4 rounded-2xl border border-[#E2E8F0] bg-white p-6">
+                  <p style={{ fontSize: "14px", lineHeight: "1.8", color: "#475569", whiteSpace: "pre-line" }}>
+                    {`Welcome back to StudiesMate. Today we will learn about animal homes called habitats. Understanding habitats helps us see how animals survive in nature.
+
+So what is a habitat? A habitat is the natural home of a living thing. It is the place where an animal or plant lives and grows in nature.
+
+Every habitat must provide four basic needs — food for energy, water to drink, air to breathe, and shelter to stay safe. Without these, animals cannot survive.
+
+There are many types of habitats. Deserts are hot and dry. The Arctic is freezing cold. Oceans are full of salt water. Forests are filled with trees.
+
+Animals have special features to survive in their habitats. These are called adaptations. For example, camels have wide feet to walk on sand and they store fat. Polar bears have thick fur to stay warm.
+
+Let's look at a common mistake. Remember, a habitat is a natural home. A dog's natural habitat is a field or forest — not a house made by humans. A habitat is found in nature.
+
+Let's take a moment to think. Why does a cactus store water inside its stem? Pause the video and think about your answer. Because it lives in a dry desert where it rarely rains — storing water keeps it alive.
+
+You are doing great work today. Let's remember — a habitat is a natural home that gives animals food, water, air, and shelter. Don't forget to download your StudiesMate worksheet. See you in the next video.`}
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <div className="mt-6">
               {lessonCompletions[CHAPTER_ID] ? (
                 <div className="inline-flex items-center gap-2 rounded-xl bg-[#ECFDF5] border border-[#6EE7B7] px-4 py-2 text-sm font-semibold text-[#10B981]">✓ Lesson Completed</div>

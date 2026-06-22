@@ -43,6 +43,7 @@ export default function ChapterPage() {
   };
 
   const [lessonCompletions, setLessonCompletions] = useState<Record<string, string>>({});
+  const [transcriptOpen, setTranscriptOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -226,6 +227,45 @@ export default function ChapterPage() {
             </button>
           </div>
         </div>
+
+        {/* Transcript — Numbers & Place Value only */}
+        {chapterId === "numbers" && (
+          <div className="mt-6">
+            <button
+              type="button"
+              onClick={() => setTranscriptOpen((v) => !v)}
+              className="rounded-xl bg-[#0B2B5A] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#0A2550] transition-colors"
+            >
+              {transcriptOpen ? "Hide Transcript ▲" : "Read Transcript ▼"}
+            </button>
+            <div
+              className="overflow-hidden transition-all duration-300 ease-in-out"
+              style={{ maxHeight: transcriptOpen ? "2000px" : "0px" }}
+            >
+              <div className="mt-4 rounded-2xl border border-[#E2E8F0] bg-white p-6">
+                <p style={{ fontSize: "14px", lineHeight: "1.8", color: "#475569", whiteSpace: "pre-line" }}>
+                  {`Welcome to StudiesMate. Let's learn math.
+
+Hello, Grade 4. Today we will learn about place value and how to read larger numbers.
+
+You already know the smaller places — ones, tens, hundreds, and thousands. In Grade 4, we use larger numbers. Let us look at the thousands family — thousands, ten thousands, and hundred thousands.
+
+Let us review. In the number four thousand, three hundred twenty-one — the four is in the thousands place. The three is in the hundreds place. The two is in the tens place. And the one is in the ones place.
+
+Now let us look at a larger number. Fifty-four thousand, three hundred twenty-one. What is the value of the five? Because it sits in the ten thousands place — its value is fifty thousand.
+
+Let us go even larger. Two hundred fifty-four thousand, three hundred twenty-one. The two is in the hundred thousands place. Its value is two hundred thousand. Let us break down this whole number — two hundred thousand, plus fifty thousand, plus four thousand, plus three hundred, plus twenty, plus one.
+
+Now it is your turn. Look at the number eighty-nine thousand and twelve. Pause the video and write down the value of the eight.
+
+The eight is in the ten thousands place. So its value is eighty thousand. Well done.
+
+Remember — where a digit sits gives it its value. Thank you for learning with StudiesMate. Please download the worksheet to practise. See you in the next video.`}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="mt-6">
           {lessonCompletions[chapterId] ? (
