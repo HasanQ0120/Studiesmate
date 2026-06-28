@@ -6,7 +6,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState, useEffect, Suspense } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { signUpParentAccount, supabase } from "@/lib/auth";
-import HeroStatCard from "@/components/HeroStatCard";
 
 function isValidEmail(email: string) {
   const e = email.trim().toLowerCase();
@@ -15,7 +14,6 @@ function isValidEmail(email: string) {
 
 function SignupForm() {
   const router = useRouter();
-
   const searchParams = useSearchParams();
   const [tab, setTab] = useState<"student" | "parent">("student");
 
@@ -74,40 +72,41 @@ function SignupForm() {
   }
 
   return (
-    <div className="flex min-h-screen text-slate-900">
-      {/* Left panel — desktop only */}
-      <div className="hidden md:flex md:w-1/2 flex-col items-center justify-center gap-8 bg-[#0B2B5A] px-12 py-16 text-white">
-        <img src="/logo.png" alt="StudiesMate" className="h-16 w-auto animate-float" />
+    <div className="flex min-h-screen text-[#111827]">
+
+      {/* Left panel */}
+      <div className="hidden md:flex md:w-2/5 flex-col items-center justify-center gap-8 bg-[#0F172A] px-10 py-16 text-white">
+        <img src="/logo.png" alt="StudiesMate" width={120} height={36} style={{ objectFit: "contain" }} />
         <p className="max-w-xs text-center text-xl font-semibold leading-snug">
           Join thousands of Pakistani students learning smarter.
         </p>
-        <HeroStatCard />
+        <div className="w-full max-w-xs rounded-xl bg-[#1E293B] px-5 py-4 text-center">
+          <p className="text-sm font-semibold text-[#22C55E]">
+            3 Subjects · 2 Languages · 8 Grades · Beta Always Free
+          </p>
+        </div>
       </div>
 
       {/* Right panel */}
-      <div className="flex w-full flex-col items-center justify-center bg-white px-4 py-14 md:w-1/2">
-        {/* Mobile-only logo */}
+      <div className="flex w-full flex-col items-center justify-center bg-white px-4 py-14 md:w-3/5">
+        {/* Mobile logo */}
         <div className="mb-6 md:hidden">
-          <img src="/logo.png" alt="StudiesMate" className="mx-auto h-12 w-auto animate-float" />
+          <img src="/logo.png" alt="StudiesMate" width={120} height={36} style={{ objectFit: "contain" }} className="mx-auto" />
         </div>
 
-        <div className="w-full max-w-xl rounded-3xl border border-slate-200 border-t-2 border-t-[#F97316] bg-white p-8 shadow-sm">
-          <h1 className="text-center text-3xl font-semibold tracking-tight">
-            Create student profile
-          </h1>
-          <p className="mt-2 text-center text-sm text-slate-600">
-            Parent sets access. Student learns calmly.
-          </p>
+        <div className="w-full max-w-md">
+          <h1 className="text-3xl font-bold text-[#111827]">Create student profile</h1>
+          <p className="mt-2 text-sm text-[#6B7280]">Parent sets access. Student learns calmly.</p>
 
           {/* Tabs */}
-          <div className="mt-6 flex overflow-hidden rounded-xl border border-slate-200">
+          <div className="mt-6 flex overflow-hidden rounded-xl border border-[#E5E7EB]">
             <button
               type="button"
               onClick={() => setTab("student")}
               className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${
                 tab === "student"
-                  ? "bg-[#0B2B5A] text-white"
-                  : "bg-white text-slate-500 hover:bg-slate-50"
+                  ? "bg-[#0F172A] text-white"
+                  : "bg-white text-[#9CA3AF] hover:bg-[#F9FAFB]"
               }`}
             >
               Student
@@ -117,8 +116,8 @@ function SignupForm() {
               onClick={() => setTab("parent")}
               className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${
                 tab === "parent"
-                  ? "bg-[#0B2B5A] text-white"
-                  : "bg-white text-slate-500 hover:bg-slate-50"
+                  ? "bg-[#0F172A] text-white"
+                  : "bg-white text-[#9CA3AF] hover:bg-[#F9FAFB]"
               }`}
             >
               Parent
@@ -129,94 +128,76 @@ function SignupForm() {
           {tab === "student" && (
             <form className="mt-8 space-y-5" onSubmit={onSubmit}>
               <div>
-                <label className="text-sm font-medium text-slate-700">
-                  Student name
-                </label>
+                <label className="text-sm font-medium text-[#374151]">Student name</label>
                 <input
                   value={studentName}
                   onChange={(e) => setStudentName(e.target.value)}
                   placeholder="Ali, Ayesha, Hassan..."
-                  className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-400"
+                  className="mt-1.5 w-full rounded-lg border border-[#E5E7EB] px-4 py-3 text-sm outline-none transition-colors focus:border-[#22C55E] focus:ring-2 focus:ring-[#22C55E]/20"
                 />
               </div>
 
               <div>
-                <label className="text-sm font-medium text-slate-700">
-                  Email
-                </label>
+                <label className="text-sm font-medium text-[#374151]">Email</label>
                 <input
                   type="email"
                   value={parentEmail}
                   onChange={(e) => setParentEmail(e.target.value)}
                   placeholder="abc@gmail.com"
-                  className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-400"
+                  className="mt-1.5 w-full rounded-lg border border-[#E5E7EB] px-4 py-3 text-sm outline-none transition-colors focus:border-[#22C55E] focus:ring-2 focus:ring-[#22C55E]/20"
                 />
-                <p className="mt-2 text-xs text-slate-500">
-                  Used for recovery and future parent dashboard.
-                </p>
+                <p className="mt-1 text-xs text-[#9CA3AF]">Used for recovery and future parent dashboard.</p>
               </div>
 
               <div>
-                <label className="text-sm font-medium text-slate-700">
-                  Phone Number
-                </label>
+                <label className="text-sm font-medium text-[#374151]">Phone Number</label>
                 <input
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="03XX-XXXXXXX"
-                  className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-400"
+                  className="mt-1.5 w-full rounded-lg border border-[#E5E7EB] px-4 py-3 text-sm outline-none transition-colors focus:border-[#22C55E] focus:ring-2 focus:ring-[#22C55E]/20"
                 />
-                <p className="mt-1 text-xs text-slate-500">Optional — for updates and support</p>
+                <p className="mt-1 text-xs text-[#9CA3AF]">Optional — for updates and support</p>
               </div>
 
               <div>
-                <label className="text-sm font-medium text-slate-700">
-                  Set password
-                </label>
-
-                <div className="relative mt-2">
+                <label className="text-sm font-medium text-[#374151]">Set password</label>
+                <div className="relative mt-1.5">
                   <input
                     type={showPassword ? "text" : "password"}
                     minLength={6}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter password"
-                    className="w-full rounded-xl border border-slate-300 px-4 py-3 pr-12 text-sm outline-none focus:border-slate-400"
+                    className="w-full rounded-lg border border-[#E5E7EB] px-4 py-3 pr-12 text-sm outline-none transition-colors focus:border-[#22C55E] focus:ring-2 focus:ring-[#22C55E]/20"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-2 text-slate-600 hover:bg-slate-100"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-2 text-[#6B7280] hover:bg-[#F9FAFB]"
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
-
-                <p className="mt-1 text-xs text-slate-500">At least 6 characters</p>
+                <p className="mt-1 text-xs text-[#9CA3AF]">At least 6 characters</p>
               </div>
 
               {error && (
-                <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
-                  {error}
-                </div>
+                <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
               )}
 
               <button
                 type="submit"
                 disabled={!canContinue || submitting}
-                className="mt-2 w-full rounded-xl bg-[#0B2B5A] px-5 py-3 text-sm font-semibold text-white hover:bg-[#0A2550] disabled:cursor-not-allowed disabled:opacity-50"
+                className="mt-2 w-full rounded-xl bg-[#22C55E] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#16A34A] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {submitting ? "Creating..." : "Create profile →"}
               </button>
 
-              <div className="rounded-xl bg-slate-50 p-4 text-xs text-slate-600">
-                <div className="font-medium text-slate-800">Important</div>
+              <div className="rounded-xl bg-[#F9FAFB] p-4 text-xs text-[#6B7280]">
+                <div className="font-medium text-[#374151]">Important</div>
                 <ul className="mt-2 list-disc space-y-1 pl-5">
                   <li>Set password helps the student log in quickly next time</li>
                   <li>Parent email is used for recovery if password is forgotten</li>
@@ -225,34 +206,30 @@ function SignupForm() {
               </div>
 
               <div className="flex items-center justify-between text-sm">
-                <Link href="/" className="text-[#0B2B5A] hover:underline">
-                  ← Back to home
-                </Link>
-                <Link href="/login" className="text-slate-700 hover:underline">
-                  Already have an account? Log in
-                </Link>
+                <Link href="/" className="text-[#6B7280] hover:text-[#374151]">← Back to home</Link>
+                <Link href="/login" className="text-[#6B7280] hover:text-[#374151]">Already have an account? Log in</Link>
               </div>
             </form>
           )}
 
           {/* Parent tab */}
           {tab === "parent" && (
-            <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-6 text-center">
-              <p className="mt-2 text-sm leading-6 text-slate-600">
+            <div className="mt-8 rounded-2xl border border-[#E5E7EB] bg-[#F9FAFB] p-6 text-center">
+              <p className="mt-2 text-sm leading-6 text-[#374151]">
                 Parent Dashboard is launching with Grade 4. Sign up your child as a student first and they will get a unique Connect Code. Use that code to connect your dashboard now — so the moment Grade 4 goes live, you can track their lessons, quiz scores, and weekly progress instantly.
               </p>
               <div className="mt-5 flex flex-col gap-3">
                 <button
                   type="button"
                   onClick={() => router.push("/parent")}
-                  className="w-full inline-flex items-center justify-center rounded-xl bg-[#0B2B5A] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#0A2550] transition-colors"
+                  className="w-full inline-flex items-center justify-center rounded-xl bg-[#0F172A] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#1E293B]"
                 >
                   Connect Now →
                 </button>
                 <button
                   type="button"
                   onClick={() => setTab("student")}
-                  className="w-full inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-[#0F172A] hover:bg-slate-50 transition-colors"
+                  className="w-full inline-flex items-center justify-center rounded-xl border border-[#E5E7EB] bg-white px-5 py-2.5 text-sm font-semibold text-[#0F172A] transition-colors hover:bg-[#F9FAFB]"
                 >
                   Sign Up as Student
                 </button>

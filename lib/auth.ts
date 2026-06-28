@@ -9,7 +9,13 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+  },
+});
 
 export type StudiesMateUserMeta = {
   studentName?: string;
@@ -38,7 +44,7 @@ export async function signUpParentAccount(params: {
     email: parentEmail.trim().toLowerCase(),
     password: password.trim(),
     options: {
-      emailRedirectTo: 'https://studiesmate-web.vercel.app/dashboard',
+      emailRedirectTo: 'https://studiesmate.org/auth/confirm',
       data: {
         studentName: studentName.trim(),
         studentClass: studentClass.trim(),

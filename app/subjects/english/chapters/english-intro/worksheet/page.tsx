@@ -1,32 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import DashboardLayout from "@/components/DashboardLayout";
 
 export default function SimpleSentenceWorksheetPage() {
   const router = useRouter();
-  const [unlocked, setUnlocked] = useState<boolean | null>(null);
 
   useEffect(() => {
     try {
-      const isUnlocked = localStorage.getItem("worksheet_unlocked_simple_sentence") === "true";
-      if (!isUnlocked) {
-        router.replace("/subjects/english/chapters/english-intro/quiz");
-        return;
-      }
-      setUnlocked(true);
       localStorage.setItem("studiesmate_last_activity_v2", JSON.stringify({
         action: "Opened Simple Sentences Worksheet",
         href: "/subjects/english/chapters/english-intro/worksheet",
         timestamp: new Date().toISOString(),
       }));
-    } catch {
-      setUnlocked(false);
-    }
-  }, [router]);
-
-  if (!unlocked) return null;
+    } catch {}
+  }, []);
 
   return (
     <DashboardLayout>

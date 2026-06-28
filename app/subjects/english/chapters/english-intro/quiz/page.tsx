@@ -3,6 +3,7 @@
 import BackButton from "@/components/BackButton";
 import DashboardLayout from "@/components/DashboardLayout";
 import { useEffect } from "react";
+import confetti from "canvas-confetti";
 
 export default function EnglishQuizPage() {
   useEffect(() => {
@@ -28,6 +29,10 @@ export default function EnglishQuizPage() {
             timestamp: new Date().toISOString(),
           }));
         } catch {}
+        const score = typeof e.data?.score === "number" ? e.data.score : 100;
+        if (score >= 60) {
+          confetti({ particleCount: 160, spread: 75, origin: { y: 0.6 } });
+        }
       }
     }
     window.addEventListener("message", handleMessage);

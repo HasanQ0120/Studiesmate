@@ -1,250 +1,38 @@
 "use client";
 
-import BackButton from "@/components/BackButton";
 import DashboardLayout from "@/components/DashboardLayout";
-import { useParams } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useParams, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useRef, useState } from "react";
+import { FileText, Download, HelpCircle, ChevronRight } from "lucide-react";
+import { supabase } from "@/lib/auth";
 
-declare global {
-  interface Window {
-    YT: { Player: any };
-    onYouTubeIframeAPIReady: () => void;
-  }
-}
-
-const SUBJECT_TITLE = "Maths";
-
-// Placeholder video IDs — update Urdu ID when ready
 const VIDEO_IDS: Record<string, { en: string; ur: string }> = {
-  numbers:             { en: "https://studiesmate.b-cdn.net/place_value_english.mp4.mp4", ur: "https://studiesmate.b-cdn.net/place_value_urdu.mp4.mp4" },
-  "addition-subtraction": { en: "PLACEHOLDER_VIDEO_ID", ur: "PLACEHOLDER_VIDEO_ID" },
+  numbers: {
+    // CDN filenames are swapped at source — urdu-named file contains English content and vice versa
+    en: "https://studiesmate.b-cdn.net/place_value_urdu.mp4.mp4",
+    ur: "https://studiesmate.b-cdn.net/place_value_english.mp4.mp4",
+  },
 };
 
-const CHAPTER_META: Record<string, { title: string; desc: string }> = {
-  numbers: { title: "Numbers & Place Value", desc: "Understanding numbers, counting, and place value." },
-  "addition-subtraction": { title: "Reading & Writing Whole Numbers", desc: "Reading, writing and understanding whole numbers in standard and expanded form." },
-  "multiplication-division": { title: "Multiplication & Division", desc: "Repeated addition, sharing, and grouping." },
-  fractions: { title: "Fractions", desc: "Parts of a whole using simple visuals." },
-  decimals: { title: "Decimals", desc: "Introduction to decimal numbers." },
-  measurement: { title: "Measurement", desc: "Length, mass, and time basics." },
-  geometry: { title: "Geometry", desc: "Shapes, angles, and spatial understanding." },
-  "data-handling": { title: "Data Handling", desc: "Simple graphs, tables, and charts." },
-  patterns: { title: "Patterns & Sequences", desc: "Finding patterns and logical sequences." },
-  "word-problems": { title: "Word Problems", desc: "Applying maths to daily life situations." },
-};
-
-export default function ChapterPage() {
-  const params = useParams<{ chapterId: string }>();
-  const chapterId = params.chapterId;
-
-  const meta = CHAPTER_META[chapterId] ?? {
-    title: "Chapter",
-    desc: "This chapter will be added soon.",
-  };
-
-  const [lessonCompletions, setLessonCompletions] = useState<Record<string, string>>({});
-  const [transcriptOpen, setTranscriptOpen] = useState(false);
-
-  useEffect(() => {
-    try {
-      const completions = JSON.parse(localStorage.getItem("studiesmate_lesson_completions") || "{}");
-      setLessonCompletions(completions);
-    } catch {}
-  }, []);
-
-  useEffect(() => {
-    if (!CHAPTER_META[chapterId]) return;
-    try {
-      localStorage.setItem("studiesmate_last_activity_v2", JSON.stringify({
-        action: `Opened ${CHAPTER_META[chapterId].title} lesson`,
-        href: `/subjects/maths/chapters/${chapterId}`,
-        timestamp: new Date().toISOString(),
-      }));
-    } catch {}
-  }, [chapterId]);
-
-  const [lang, setLang] = useState<"en" | "ur">("en");
-  const langRef = useRef<"en" | "ur">("en");
-  const playerRef = useRef<any>(null);
-  const ytReadyRef = useRef(false);
-  const videoEnRef = useRef<HTMLVideoElement>(null);
-  const videoUrRef = useRef<HTMLVideoElement>(null);
-
-  const videoIds = VIDEO_IDS[chapterId] ?? { en: "PLACEHOLDER_VIDEO_ID", ur: "PLACEHOLDER_VIDEO_ID" };
-
-  const initPlayer = useCallback(
-    (startSeconds = 0) => {
-      playerRef.current?.destroy?.();
-      playerRef.current = new window.YT.Player("yt-player", {
-        height: "100%",
-        width: "100%",
-        videoId: videoIds[langRef.current],
-        playerVars: {
-          enablejsapi: 1,
-          start: Math.floor(startSeconds),
-          rel: 0,
-          modestbranding: 1,
-        },
-        events: {
-          onReady: (e: any) => {
-            if (startSeconds > 0) e.target.seekTo(startSeconds, true);
-          },
-        },
-      });
-    },
-    [videoIds]
-  );
-
-  useEffect(() => {
-    if (videoIds.en.startsWith("https://")) return;
-
-    const setup = () => {
-      ytReadyRef.current = true;
-      initPlayer(0);
-    };
-
-    if (window.YT?.Player) {
-      setup();
-    } else {
-      window.onYouTubeIframeAPIReady = setup;
-      if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
-        const tag = document.createElement("script");
-        tag.src = "https://www.youtube.com/iframe_api";
-        document.head.appendChild(tag);
-      }
-    }
-
-    return () => {
-      playerRef.current?.destroy?.();
-    };
-  }, [initPlayer, videoIds.en]);
-
-  function handleLangSwitch(newLang: "en" | "ur") {
-    if (newLang === lang) return;
-    if (videoIds.en.startsWith("https://")) {
-      const currentVideo = lang === "en" ? videoEnRef.current : videoUrRef.current;
-      const nextVideo = newLang === "en" ? videoEnRef.current : videoUrRef.current;
-      if (currentVideo && nextVideo) {
-        const currentTime = currentVideo.currentTime;
-        currentVideo.pause();
-        nextVideo.currentTime = currentTime;
-        langRef.current = newLang;
-        setLang(newLang);
-        nextVideo.play().catch(() => {});
-      } else {
-        langRef.current = newLang;
-        setLang(newLang);
-      }
-    } else {
-      const time: number = playerRef.current?.getCurrentTime?.() ?? 0;
-      langRef.current = newLang;
-      setLang(newLang);
-      if (ytReadyRef.current) initPlayer(time);
-    }
-  }
-
-  return (
-    <DashboardLayout>
-    <main className="min-h-screen bg-white text-slate-900 pb-20 md:pb-16">
-      <div className="mx-auto max-w-4xl px-6 py-10">
-        <BackButton href="/dashboard" label="Back to Dashboard" />
-
-        <h1 className="mt-6 text-3xl font-semibold tracking-tight">
-          {SUBJECT_TITLE} • {meta.title}
-        </h1>
-        <p className="mt-2 text-sm text-slate-700">{meta.desc}</p>
-
-        {/* Video player + bilingual slider */}
-        <div className="mt-10">
-          {videoIds.en.startsWith("https://") ? (
-            <div className="aspect-video w-full overflow-hidden rounded-2xl border border-[#E2E8F0] bg-black relative">
-              <video
-                ref={videoEnRef}
-                src={videoIds.en}
-                controls
-                className="h-full w-full"
-                style={{ display: lang === "en" ? "block" : "none" }}
-              />
-              <video
-                ref={videoUrRef}
-                src={videoIds.ur}
-                controls
-                className="h-full w-full"
-                style={{ display: lang === "ur" ? "block" : "none" }}
-              />
-            </div>
-          ) : videoIds.en === "PLACEHOLDER_VIDEO_ID" ? (
-            <div
-              style={{
-                background: "#ffffff",
-                border: "1px solid #0B2B5A",
-                borderRadius: "12px",
-                padding: "32px",
-                textAlign: "center",
-              }}
-            >
-              <div className="text-4xl mb-4">🎬</div>
-              <p className="text-lg font-semibold text-[#0B2B5A]">Video launching June 20th</p>
-              <p className="mt-2 text-sm text-[#64748B]">Join our community to get updates on launch day.</p>
-              <a
-                href="https://chat.whatsapp.com/H8q5PBchpRNC4TWIeWp49I"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-6 inline-flex items-center justify-center rounded-xl bg-[#0B2B5A] px-6 py-3 text-sm font-semibold text-white hover:bg-[#0A2550] transition-colors"
-              >
-                Join WhatsApp Community →
-              </a>
-            </div>
-          ) : (
-            <div className="aspect-video w-full overflow-hidden rounded-2xl border border-[#E2E8F0] bg-black">
-              <div id="yt-player" className="h-full w-full" />
-            </div>
-          )}
-
-          {/* Bilingual slider */}
-          <div className="mt-3 flex w-fit items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 p-1">
-            <button
-              type="button"
-              onClick={() => handleLangSwitch("en")}
-              className={`rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-150 ${
-                lang === "en"
-                  ? "bg-[#0B2B5A] text-white shadow-sm"
-                  : "text-slate-600 hover:text-slate-900"
-              }`}
-            >
-              English
-            </button>
-            <button
-              type="button"
-              onClick={() => handleLangSwitch("ur")}
-              className={`rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-150 ${
-                lang === "ur"
-                  ? "bg-[#0B2B5A] text-white shadow-sm"
-                  : "text-slate-600 hover:text-slate-900"
-              }`}
-            >
-              اردو (Urdu)
-            </button>
-          </div>
-        </div>
-
-        {/* Transcript — Numbers & Place Value only */}
-        {chapterId === "numbers" && (
-          <div className="mt-6">
-            <button
-              type="button"
-              onClick={() => setTranscriptOpen((v) => !v)}
-              className="rounded-xl bg-[#0B2B5A] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#0A2550] transition-colors"
-            >
-              {transcriptOpen ? "Hide Transcript ▲" : "Read Transcript ▼"}
-            </button>
-            <div
-              className="overflow-hidden transition-all duration-300 ease-in-out"
-              style={{ maxHeight: transcriptOpen ? "2000px" : "0px" }}
-            >
-              <div className="mt-4 rounded-2xl border border-[#E2E8F0] bg-white p-6">
-                <p style={{ fontSize: "14px", lineHeight: "1.8", color: "#475569", whiteSpace: "pre-line" }}>
-                  {`Welcome to StudiesMate. Let's learn math.
+const CHAPTER_META: Record<string, {
+  title: string;
+  quizSubtitle: string;
+  quizQuestion: string;
+  quizOptions: string[];
+  worksheetSubtitle: string;
+  explainEn: string;
+  explainUr: string;
+  transcript: string;
+}> = {
+  numbers: {
+    title: "Numbers & Place Value",
+    quizSubtitle: "Test your understanding of Place Value",
+    quizQuestion: "In the number 456, what is the value of 4?",
+    quizOptions: ["4", "40", "400", "4000"],
+    worksheetSubtitle: "Print and practice Place Value exercises",
+    explainEn: "In any number, each digit has a position called its 'place'. This position tells you exactly how much that digit is worth. In 456: the '4' is in the hundreds place, so its value is 400. The '5' is in the tens place — its value is 50. The '6' is in the ones place — its value is 6. The further left a digit sits, the bigger its value!",
+    explainUr: "کسی بھی نمبر میں، ہر ہندسے کی ایک جگہ ہوتی ہے جسے 'place' کہتے ہیں۔ یہ جگہ بتاتی ہے کہ اس ہندسے کی قدر کتنی ہے۔ 456 میں: '4' سیکڑوں کی جگہ پر ہے، اس لیے اس کی قدر 400 ہے۔ '5' دہائیوں میں ہے — اس کی قدر 50 ہے۔ '6' اکائیوں میں ہے — اس کی قدر 6 ہے۔ جتنا ہندسہ بائیں طرف ہو، اتنی زیادہ اس کی قدر ہے۔",
+    transcript: `Welcome to StudiesMate. Let's learn math.
 
 Hello, Grade 4. Today we will learn about place value and how to read larger numbers.
 
@@ -260,42 +48,374 @@ Now it is your turn. Look at the number eighty-nine thousand and twelve. Pause t
 
 The eight is in the ten thousands place. So its value is eighty thousand. Well done.
 
-Remember — where a digit sits gives it its value. Thank you for learning with StudiesMate. Please download the worksheet to practise. See you in the next video.`}
-                </p>
+Remember — where a digit sits gives it its value. Thank you for learning with StudiesMate. Please download the worksheet to practise. See you in the next video.`,
+  },
+};
+
+function BackButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex items-center gap-2 rounded-lg bg-[#0F172A] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#1E293B]"
+    >
+      ← Back to Lesson
+    </button>
+  );
+}
+
+function ChapterPageInner() {
+  const params = useParams<{ chapterId: string }>();
+  const searchParams = useSearchParams();
+  const chapterId = params.chapterId;
+  const meta = CHAPTER_META[chapterId];
+  const videoIds = VIDEO_IDS[chapterId] ?? { en: "", ur: "" };
+
+  const [lang, setLang] = useState<"en" | "ur">("en");
+  const [lessonCompletions, setLessonCompletions] = useState<Record<string, string>>({});
+  const [transcriptOpen, setTranscriptOpen] = useState(false);
+  const [explanation, setExplanation] = useState("");
+  const [isExplaining, setIsExplaining] = useState(false);
+  const [creditsLeft, setCreditsLeft] = useState<number | null>(null);
+  const [showExplanation, setShowExplanation] = useState(false);
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [view, setView] = useState<"lesson" | "quiz" | "worksheet">(
+    searchParams.get("view") === "quiz" ? "quiz" :
+    searchParams.get("view") === "worksheet" ? "worksheet" : "lesson"
+  );
+
+  const videoEnRef = useRef<HTMLVideoElement>(null);
+  const videoUrRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    try {
+      setLessonCompletions(JSON.parse(localStorage.getItem("studiesmate_lesson_completions") || "{}"));
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    if (!meta) return;
+    try {
+      localStorage.setItem("studiesmate_last_activity_v2", JSON.stringify({
+        action: `Opened ${meta.title} lesson`,
+        href: `/subjects/maths/chapters/${chapterId}`,
+        timestamp: new Date().toISOString(),
+      }));
+      localStorage.setItem("last_lesson_math", meta.title);
+    } catch {}
+  }, [chapterId, meta]);
+
+  function handleLangSwitch(newLang: "en" | "ur") {
+    if (newLang === lang) return;
+    const activeRef = lang === "en" ? videoEnRef : videoUrRef;
+    const nextRef = newLang === "en" ? videoEnRef : videoUrRef;
+    const currentTime = activeRef.current?.currentTime ?? 0;
+    activeRef.current?.pause();
+    if (nextRef.current) {
+      nextRef.current.currentTime = currentTime;
+    }
+    setLang(newLang);
+    nextRef.current?.play().catch(() => {});
+  }
+
+  async function handleExplainAgain() {
+    setIsExplaining(true);
+    setShowExplanation(false);
+    const { data: { session } } = await supabase.auth.getSession();
+    const userId = session?.user?.id;
+    const response = await fetch("/api/explain", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        topic: meta.title,
+        subject: "Mathematics",
+        language: lang === "ur" ? "urdu" : "english",
+        userId,
+      }),
+    });
+    const data = await response.json();
+    if (response.status === 403 && data.error === "no_credits") {
+      setExplanation("no_credits");
+    } else {
+      setExplanation(data.explanation);
+      setCreditsLeft(data.creditsLeft);
+    }
+    setIsExplaining(false);
+    setShowExplanation(true);
+  }
+
+  function markComplete() {
+    try {
+      const completions = JSON.parse(localStorage.getItem("studiesmate_lesson_completions") || "{}");
+      completions[chapterId] = new Date().toISOString();
+      localStorage.setItem("studiesmate_lesson_completions", JSON.stringify(completions));
+      localStorage.setItem("studiesmate_last_activity_v2", JSON.stringify({
+        action: `Completed ${meta?.title || chapterId} lesson`,
+        href: `/subjects/maths/chapters/${chapterId}`,
+        timestamp: new Date().toISOString(),
+      }));
+      setLessonCompletions(completions);
+    } catch {}
+  }
+
+  if (!meta || !videoIds.en) {
+    return (
+      <DashboardLayout>
+        <div className="flex min-h-screen items-center justify-center bg-[#F9FAFB] text-center px-6">
+          <div>
+            <p className="text-lg font-bold text-[#111827]">This chapter is coming soon.</p>
+            <p className="mt-2 text-sm text-[#6B7280]">Check back after Beta launches more content.</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  const isCompleted = !!lessonCompletions[chapterId];
+
+  return (
+    <DashboardLayout>
+      <div className="min-h-screen bg-[#F9FAFB] px-5 py-7 pb-20 md:pb-10">
+
+        {/* Breadcrumb */}
+        <p className="text-xs text-[#9CA3AF]">Mathematics › {meta.title}</p>
+
+        {/* Title */}
+        <h1 className="mt-1.5 text-2xl font-bold text-[#111827]">Lesson 1: {meta.title}</h1>
+
+        {/* Two-column layout */}
+        <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_340px]">
+
+          {/* ── LEFT COLUMN ── */}
+          <div className="flex flex-col gap-4">
+            {view === "lesson" ? (
+              <>
+                {/* Video player */}
+                <div className="overflow-hidden rounded-xl bg-[#0F172A]">
+                  <div className="aspect-video relative">
+                    <video
+                      ref={videoEnRef}
+                      src={videoIds.en}
+                      controls
+                      className="absolute inset-0 h-full w-full"
+                      style={{ display: lang === "en" ? "block" : "none" }}
+                    />
+                    <video
+                      ref={videoUrRef}
+                      src={videoIds.ur}
+                      controls
+                      className="absolute inset-0 h-full w-full"
+                      style={{ display: lang === "ur" ? "block" : "none" }}
+                    />
+                  </div>
+                  <div className="px-4 py-3">
+                    <p className="text-sm font-bold text-white">{meta.title}</p>
+                    <p className="mt-0.5 text-xs text-[#9CA3AF]">Mathematics · Beta · 8:45</p>
+                  </div>
+                </div>
+
+                {/* Bilingual Mode card */}
+                <div className="flex items-center justify-between rounded-xl border border-[#F3F4F6] bg-white p-4 shadow-sm">
+                  <div>
+                    <p className="text-sm font-bold text-[#111827]">Bilingual Mode</p>
+                    <p className="mt-0.5 text-xs text-[#6B7280]">Video continues from the same timestamp</p>
+                  </div>
+                  <div className="flex overflow-hidden rounded-lg border border-[#E5E7EB]">
+                    <button
+                      type="button"
+                      onClick={() => handleLangSwitch("en")}
+                      className={`px-3 py-1.5 text-xs font-semibold transition-colors ${lang === "en" ? "bg-[#22C55E] text-white" : "text-[#9CA3AF] hover:text-[#374151]"}`}
+                    >
+                      English
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleLangSwitch("ur")}
+                      className={`px-3 py-1.5 text-xs font-semibold transition-colors ${lang === "ur" ? "bg-[#22C55E] text-white" : "text-[#9CA3AF] hover:text-[#374151]"}`}
+                    >
+                      اردو
+                    </button>
+                  </div>
+                </div>
+
+                {/* Explain Again card */}
+                <div className="rounded-xl border border-[#F3F4F6] bg-white shadow-sm">
+                  <div className="flex items-center justify-between p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F3F4F6]">
+                        <FileText className="h-4 w-4 text-[#6B7280]" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-[#111827]">Explain Again</p>
+                        <p className="mt-0.5 text-xs text-[#6B7280]">
+                          Get a simple explanation in {lang === "en" ? "English" : "اردو"}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleExplainAgain}
+                      disabled={isExplaining}
+                      className="inline-flex items-center gap-1.5 rounded-full bg-[#22C55E] px-4 py-1.5 text-xs font-semibold text-white hover:bg-[#16A34A] transition-colors disabled:opacity-70"
+                    >
+                      {isExplaining ? (
+                        <>
+                          <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                          Explaining...
+                        </>
+                      ) : "Explain Again →"}
+                    </button>
+                  </div>
+                </div>
+                {showExplanation && (
+                  <div className="rounded-xl border border-[#E5E7EB] bg-white p-4 mt-2">
+                    {explanation === "no_credits" ? (
+                      <div>
+                        <p className="text-sm text-[#6B7280]">You&apos;ve used all your Explain Again credits. Grade 4 is launching soon — purchase it to get 25 credits every day.</p>
+                        <a href="/phase-1" className="mt-3 inline-block rounded-full bg-[#22C55E] px-4 py-1.5 text-xs font-semibold text-white hover:bg-[#16A34A] transition-colors">Upgrade to Grade 4 →</a>
+                      </div>
+                    ) : (
+                      <div>
+                        <p style={{ fontSize: "15px", lineHeight: "1.6", color: "#111827" }}>{explanation}</p>
+                        <p className="mt-2 text-xs text-[#9CA3AF]">Credits left: {creditsLeft}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Transcript card */}
+                <div className="rounded-xl border border-[#F3F4F6] bg-white shadow-sm">
+                  <button
+                    type="button"
+                    onClick={() => setTranscriptOpen((v) => !v)}
+                    className="flex w-full items-center gap-3 p-4"
+                  >
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F3F4F6]">
+                      <FileText className="h-4 w-4 text-[#6B7280]" />
+                    </div>
+                    <span className="flex-1 text-left text-sm font-bold text-[#111827]">Read Transcript</span>
+                    <ChevronRight
+                      className="h-4 w-4 text-[#9CA3AF] transition-transform duration-200"
+                      style={{ transform: transcriptOpen ? "rotate(90deg)" : "rotate(0deg)" }}
+                    />
+                  </button>
+                  <div
+                    className="overflow-hidden transition-all duration-300"
+                    style={{ maxHeight: transcriptOpen ? "2000px" : "0px" }}
+                  >
+                    <div className="border-t border-[#F3F4F6] px-4 pb-4 pt-3">
+                      <p style={{ fontSize: "14px", lineHeight: "1.8", color: "#475569", whiteSpace: "pre-line" }}>
+                        {meta.transcript}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mark as Complete */}
+                {isCompleted ? (
+                  <div className="flex items-center justify-center gap-2 rounded-full border border-[#6EE7B7] bg-[#ECFDF5] py-3 text-sm font-semibold text-[#10B981]">
+                    ✓ Lesson Completed
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={markComplete}
+                    className="w-full rounded-full bg-[#0F172A] py-3 text-sm font-semibold text-white hover:bg-[#1E293B] transition-colors"
+                  >
+                    ✓ Mark as Complete
+                  </button>
+                )}
+              </>
+            ) : view === "quiz" ? (
+              <>
+                <BackButton onClick={() => setView("lesson")} />
+                <iframe
+                  src="/StudiesMate_Quiz_PlaceValue.html"
+                  width="100%"
+                  height={600}
+                  style={{ border: "none", borderRadius: "12px" }}
+                  scrolling="auto"
+                />
+              </>
+            ) : (
+              <>
+                <BackButton onClick={() => setView("lesson")} />
+                <iframe
+                  src="/worksheet_place_value.pdf"
+                  width="100%"
+                  height={700}
+                  style={{ border: "none", borderRadius: "12px" }}
+                />
+              </>
+            )}
+          </div>
+
+          {/* ── RIGHT COLUMN ── */}
+          <div className="flex flex-col gap-4">
+
+            {/* Quick Quiz card */}
+            <div className="rounded-xl border border-[#F3F4F6] bg-white p-5 shadow-sm">
+              <div className="flex items-center gap-2">
+                <HelpCircle className="h-5 w-5 text-[#22C55E]" />
+                <h3 className="text-sm font-bold text-[#111827]">Quick Quiz</h3>
               </div>
+              <p className="mt-1 text-xs text-[#6B7280]">{meta.quizSubtitle}</p>
+
+              <p className="mt-4 text-sm font-semibold text-[#111827]">{meta.quizQuestion}</p>
+              <div className="mt-3 space-y-2">
+                {meta.quizOptions.map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => setSelectedOption(option)}
+                    className={`w-full rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
+                      selectedOption === option
+                        ? "border-[#22C55E] bg-[#F0FDF4] font-semibold text-[#16A34A]"
+                        : "border-[#E5E7EB] bg-white text-[#374151] hover:border-[#D1D5DB]"
+                    }`}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setView("quiz")}
+                className="mt-4 flex w-full items-center justify-center rounded-xl bg-[#22C55E] py-2.5 text-sm font-semibold text-white hover:bg-[#16A34A] transition-colors"
+              >
+                Start Full Quiz →
+              </button>
+            </div>
+
+            {/* Worksheet card */}
+            <div className="rounded-xl border border-[#F3F4F6] bg-white p-5 shadow-sm">
+              <div className="flex items-center gap-2">
+                <Download className="h-5 w-5 text-[#6B7280]" />
+                <h3 className="text-sm font-bold text-[#111827]">Worksheet</h3>
+              </div>
+              <p className="mt-1 text-xs text-[#6B7280]">{meta.worksheetSubtitle}</p>
+              <button
+                type="button"
+                onClick={() => setView("worksheet")}
+                className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-[#E5E7EB] bg-white py-2.5 text-sm font-semibold text-[#374151] hover:border-[#D1D5DB] transition-colors"
+              >
+                <Download className="h-4 w-4" />
+                Download PDF
+              </button>
             </div>
           </div>
-        )}
 
-        <div className="mt-6">
-          {lessonCompletions[chapterId] ? (
-            <div className="inline-flex items-center gap-2 rounded-xl bg-[#ECFDF5] border border-[#6EE7B7] px-4 py-2 text-sm font-semibold text-[#10B981]">
-              ✓ Lesson Completed
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={() => {
-                try {
-                  const completions = JSON.parse(localStorage.getItem("studiesmate_lesson_completions") || "{}");
-                  completions[chapterId] = new Date().toISOString();
-                  localStorage.setItem("studiesmate_lesson_completions", JSON.stringify(completions));
-                  localStorage.setItem("studiesmate_last_activity_v2", JSON.stringify({
-                    action: `Completed ${CHAPTER_META[chapterId]?.title || chapterId} lesson`,
-                    href: `/subjects/maths/chapters/${chapterId}`,
-                    timestamp: new Date().toISOString(),
-                  }));
-                  setLessonCompletions(completions);
-                } catch {}
-              }}
-              className="inline-flex items-center gap-2 rounded-xl bg-[#F97316] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#EA580C] transition-colors shadow-sm"
-            >
-              ✓ Mark as Complete
-            </button>
-          )}
         </div>
       </div>
-    </main>
     </DashboardLayout>
+  );
+}
+
+export default function ChapterPage() {
+  return (
+    <Suspense fallback={null}>
+      <ChapterPageInner />
+    </Suspense>
   );
 }
