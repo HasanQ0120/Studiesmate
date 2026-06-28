@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import confetti from "canvas-confetti";
 import BackButton from "@/components/BackButton";
 import DashboardLayout from "@/components/DashboardLayout";
 
@@ -26,6 +27,10 @@ export default function ScienceQuizPage() {
             timestamp: new Date().toISOString(),
           }));
         } catch {}
+        const score = typeof e.data?.score === "number" ? e.data.score : 100;
+        if (score >= 60) {
+          confetti({ particleCount: 160, spread: 75, origin: { y: 0.6 } });
+        }
       }
     }
 

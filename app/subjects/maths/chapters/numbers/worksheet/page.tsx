@@ -1,32 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import DashboardLayout from "@/components/DashboardLayout";
 
 export default function NumbersWorksheetPage() {
   const router = useRouter();
-  const [unlocked, setUnlocked] = useState<boolean | null>(null);
 
   useEffect(() => {
     try {
-      const isUnlocked = localStorage.getItem("worksheet_unlocked_place_value") === "true";
-      if (!isUnlocked) {
-        router.replace("/subjects/maths/chapters/numbers/quiz");
-        return;
-      }
-      setUnlocked(true);
       localStorage.setItem("studiesmate_last_activity_v2", JSON.stringify({
         action: "Opened Numbers & Place Value Worksheet",
         href: "/subjects/maths/chapters/numbers/worksheet",
         timestamp: new Date().toISOString(),
       }));
-    } catch {
-      setUnlocked(false);
-    }
-  }, [router]);
-
-  if (!unlocked) return null;
+    } catch {}
+  }, []);
 
   return (
     <DashboardLayout>

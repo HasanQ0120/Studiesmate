@@ -42,15 +42,16 @@ body {
 }
 
 @keyframes pageFadeIn {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-main, .page-wrapper, [class*="page"] {
-  animation: fadeIn 0.3s ease-in-out;
+@keyframes slideInRight {
+  from { transform: translateX(110%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
 }
 
-.page-wrapper {
+.page-wrapper, main, [class*="container"] {
   animation: pageFadeIn 0.3s ease-out;
 }
 

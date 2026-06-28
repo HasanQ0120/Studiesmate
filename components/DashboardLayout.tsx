@@ -1,274 +1,388 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { LayoutDashboard, Calculator, BookOpen, FlaskConical, ChevronDown, ChevronRight, Home, Lock, FileText } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  LayoutDashboard, Calculator, BookOpen, FlaskConical,
+  ChevronDown, ChevronRight, FileText,
+  PlayCircle, HelpCircle, TrendingUp, Home,
+} from "lucide-react";
+import { supabase } from "@/lib/auth";
 
 type SidebarChild = {
   id: string;
   label: string;
-  href: string | null;
-  isQuiz: boolean;
-  isWorksheet: boolean;
-  worksheetUnlocked?: boolean;
+  href: string;
+  icon: React.ElementType;
 };
-
-type UnlockState = {
-  place_value: boolean;
-  habitat: boolean;
-  simple_sentence: boolean;
-};
-
-function loadUnlocks(): UnlockState {
-  try {
-    return {
-      place_value: localStorage.getItem("worksheet_unlocked_place_value") === "true",
-      habitat: localStorage.getItem("worksheet_unlocked_habitat") === "true",
-      simple_sentence: localStorage.getItem("worksheet_unlocked_simple_sentence") === "true",
-    };
-  } catch {
-    return { place_value: false, habitat: false, simple_sentence: false };
-  }
-}
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+
   const [expanded, setExpanded] = useState<string[]>([]);
-  const [unlocks, setUnlocks] = useState<UnlockState>({ place_value: false, habitat: false, simple_sentence: false });
-  const [lockedMsg, setLockedMsg] = useState<string | null>(null);
+  const [connectCode, setConnectCode] = useState<string>("");
+  const [studentName, setStudentName] = useState<string>("");
+  const [userEmail, setUserEmail] = useState<string>("");
+  const [dropupOpen, setDropupOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+
+  const avatarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let sectionId: string | null = null;
-    if (pathname.startsWith('/subjects/maths')) sectionId = 'maths';
-    else if (pathname.startsWith('/subjects/english')) sectionId = 'english';
-    else if (pathname.startsWith('/subjects/science')) sectionId = 'science';
+    if (pathname.startsWith("/subjects/maths")) sectionId = "maths";
+    else if (pathname.startsWith("/subjects/english")) sectionId = "english";
+    else if (pathname.startsWith("/subjects/science")) sectionId = "science";
     if (sectionId) {
-      setExpanded(prev => prev.includes(sectionId!) ? prev : [...prev, sectionId!]);
+      setExpanded((prev) => (prev.includes(sectionId!) ? prev : [...prev, sectionId!]));
     }
   }, [pathname]);
 
   useEffect(() => {
-    setUnlocks(loadUnlocks());
     try {
       const saved = localStorage.getItem("studiesmate_sidebar_expanded");
       if (saved) setExpanded(JSON.parse(saved));
     } catch {}
 
-    function handleMessage(e: MessageEvent) {
-      if (e.data?.type === "quizComplete") {
-        setUnlocks(loadUnlocks());
+    function handleDocClick(e: MouseEvent) {
+      if (avatarRef.current && !avatarRef.current.contains(e.target as Node)) {
+        setDropupOpen(false);
       }
     }
-    function handleDocClick() {
-      setLockedMsg(null);
-    }
-    window.addEventListener("message", handleMessage);
     document.addEventListener("click", handleDocClick);
     return () => {
-      window.removeEventListener("message", handleMessage);
       document.removeEventListener("click", handleDocClick);
     };
   }, []);
 
+  useEffect(() => {
+    async function loadFromSession(session: { user: { id: string; email?: string; user_metadata?: Record<string, unknown> } } | null) {
+      if (!session) return;
+      const name = ((session.user.user_metadata?.studentName as string | undefined) || "").trim();
+      setStudentName(name.split(" ")[0] || "");
+      setUserEmail(session.user.email || "");
+      const { data } = await supabase
+        .from("profiles")
+        .select("connect_code")
+        .eq("id", session.user.id)
+        .maybeSingle();
+      if (data?.connect_code) setConnectCode(data.connect_code);
+    }
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      loadFromSession(session);
+    });
+
+    supabase.auth.getSession().then(({ data: { session } }) => loadFromSession(session));
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Hide site header and footer on all dashboard pages
+  useEffect(() => {
+    const header = document.querySelector("header");
+    const footer = document.querySelector("footer");
+    if (header) header.style.display = "none";
+    if (footer) footer.style.display = "none";
+    return () => {
+      if (header) header.style.display = "";
+      if (footer) footer.style.display = "";
+    };
+  }, []);
+
   function toggleExpand(id: string) {
-    setExpanded(prev => {
-      const next = prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id];
-      try {
-        localStorage.setItem("studiesmate_sidebar_expanded", JSON.stringify(next));
-      } catch {}
+    setExpanded((prev) => {
+      const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
+      try { localStorage.setItem("studiesmate_sidebar_expanded", JSON.stringify(next)); } catch {}
       return next;
     });
   }
 
-  function isActive(href: string) {
-    return pathname === href;
+  function isActive(href: string) { return pathname === href; }
+
+  function handleLogout() {
+    setDropupOpen(false);
+    setShowLogoutModal(true);
   }
 
-  const sidebarItems = [
-    {
-      id: "dashboard",
-      label: "Home",
-      icon: LayoutDashboard,
-      href: "/dashboard",
-      locked: false,
-      children: [] as SidebarChild[],
-    },
+  async function handleConfirmLogout() {
+    await supabase.auth.signOut();
+    setShowLogoutModal(false);
+    setShowToast(true);
+    setTimeout(() => router.push("/"), 2000);
+  }
+
+  type SubjectEntry = {
+    id: string;
+    label: string;
+    icon: React.ElementType;
+    iconColor: string;
+    sectionLabel: string;
+    children: SidebarChild[];
+  };
+
+  const subjects: SubjectEntry[] = [
     {
       id: "maths",
       label: "Mathematics",
       icon: Calculator,
-      href: null,
-      locked: false,
+      iconColor: "#22C55E",
+      sectionLabel: "NUMBERS & PLACE VALUE",
       children: [
-        { id: "numbers-lesson", label: "Numbers & Place Value", href: "/subjects/maths/chapters/numbers", isQuiz: false, isWorksheet: false },
-        { id: "numbers-quiz", label: "Numbers & Place Value Quiz", href: "/subjects/maths/chapters/numbers/quiz", isQuiz: true, isWorksheet: false },
-        { id: "numbers-worksheet", label: "Numbers & Place Value Worksheet", href: unlocks.place_value ? "/subjects/maths/chapters/numbers/worksheet" : null, isQuiz: false, isWorksheet: true, worksheetUnlocked: unlocks.place_value },
-      ] as SidebarChild[],
+        { id: "maths-lesson", label: "Lesson", href: "/subjects/maths/chapters/numbers", icon: PlayCircle },
+        { id: "maths-quiz", label: "Quiz", href: "/subjects/maths/chapters/numbers?view=quiz", icon: HelpCircle },
+        { id: "maths-ws", label: "Worksheet", href: "/subjects/maths/chapters/numbers?view=worksheet", icon: FileText },
+      ],
     },
     {
       id: "english",
       label: "English",
       icon: BookOpen,
-      href: null,
-      locked: false,
+      iconColor: "#3B82F6",
+      sectionLabel: "SIMPLE SENTENCE",
       children: [
-        { id: "english-lesson", label: "Simple Sentences", href: "/subjects/english/chapters/english-intro", isQuiz: false, isWorksheet: false },
-        { id: "english-quiz", label: "Simple Sentences Quiz", href: "/subjects/english/chapters/english-intro/quiz", isQuiz: true, isWorksheet: false },
-        { id: "english-worksheet", label: "Simple Sentences Worksheet", href: unlocks.simple_sentence ? "/subjects/english/chapters/english-intro/worksheet" : null, isQuiz: false, isWorksheet: true, worksheetUnlocked: unlocks.simple_sentence },
-      ] as SidebarChild[],
+        { id: "english-lesson", label: "Lesson", href: "/subjects/english/chapters/english-intro", icon: PlayCircle },
+        { id: "english-quiz", label: "Quiz", href: "/subjects/english/chapters/english-intro?view=quiz", icon: HelpCircle },
+        { id: "english-ws", label: "Worksheet", href: "/subjects/english/chapters/english-intro?view=worksheet", icon: FileText },
+      ],
     },
     {
       id: "science",
       label: "Science",
       icon: FlaskConical,
-      href: null,
-      locked: false,
+      iconColor: "#F59E0B",
+      sectionLabel: "HABITAT",
       children: [
-        { id: "science-lesson", label: "What is a Habitat?", href: "/subjects/science/chapters/science-intro", isQuiz: false, isWorksheet: false },
-        { id: "science-quiz", label: "What is a Habitat? Quiz", href: "/subjects/science/chapters/science-intro/quiz", isQuiz: true, isWorksheet: false },
-        { id: "science-worksheet", label: "What is a Habitat? Worksheet", href: unlocks.habitat ? "/subjects/science/chapters/science-intro/worksheet" : null, isQuiz: false, isWorksheet: true, worksheetUnlocked: unlocks.habitat },
-      ] as SidebarChild[],
+        { id: "science-lesson", label: "Lesson", href: "/subjects/science/chapters/science-intro", icon: PlayCircle },
+        { id: "science-quiz", label: "Quiz", href: "/subjects/science/chapters/science-intro?view=quiz", icon: HelpCircle },
+        { id: "science-ws", label: "Worksheet", href: "/subjects/science/chapters/science-intro?view=worksheet", icon: FileText },
+      ],
     },
   ];
 
   return (
-    <div className="flex min-h-screen bg-[#F8FAFC]">
-      {/* Left Sidebar */}
-      <aside className="hidden md:flex flex-col w-64 shrink-0 border-r border-[#E2E8F0] bg-white sticky top-[72px] h-[calc(100vh-72px)] overflow-y-auto">
-        <div className="p-4">
-          <p className="text-[13px] font-bold uppercase tracking-widest text-[#F97316] mb-3 px-2">Beta</p>
+    <div className="bg-[#F9FAFB]">
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(12px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
 
-          {sidebarItems.map((item) => {
-            const Icon = item.icon;
-            const isExpanded = expanded.includes(item.id);
+      {/* ── SIDEBAR ── */}
+      <aside className="hidden md:flex w-[220px] flex-col justify-between bg-[#0F172A] fixed left-0 top-0 h-screen overflow-y-auto z-40">
 
-            if (item.href) {
+        <div className="flex flex-col">
+          {/* Logo */}
+          <div className="px-5 pt-5 pb-4 border-b border-white/10">
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "white", borderRadius: "8px", padding: "8px", width: "100%" }}>
+              <img src="/logo.png" alt="StudiesMate" style={{ width: "100%", maxWidth: "140px", height: "auto", objectFit: "contain", display: "block", margin: "0 auto" }} />
+            </div>
+            <p className="mt-1 text-[11px] text-[#6B7280]">Beta</p>
+          </div>
+
+          {/* Nav */}
+          <nav className="px-3 pt-4 pb-2">
+
+            {/* Home */}
+            <Link
+              href="/"
+              className="flex items-center gap-3 border-l-2 border-transparent rounded-r-lg px-3 py-2.5 mb-1 text-sm font-semibold text-white hover:bg-white/5 transition-all"
+              style={{ animation: "fadeIn 0.4s ease-out both", animationDelay: "0.05s" }}
+            >
+              <Home className="h-4 w-4 shrink-0" />
+              Home
+            </Link>
+
+            {/* Dashboard */}
+            <Link
+              href="/dashboard"
+              className={`flex items-center gap-3 border-l-2 rounded-r-lg px-3 py-2.5 mb-1 text-sm font-semibold transition-all ${
+                isActive("/dashboard")
+                  ? "border-[#22C55E] bg-[#22C55E]/15 text-[#22C55E]"
+                  : "border-transparent text-white hover:bg-white/5"
+              }`}
+              style={{ animation: "fadeIn 0.4s ease-out both", animationDelay: "0.1s" }}
+            >
+              <LayoutDashboard className="h-4 w-4 shrink-0" />
+              Dashboard
+            </Link>
+
+            {/* Subject collapsibles */}
+            {subjects.map(({ id, label, icon: Icon, iconColor, sectionLabel, children }, i) => {
+              const isExpanded = expanded.includes(id);
               return (
-                <Link
-                  key={item.id}
-                  href={item.href}
-                  className={`flex items-center gap-3 rounded-xl px-3 py-2.5 mb-1 text-sm font-semibold transition-all ${
-                    isActive(item.href)
-                      ? "bg-[#FFF7ED] text-[#F97316] border border-[#FED7AA]"
-                      : "text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A]"
-                  }`}
-                >
-                  <Icon className="h-4 w-4 shrink-0" />
-                  {item.label}
-                </Link>
-              );
-            }
+                <div key={id} className="mb-1" style={{ animation: "fadeIn 0.4s ease-out both", animationDelay: `${(i + 3) * 0.05}s` }}>
+                  <button
+                    type="button"
+                    onClick={() => toggleExpand(id)}
+                    className="w-full flex items-center gap-3 border-l-2 border-transparent rounded-r-lg px-3 py-2.5 text-sm font-semibold text-white hover:bg-white/5 transition-all"
+                  >
+                    <Icon className="h-4 w-4 shrink-0" style={{ color: iconColor }} />
+                    <span className="flex-1 text-left">{label}</span>
+                    {isExpanded
+                      ? <ChevronDown className="h-3.5 w-3.5 text-[#6B7280]" />
+                      : <ChevronRight className="h-3.5 w-3.5 text-[#6B7280]" />
+                    }
+                  </button>
 
-            return (
-              <div key={item.id} className="mb-1">
+                  {isExpanded && (
+                    <div className="ml-5 border-l border-white/10 pl-3 pt-1 pb-1 flex flex-col gap-0.5">
+                      <span className="px-1 pt-1 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-[#4B5563]">
+                        {sectionLabel}
+                      </span>
+
+                      {children.map((child) => {
+                        const ChildIcon = child.icon;
+                        return (
+                          <Link
+                            key={child.id}
+                            href={child.href}
+                            className={`flex items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-medium transition-all ${
+                              isActive(child.href)
+                                ? "text-[#22C55E] bg-[#22C55E]/10"
+                                : "text-[#9CA3AF] hover:text-white hover:bg-white/5"
+                            }`}
+                          >
+                            <ChildIcon className="h-3.5 w-3.5 shrink-0" />
+                            {child.label}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+
+            {/* All Grades */}
+            <Link
+              href="/phase-1"
+              className={`flex items-center gap-3 border-l-2 border-transparent rounded-r-lg px-3 py-2.5 text-sm font-semibold transition-all ${
+                isActive("/phase-1")
+                  ? "border-[#22C55E] bg-[#22C55E]/15 text-[#22C55E]"
+                  : "text-[#9CA3AF] hover:bg-white/5 hover:text-white"
+              }`}
+              style={{ animation: "fadeIn 0.4s ease-out both", animationDelay: "0.3s" }}
+            >
+              <TrendingUp className="h-4 w-4 shrink-0" />
+              All Grades
+            </Link>
+          </nav>
+        </div>
+
+        {/* Bottom — Connect Parent + Avatar */}
+        <div className="border-t border-white/10">
+          <div className="px-5 pt-4 pb-3">
+            <Link href="/parent" className="flex items-center gap-2 group">
+              <span className="h-2 w-2 rounded-full bg-[#22C55E]" />
+              <span className="text-sm font-medium text-white group-hover:text-[#22C55E] transition-colors">Connect Parent</span>
+            </Link>
+            <p className="mt-1.5 font-mono text-xs text-[#22C55E]">
+              {connectCode ? `Code: ${connectCode}` : "Code: —"}
+            </p>
+          </div>
+
+          {/* Avatar row with dropup */}
+          <div className="border-t border-white/10 px-3 py-2.5 relative" ref={avatarRef}>
+            <button
+              type="button"
+              onClick={() => setDropupOpen((v) => !v)}
+              className="flex w-full items-center gap-2.5 rounded-lg p-2 hover:bg-white/5 transition-colors"
+            >
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#374151] text-xs font-bold text-white">
+                {studentName ? studentName[0].toUpperCase() : userEmail ? userEmail[0].toUpperCase() : "U"}
+              </div>
+              <span className="flex-1 truncate text-left text-sm font-medium text-white">
+                {studentName || userEmail.split("@")[0] || "Student"}
+              </span>
+            </button>
+
+            {dropupOpen && (
+              <div className="absolute bottom-full left-3 right-3 mb-1 overflow-hidden rounded-lg border border-[#E5E7EB] bg-white shadow-lg">
                 <button
                   type="button"
-                  onClick={() => !item.locked && toggleExpand(item.id)}
-                  className={`w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all ${
-                    item.locked
-                      ? "text-[#94A3B8] cursor-not-allowed"
-                      : "text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A]"
-                  }`}
+                  onClick={() => { setDropupOpen(false); router.push("/"); }}
+                  className="flex w-full items-center gap-2 px-3 py-2.5 text-sm text-[#111827] hover:bg-[#F9FAFB] transition-colors"
                 >
-                  <Icon className="h-4 w-4 shrink-0" />
-                  <span className="flex-1 text-left">{item.label}</span>
-                  {item.locked ? (
-                    <span className="text-[10px] font-bold text-[#94A3B8] bg-[#F1F5F9] rounded-full px-2 py-0.5">Soon</span>
-                  ) : (
-                    isExpanded ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />
-                  )}
+                  🏠 Home
                 </button>
-
-                {isExpanded && !item.locked && item.children.length > 0 && (
-                  <div className="ml-4 mt-1 border-l border-[#E2E8F0] pl-3 flex flex-col gap-1">
-                    {item.children.map((child) => {
-                      if (child.isWorksheet) {
-                        if (child.worksheetUnlocked && child.href) {
-                          return (
-                            <Link
-                              key={child.id}
-                              href={child.href}
-                              className={`flex items-center gap-2 rounded-lg px-2 py-2 text-xs font-semibold transition-all ${
-                                isActive(child.href)
-                                  ? "bg-[#FFF7ED] text-[#F97316]"
-                                  : "text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A]"
-                              }`}
-                            >
-                              <FileText className="h-3 w-3 shrink-0 text-[#22C55E]" />
-                              {child.label}
-                            </Link>
-                          );
-                        }
-                        return (
-                          <div key={child.id}>
-                            <button
-                              type="button"
-                              onClick={(e) => { e.stopPropagation(); setLockedMsg(prev => prev === child.id ? null : child.id); }}
-                              className="w-full flex items-center gap-2 rounded-lg px-2 py-2 text-xs font-semibold text-[#94A3B8] cursor-default"
-                            >
-                              <Lock className="h-3 w-3 shrink-0" />
-                              {child.label}
-                            </button>
-                            <p className="px-2 pb-1 text-[11px] text-[#94A3B8] italic font-normal leading-snug">
-                              Complete the quiz above to unlock
-                            </p>
-                            {lockedMsg === child.id && (
-                              <p className="mt-0.5 mb-1 px-2 text-[11px] text-[#F97316] leading-snug">
-                                Complete the quiz first to unlock this worksheet.
-                              </p>
-                            )}
-                          </div>
-                        );
-                      }
-
-                      return (
-                        <Link
-                          key={child.id}
-                          href={child.href as string}
-                          className={`flex items-center gap-2 rounded-lg px-2 py-2 text-xs font-semibold transition-all ${
-                            isActive(child.href as string)
-                              ? "bg-[#FFF7ED] text-[#F97316]"
-                              : "text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A]"
-                          }`}
-                        >
-                          <div className={`h-2 w-2 rounded-full shrink-0 ${isActive(child.href as string) ? "bg-[#F97316]" : "bg-[#E2E8F0]"}`} />
-                          {child.label}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                )}
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="flex w-full items-center gap-2 px-3 py-2.5 text-sm text-[#111827] hover:bg-[#F9FAFB] transition-colors"
+                >
+                  🚪 Logout
+                </button>
               </div>
-            );
-          })}
+            )}
+          </div>
         </div>
       </aside>
 
       {/* Mobile bottom tab bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-[#E2E8F0] bg-white flex items-center justify-around px-2 py-2">
-        <Link href="/dashboard" className="flex flex-col items-center gap-1 text-[10px] font-semibold text-[#475569]">
-          <Home className="h-5 w-5" />
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-[#0F172A] flex items-center justify-around px-2 py-2">
+        <Link href="/dashboard" className="flex flex-col items-center gap-1 text-[10px] font-semibold text-[#9CA3AF]">
+          <LayoutDashboard className="h-5 w-5" />
           Home
         </Link>
-        <Link href="/subjects/maths/chapters/numbers" className="flex flex-col items-center gap-1 text-[10px] font-semibold text-[#475569]">
+        <Link href="/subjects/maths/chapters/numbers" className="flex flex-col items-center gap-1 text-[10px] font-semibold text-[#22C55E]">
           <Calculator className="h-5 w-5" />
           Math
         </Link>
-        <Link href="/subjects/english/chapters/english-intro" className="flex flex-col items-center gap-1 text-[10px] font-semibold text-[#475569]">
+        <Link href="/subjects/english/chapters/english-intro" className="flex flex-col items-center gap-1 text-[10px] font-semibold text-[#3B82F6]">
           <BookOpen className="h-5 w-5" />
           English
         </Link>
-        <Link href="/subjects/science/chapters/science-intro" className="flex flex-col items-center gap-1 text-[10px] font-semibold text-[#475569]">
+        <Link href="/subjects/science/chapters/science-intro" className="flex flex-col items-center gap-1 text-[10px] font-semibold text-[#F59E0B]">
           <FlaskConical className="h-5 w-5" />
           Science
         </Link>
       </div>
 
-      {/* Right content panel */}
-      <main className="flex-1 min-w-0 overflow-y-auto pb-20 md:pb-0">
-        {children}
+      {/* Main content */}
+      <main className="md:ml-[220px] h-screen overflow-y-auto pb-20 md:pb-0">
+        <div className="mx-auto max-w-[1100px]">
+          {children}
+        </div>
       </main>
+
+      {/* Logout toast */}
+      {showToast && (
+        <div style={{ position: "fixed", top: "20px", right: "20px", background: "#22C55E", color: "white", padding: "12px 20px", borderRadius: "12px", fontSize: "14px", fontWeight: 600, zIndex: 9999, animation: "slideInRight 0.3s ease-out", boxShadow: "0 4px 12px rgba(0,0,0,0.15)", maxWidth: "320px" }}>
+          You have been logged out successfully.
+        </div>
+      )}
+
+      {/* Logout confirmation modal */}
+      {showLogoutModal && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ background: "white", borderRadius: "16px", padding: "32px", maxWidth: "380px", width: "90%", textAlign: "center", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
+            <p style={{ fontSize: "48px", marginBottom: "12px" }}>👋</p>
+            <h2 style={{ fontSize: "22px", fontWeight: 700, color: "#0F172A" }}>Leaving so soon?</h2>
+            <p style={{ fontSize: "14px", color: "#6B7280", marginTop: "8px" }}>Your progress is saved. We&apos;ll be here when you come back.</p>
+            <div style={{ display: "flex", gap: "12px", justifyContent: "center", marginTop: "24px" }}>
+              <button
+                type="button"
+                onClick={() => setShowLogoutModal(false)}
+                style={{ background: "#22C55E", color: "white", borderRadius: "9999px", padding: "10px 24px", fontWeight: 600, border: "none", cursor: "pointer", fontSize: "14px" }}
+              >
+                Stay &amp; Learn
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmLogout}
+                style={{ background: "white", border: "1.5px solid #EF4444", color: "#EF4444", borderRadius: "9999px", padding: "10px 24px", fontWeight: 600, cursor: "pointer", fontSize: "14px" }}
+              >
+                Yes, Log out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

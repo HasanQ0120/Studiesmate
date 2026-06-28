@@ -1,233 +1,352 @@
 "use client";
 
+import { useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import Reveal from "@/components/Reveal";
-import HeroStatCard from "@/components/HeroStatCard";
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/auth";
-
-const SUBJECT_PREVIEW = [
-  "Math",
-  "English",
-  "Science",
-];
 
 export default function HomePage() {
   const router = useRouter();
 
-  const [displayText, setDisplayText] = useState("");
-  const fullText = "Smart learning for school students, without stress.";
+  const [demoLang, setDemoLang] = useState<"english" | "urdu">("english");
+  const demoEnRef = useRef<HTMLVideoElement>(null);
+  const demoUrRef = useRef<HTMLVideoElement>(null);
 
-  useEffect(() => {
-    let i = 0;
-    const timer = setInterval(() => {
-      if (i < fullText.length) {
-        setDisplayText(fullText.slice(0, i + 1));
-        i++;
-      } else {
-        clearInterval(timer);
-      }
-    }, 40);
-    return () => clearInterval(timer);
-  }, []);
+  function handleDemoLangSwitch(newLang: "english" | "urdu") {
+    if (newLang === demoLang) return;
+    const activeRef = demoLang === "english" ? demoEnRef : demoUrRef;
+    const nextRef = newLang === "english" ? demoEnRef : demoUrRef;
+    const currentTime = activeRef.current?.currentTime ?? 0;
+    activeRef.current?.pause();
+    if (nextRef.current) {
+      nextRef.current.currentTime = currentTime;
+    }
+    setDemoLang(newLang);
+    nextRef.current?.play().catch(() => {});
+  }
 
   const handleStartBeta = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        router.push('/dashboard');
+        router.push("/dashboard");
       } else {
-        router.push('/signup');
+        router.push("/signup");
       }
     } catch {
-      router.push('/signup');
+      router.push("/signup");
     }
   };
 
   return (
-    <main className="min-h-screen bg-white text-slate-900">
-      {/* HERO (Blue) */}
-      <section className="bg-[#0B2B5A] text-white">
-        <div className="mx-auto max-w-6xl px-4 py-16 md:py-20">
-          <div className="flex flex-col md:flex-row md:items-center md:gap-16">
-            <Reveal className="max-w-3xl md:flex-1">
-              <p className="text-sm font-medium text-white/80 transition-colors duration-200">
-                Learn calmly, one small step at a time.
-              </p>
+    <main className="min-h-screen bg-white text-[#111827]">
 
-              <h1 className="mt-4 text-4xl font-semibold leading-tight tracking-tight md:text-5xl">
-                {displayText}<span className="animate-pulse">|</span>
+      {/* ── SECTION 1: HERO ── */}
+      <section className="bg-[#F9FAFB]">
+        <div className="mx-auto max-w-6xl px-4 py-16 md:py-24">
+          <div className="flex flex-col items-center gap-12 md:flex-row md:items-center md:gap-16">
+
+            {/* Left */}
+            <div className="flex-1">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#DCFCE7] px-3 py-1 text-xs font-semibold text-[#16A34A]">
+                ⚡ Free Beta
+              </span>
+
+              <h1 className="mt-5 text-4xl font-bold leading-tight tracking-tight text-[#111827] md:text-5xl">
+                Smart learning for school students{" "}
+                <span className="text-[#22C55E]">without stress</span>
               </h1>
 
-              <p className="mt-5 text-base leading-7 text-white/85 md:text-lg">
-                StudiesMate helps students practice daily with simple, bilingual
-                lessons while parents stay informed and confident.
+              <p className="mt-5 text-base leading-7 text-[#6B7280] md:text-lg">
+                Bilingual video lessons in English and Urdu for Grades 1–8. Watch, quiz, and practice — designed for Pakistani school students.
               </p>
 
               <div className="mt-8 flex flex-wrap items-center gap-3">
                 <button
                   type="button"
                   onClick={handleStartBeta}
-                  className="rounded-xl bg-white px-5 py-3 text-sm font-semibold text-[#0B2B5A] transition-all duration-200 hover:bg-white/95 hover:-translate-y-0.5 active:translate-y-0 animate-pulse hover:animate-none"
+                  className="rounded-full bg-[#22C55E] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#16A34A]"
                 >
-                  Start Free Beta
+                  Start Free Beta →
                 </button>
                 <Link
                   href="/phase-1"
-                  className="rounded-xl border border-white/30 px-5 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-white/10 hover:-translate-y-0.5 active:translate-y-0"
+                  className="rounded-full border border-[#D1D5DB] bg-white px-6 py-3 text-sm font-semibold text-[#374151] transition-colors hover:border-[#9CA3AF]"
                 >
-                  View Plans
+                  ▶ Watch Demo
                 </Link>
               </div>
 
-              <div className="mt-6 inline-flex rounded-lg bg-white/10 px-3 py-2 text-xs text-white/80 transition-colors duration-200 hover:bg-white/15">
-                No ads • Calm experience • Guided learning
-              </div>
-
-              {/* Proof strip (small, no layout shift) */}
-              <div className="mt-4 flex flex-wrap gap-2">
-                {[
-                  "Parent-friendly",
-                  "Urdu + English support",
-                  "Short daily lessons",
-                  "Bilingual Learning",
-                ].map((t) => (
-                  <span
-                    key={t}
-                    className="rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs text-white/85 transition-all duration-200 hover:bg-white/10 hover:border-white/30"
-                  >
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </Reveal>
-
-            {/* Floating stat card — desktop only */}
-            <div className="hidden md:flex flex-shrink-0 items-center justify-center">
-              <HeroStatCard />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* HOW IT WORKS (White) */}
-      <section className="bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-14">
-          <Reveal>
-            <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-              <div>
-                <h2 className="text-xl font-semibold">How it works</h2>
-                <p className="mt-2 max-w-2xl text-sm text-slate-700">
-                  A simple routine students can follow daily. Clear steps, small
-                  effort, steady progress.
-                </p>
-              </div>
+              <p className="mt-4 text-xs text-[#9CA3AF]">
+                No credit card required · Free Beta access · Cancel anytime
+              </p>
             </div>
 
-            <div className="mt-8 grid gap-5 md:grid-cols-3">
-              {[
-                {
-                  step: "Step 1",
-                  title: "Choose a subject",
-                  desc: "Math, English, and Science — all unlocked in Beta with one lesson and one quiz each.",
-                },
-                {
-                  step: "Step 2",
-                  title: "Learn in small steps",
-                  desc: "Short explanations designed for understanding, not memorizing.",
-                },
-                {
-                  step: "Step 3",
-                  title: "Practice and improve",
-                  desc: "Quick checks build confidence and make progress visible over time.",
-                },
-              ].map((c, idx) => (
-                <Reveal key={c.step} delayMs={idx * 80}>
-                  <div className="rounded-2xl border border-slate-200 bg-white p-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)] hover:border-[#0F1F3D]">
-                    <div className="text-sm font-medium text-slate-600">{c.step}</div>
-                    <div className="mt-2 text-lg font-semibold tracking-tight">
-                      {c.title}
-                    </div>
-                    <p className="mt-2 text-sm leading-6 text-slate-700">{c.desc}</p>
+            {/* Right — Student card */}
+            <div className="w-full flex-shrink-0 md:w-80">
+              <div className="rounded-2xl bg-white p-6 shadow-[0_8px_40px_rgba(0,0,0,0.1)]">
+                {/* Student header */}
+                <div className="flex items-center gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#0F172A] text-sm font-bold text-white">AR</div>
+                  <div>
+                    <div className="text-sm font-semibold text-[#111827]">Ahmed Raza</div>
+                    <div className="text-xs text-[#6B7280]">Beta · Mathematics</div>
                   </div>
-                </Reveal>
-              ))}
-            </div>
-          </Reveal>
-        </div>
-      </section>
+                  <span className="ml-auto flex items-center gap-1 rounded-full bg-[#DCFCE7] px-2 py-0.5 text-xs font-medium text-[#16A34A]">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#22C55E]" />
+                    Active
+                  </span>
+                </div>
 
-      {/* FOCUS (Blue section + image on right) */}
-      <section className="bg-[#0B2B5A] text-white">
-        <div className="mx-auto max-w-6xl px-4 py-16">
-          <div className="grid items-start gap-10 md:grid-cols-2">
-            <Reveal>
-              <div>
-                <h3 className="text-2xl font-semibold tracking-tight md:text-3xl">
-                  What StudiesMate focuses on
-                </h3>
-                <p className="mt-3 max-w-xl text-base leading-7 text-white/80 md:text-lg">
-                  Simple learning that works daily. No clutter, no pressure.
-                </p>
-
-                <div className="mt-8 space-y-4">
+                {/* Progress bars */}
+                <div className="mt-5 space-y-3">
                   {[
-                    {
-                      title: "Clarity first",
-                      desc: "Short explanations that focus on understanding, not memorizing.",
-                    },
-                    {
-                      title: "Practice that builds confidence",
-                      desc: "Small checks that reinforce learning without overwhelming students.",
-                    },
-                    {
-                      title: "Bilingual support",
-                      desc: "Help in Urdu and English so students don’t get stuck because of language. Urdu is support language here, not a separate subject.",
-                    },
-                  ].map((c, idx) => (
-                    <Reveal key={c.title} delayMs={idx * 90}>
-                      <div className="rounded-2xl border border-white/15 bg-white/10 p-6 transition-all duration-200 hover:bg-white/15 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)] hover:border-[#0F1F3D]">
-                        <h4 className="text-lg font-semibold md:text-xl">{c.title}</h4>
-                        <p className="mt-2 text-sm leading-6 text-white/80 md:text-base">
-                          {c.desc}
-                        </p>
+                    { label: "Mathematics", pct: 68, color: "#22C55E" },
+                    { label: "English", pct: 45, color: "#3B82F6" },
+                    { label: "Science", pct: 82, color: "#F97316" },
+                  ].map(({ label, pct, color }) => (
+                    <div key={label}>
+                      <div className="mb-1 flex justify-between text-xs">
+                        <span className="text-[#374151]">{label}</span>
+                        <span className="font-medium text-[#374151]">{pct}%</span>
                       </div>
-                    </Reveal>
+                      <div className="h-2 overflow-hidden rounded-full bg-[#F3F4F6]">
+                        <div className="h-2 rounded-full" style={{ width: `${pct}%`, backgroundColor: color }} />
+                      </div>
+                    </div>
                   ))}
                 </div>
-              </div>
-            </Reveal>
 
-            <Reveal delayMs={120}>
-              <div className="relative mt-6 md:mt-16">
-                <div className="mt-12 overflow-hidden rounded-2xl border border-white/15 bg-white/5 shadow-lg transition-all duration-300 hover:shadow-xl">
-                  <Image
-                    src="/images/picture.png"
-                    alt="Student learning"
-                    width={1200}
-                    height={900}
-                    className="h-auto w-full object-cover transition-transform duration-500 hover:scale-[1.02]"
-                    priority
-                  />
-                </div>
               </div>
-            </Reveal>
+            </div>
+
           </div>
         </div>
       </section>
 
-      {/* FOUNDERS NOTE (White) */}
-      <section className="bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-14">
-          <Reveal>
-            <div style={{border: "1px solid #E2E8F0", borderRadius: "16px", padding: "32px", boxShadow: "0 4px 20px rgba(0,0,0,0.06)"}} className="bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)]">
-              <div className="flex items-center gap-4 mb-6">
-                <img src="/owl-icon.png" alt="StudiesMate" className="h-12 w-12 rounded-full" />
-                <h2 className="text-xl font-semibold text-slate-900">A note from the founders</h2>
+      {/* ── SECTION 2: HOW IT WORKS ── */}
+      <section className="bg-[#F9FAFB]">
+        <div className="mx-auto max-w-6xl px-4 py-16">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-[#111827]">How StudiesMate Works</h2>
+            <p className="mt-3 text-base text-[#6B7280]">Three simple steps to better grades — in English or Urdu</p>
+          </div>
+
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {[
+              {
+                num: "01",
+                iconBg: "#DCFCE7",
+                iconColor: "#22C55E",
+                icon: (
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                ),
+                title: "Watch a Short Lesson",
+                desc: "Bite-sized video lessons designed for the Pakistani curriculum. Toggle between English and Urdu anytime.",
+              },
+              {
+                num: "02",
+                iconBg: "#DBEAFE",
+                iconColor: "#3B82F6",
+                icon: (
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                  </svg>
+                ),
+                title: "Take the Quiz",
+                desc: "Quick quizzes after each lesson reinforce learning. Instant feedback so students know what to review.",
+              },
+              {
+                num: "03",
+                iconBg: "#FEF3C7",
+                iconColor: "#F97316",
+                icon: (
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                ),
+                title: "Download the Worksheet",
+                desc: "Print and practice on paper. Parents can track results on the connected dashboard.",
+              },
+            ].map(({ num, iconBg, iconColor, icon, title, desc }) => (
+              <div key={num} className="relative overflow-hidden rounded-2xl bg-white p-6 shadow-sm">
+                <div className="text-6xl font-black text-[#F3F4F6] absolute right-4 top-2 leading-none select-none">{num}</div>
+                <div className="relative">
+                  <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl" style={{ backgroundColor: iconBg, color: iconColor }}>
+                    {icon}
+                  </div>
+                  <h3 className="mt-4 text-lg font-bold text-[#111827]">{title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-[#6B7280]">{desc}</p>
+                </div>
               </div>
-              <div className="mt-5 space-y-4 text-sm leading-7 text-slate-700">
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── SECTION 3: SUBJECTS ── */}
+      <section className="bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-16">
+          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div>
+              <h2 className="text-3xl font-bold text-[#111827]">Subjects for Grade 1–8</h2>
+              <p className="mt-2 text-base text-[#6B7280]">Aligned with the Pakistani national curriculum</p>
+            </div>
+            <Link href="/phase-1" className="text-sm font-semibold text-[#22C55E] hover:text-[#16A34A]">View all grades →</Link>
+          </div>
+
+          <div className="mt-10 grid gap-6 md:grid-cols-3">
+            {/* Mathematics */}
+            <div className="rounded-2xl bg-[#F0FDF4] p-6">
+              <div className="flex items-start justify-between">
+                <span className="inline-flex rounded-full bg-[#DCFCE7] px-3 py-1 text-xs font-semibold text-[#16A34A]">Grade 1–8</span>
+                <span className="text-2xl">🧮</span>
+              </div>
+              <h3 className="mt-4 text-lg font-bold text-[#111827]">Mathematics</h3>
+              <ul className="mt-3 space-y-1.5">
+                {["Numbers & Place Value", "Addition & Subtraction", "Multiplication", "Fractions"].map((t) => (
+                  <li key={t} className="flex items-center gap-2 text-sm text-[#374151]">
+                    <span className="text-[#22C55E]">✓</span>{t}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-5 flex items-center justify-between">
+                <span className="text-xs text-[#6B7280]">1 lesson in Beta</span>
+                <Link href="/signup" className="text-sm font-semibold text-[#22C55E] hover:text-[#16A34A]">Start →</Link>
+              </div>
+            </div>
+
+            {/* English */}
+            <div className="rounded-2xl bg-[#EFF6FF] p-6">
+              <div className="flex items-start justify-between">
+                <span className="inline-flex rounded-full bg-[#DBEAFE] px-3 py-1 text-xs font-semibold text-[#2563EB]">Grade 1–8</span>
+                <span className="text-2xl">📚</span>
+              </div>
+              <h3 className="mt-4 text-lg font-bold text-[#111827]">English</h3>
+              <ul className="mt-3 space-y-1.5">
+                {["Simple Sentences", "Reading Comprehension", "Grammar Basics", "Creative Writing"].map((t) => (
+                  <li key={t} className="flex items-center gap-2 text-sm text-[#374151]">
+                    <span className="text-[#3B82F6]">✓</span>{t}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-5 flex items-center justify-between">
+                <span className="text-xs text-[#6B7280]">1 lesson in Beta</span>
+                <Link href="/signup" className="text-sm font-semibold text-[#3B82F6] hover:text-[#2563EB]">Start →</Link>
+              </div>
+            </div>
+
+            {/* Science */}
+            <div className="rounded-2xl bg-[#FEFCE8] p-6">
+              <div className="flex items-start justify-between">
+                <span className="inline-flex rounded-full bg-[#FEF3C7] px-3 py-1 text-xs font-semibold text-[#D97706]">Grade 1–8</span>
+                <span className="text-2xl">🔬</span>
+              </div>
+              <h3 className="mt-4 text-lg font-bold text-[#111827]">Science</h3>
+              <ul className="mt-3 space-y-1.5">
+                {["Habitats & Animals", "Plants & Growth", "Human Body", "Earth & Space"].map((t) => (
+                  <li key={t} className="flex items-center gap-2 text-sm text-[#374151]">
+                    <span className="text-[#F97316]">✓</span>{t}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-5 flex items-center justify-between">
+                <span className="text-xs text-[#6B7280]">1 lesson in Beta</span>
+                <Link href="/signup" className="text-sm font-semibold text-[#F97316] hover:text-[#EA580C]">Start →</Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── SECTION 4: BILINGUAL FEATURE ── */}
+      <section className="bg-[#0F172A] text-white">
+        <div className="mx-auto max-w-6xl px-4 py-16">
+          <div className="grid items-center gap-12 md:grid-cols-2">
+
+            {/* Left */}
+            <div>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#14532D] px-3 py-1 text-xs font-semibold text-[#22C55E]">
+                🌐 Unique Feature
+              </span>
+              <h2 className="mt-5 text-3xl font-bold leading-tight md:text-4xl">
+                Learn in English,{" "}
+                <span className="text-[#22C55E]">switch to Urdu</span>{" "}
+                instantly
+              </h2>
+              <p className="mt-4 text-base leading-7 text-white/70">
+                Our Bilingual Slider lets students watch the same lesson in English or Roman Urdu — switching at any point without losing their place.
+              </p>
+              <ul className="mt-6 space-y-3">
+                {[
+                  "Same video timestamp, different language",
+                  "Roman Urdu narration for all Grade 1 lessons",
+                  "Practice questions in both languages",
+                  "Built for the Pakistani classroom",
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-sm text-white/80">
+                    <span className="mt-0.5 font-bold text-[#22C55E]">✓</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Right — interactive demo video */}
+            <div className="rounded-2xl bg-[#1E293B] p-6">
+              <div className="flex overflow-hidden rounded-lg border border-white/10 mb-4 w-fit">
+                <button
+                  type="button"
+                  onClick={() => handleDemoLangSwitch("english")}
+                  className={`px-4 py-1.5 text-xs font-semibold transition-colors ${demoLang === "english" ? "bg-[#22C55E] text-white" : "text-white/50 hover:text-white"}`}
+                >
+                  English
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDemoLangSwitch("urdu")}
+                  className={`px-4 py-1.5 text-xs font-semibold transition-colors ${demoLang === "urdu" ? "bg-[#22C55E] text-white" : "text-white/50 hover:text-white"}`}
+                >
+                  اردو
+                </button>
+              </div>
+              <video
+                ref={demoEnRef}
+                src="https://studiesmate.b-cdn.net/simple_sentence_english.mp4.mp4"
+                controls
+                width="100%"
+                style={{ borderRadius: "12px", background: "black", display: demoLang === "english" ? "block" : "none" }}
+              />
+              <video
+                ref={demoUrRef}
+                src="https://studiesmate.b-cdn.net/Copy%20of%20StudiesMate_SimpleSentences_Grade4_v3.pptx.mp4"
+                controls
+                width="100%"
+                style={{ borderRadius: "12px", background: "black", display: demoLang === "urdu" ? "block" : "none" }}
+              />
+              <div className="mt-4">
+                <div className="text-sm font-semibold text-white">Simple Sentences</div>
+                <div className="mt-1 text-xs text-white/50">English · Beta · 1:50</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ── SECTION 5: FOUNDER NOTE ── */}
+      <section className="bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-16">
+          <div className="mx-auto max-w-2xl">
+            <div className="rounded-2xl border border-[#E5E7EB] bg-white p-8 shadow-[0_4px_20px_rgba(0,0,0,0.06)]">
+              <div className="text-center">
+                <img src="/favicon.png" alt="StudiesMate" style={{ width: "48px", height: "48px", borderRadius: "8px", marginBottom: "12px", display: "inline-block" }} />
+              </div>
+              <p className="text-center text-base font-bold text-[#111827] w-full">A note from the founders</p>
+              <div className="mt-5 space-y-4 text-sm leading-7 text-[#6B7280]">
                 <p>
                   My name is Muhammad Hasan. I am 18 years old, from Karachi. I built StudiesMate because I saw students around me struggling — not because they weren't smart, but because concepts were being taught in a language they hadn't fully mastered yet.
                 </p>
@@ -241,175 +360,15 @@ export default function HomePage() {
                   We are just getting started. But we are building this the right way — slowly, with your child's understanding as the only goal.
                 </p>
               </div>
-              <p className="mt-6 text-sm font-medium text-[#0B2B5A]">
+              <p className="mt-6 text-sm font-semibold text-[#0F172A]">
                 — Muhammad Hasan &amp; Muhammad Umer, Founders of StudiesMate
               </p>
             </div>
-          </Reveal>
+
+          </div>
         </div>
       </section>
 
-      {/* WHAT HAPPENS AFTER BETA (White) */}
-      <section className="bg-white">
-        <div className="mx-auto max-w-6xl px-4 pb-14">
-          <Reveal>
-            <div style={{border: "1px solid #E2E8F0", borderRadius: "16px", padding: "32px", boxShadow: "0 4px 20px rgba(0,0,0,0.06)"}} className="bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)]">
-              <h2 className="text-xl font-semibold text-slate-900">What happens after Beta?</h2>
-              <div className="mt-5 space-y-4 text-sm leading-7 text-slate-700">
-                <p>
-                  Beta is just the beginning. Grade 4 full course launches in July. After that we expand one grade at a time only when content is ready and quality is confirmed. No rushing. No compromise on quality.
-                </p>
-                <p>
-                  Your child's understanding is the only thing that matters to us.
-                </p>
-              </div>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* WHY DIFFERENT (Blue) */}
-      <section className="bg-[#0B2B5A] text-white">
-        <div className="mx-auto max-w-6xl px-4 py-16">
-          <Reveal>
-            <h3 className="text-2xl font-semibold tracking-tight md:text-3xl">
-              Why StudiesMate feels different
-            </h3>
-            <p className="mt-3 max-w-2xl text-base leading-7 text-white/80 md:text-lg">
-              Calm design, clear structure, and controlled learning. No noise.
-            </p>
-
-            <div className="mt-10 grid gap-5 md:grid-cols-2">
-              <Reveal delayMs={0}>
-                <div className="rounded-2xl border border-white/15 bg-white/10 p-6 transition-all duration-200 hover:bg-white/15 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)] hover:border-[#0F1F3D]">
-                  <h4 className="text-lg font-semibold md:text-xl">Built for trust</h4>
-                  <p className="mt-2 text-sm leading-6 text-white/80 md:text-base">
-                    Parent-friendly layout, calm tone, and clear expectations.
-                  </p>
-                </div>
-              </Reveal>
-
-              <Reveal delayMs={80}>
-                <div className="rounded-2xl border border-white/15 bg-white/10 p-6 transition-all duration-200 hover:bg-white/15 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)] hover:border-[#0F1F3D]">
-                  <h4 className="text-lg font-semibold md:text-xl">
-                    No ads, no distractions
-                  </h4>
-                  <p className="mt-2 text-sm leading-6 text-white/80 md:text-base">
-                    A clean experience that helps students focus on learning.
-                  </p>
-                </div>
-              </Reveal>
-
-              {/* Card 3 - centered under the first two (no other layout changes) */}
-              <div className="md:col-span-2 flex justify-center">
-                <Reveal delayMs={140} className="w-full max-w-3xl">
-                  <div className="rounded-2xl border border-white/15 bg-white/10 p-6 transition-all duration-200 hover:bg-white/15 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)] hover:border-[#0F1F3D]">
-                    <h4 className="text-lg font-semibold md:text-xl">
-                      Bilingual support
-                    </h4>
-                    <p className="mt-2 text-sm leading-6 text-white/80 md:text-base">
-                      Help is available in English and Urdu so language doesn’t block
-                      learning. Urdu is support language, not a subject track.
-                    </p>
-                  </div>
-                </Reveal>
-              </div>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* SUBJECTS AREA (White) */}
-      <section className="bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-14">
-          <Reveal>
-            <div className="flex items-end justify-between gap-6">
-              <div>
-                <h3 className="text-xl font-semibold">Subjects</h3>
-                <p className="mt-2 text-sm text-slate-700">
-                  Three subjects. One lesson and one quiz each. Completely free.
-                </p>
-              </div>
-            </div>
-
-            {/* Subject preview (small add, no section re-order) */}
-            <div className="mt-5 flex flex-wrap gap-2">
-              {SUBJECT_PREVIEW.map((s, idx) => (
-                <Reveal key={s} delayMs={idx * 35}>
-                  <span className="inline-flex rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-700 transition-all duration-200 hover:border-slate-300 hover:bg-slate-50">
-                    {s}
-                  </span>
-                </Reveal>
-              ))}
-            </div>
-
-            <div className="mt-8">
-              <div className="rounded-2xl border border-white/15 bg-[#0B2B5A] p-7 text-white transition-all duration-200 hover:shadow-xl md:flex md:items-center md:justify-between">
-                <div className="max-w-2xl">
-                  <h3 className="text-xl font-semibold">
-                    Start with calm, consistent learning
-                  </h3>
-                  <p className="mt-2 text-sm leading-6 text-white/80">
-                    Beta is free — no payment, no commitment. Math, English, and Science included.
-                  </p>
-                </div>
-                <div className="mt-5 flex flex-wrap gap-3 md:mt-0">
-                  <button
-                    type="button"
-                    onClick={handleStartBeta}
-                    className="inline-flex rounded-xl bg-white px-5 py-3 text-sm font-semibold text-[#0B2B5A] transition-all duration-200 hover:bg-white/95 hover:-translate-y-0.5"
-                  >
-                    Get started
-                  </button>
-                  <Link
-                    href="/phase-1"
-                    className="inline-flex rounded-xl border border-white/30 px-5 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-white/10 hover:-translate-y-0.5"
-                  >
-                    View Plans
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* PARENT SECTION (White) */}
-      <section className="bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-14">
-          <Reveal>
-            <div className="rounded-2xl border border-slate-200 bg-white p-7 transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)] hover:border-[#0F1F3D]">
-              <h3 className="text-xl font-semibold">For Parents</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-700 max-w-2xl">
-                StudiesMate is designed with parents in mind. No ads, no
-                distractions — just calm, focused learning your child can do
-                independently. You stay in control of what they access.
-              </p>
-              <div className="mt-6 grid gap-4 sm:grid-cols-3">
-                {[
-                  {
-                    title: "Safe by design",
-                    desc: "No external links, no ads, no social features.",
-                  },
-                  {
-                    title: "Short sessions",
-                    desc: "Lessons take under 10 minutes. Easy to fit in daily.",
-                  },
-                  {
-                    title: "Bilingual support",
-                    desc: "Urdu support built in so language isn't a barrier.",
-                  },
-                ].map((c) => (
-                  <div key={c.title} className="rounded-xl border border-slate-200 p-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,31,61,0.12)] hover:border-[#0F1F3D]">
-                    <div className="text-sm font-semibold">{c.title}</div>
-                    <p className="mt-1 text-sm text-slate-600">{c.desc}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Reveal>
-        </div>
-      </section>
     </main>
   );
 }
