@@ -36,6 +36,17 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Section 1b — Vision */}
+      <section className="bg-[#F9FAFB] px-4 py-16 text-center">
+        <div className="mx-auto max-w-5xl">
+          <div className="text-5xl" style={{ margin: "0 auto" }}>🌍</div>
+          <h2 className="mt-4 text-2xl font-bold text-[#111827]">Our Vision</h2>
+          <p className="mt-4 text-base leading-7 text-[#374151]" style={{ maxWidth: "700px", margin: "16px auto 0" }}>
+            We believe every Pakistani student deserves to actually understand what they&apos;re learning — not just memorize it for an exam. StudiesMate is built on a simple idea: teach clearly, in the language students think in, and never overwhelm them with more than they need. No gimmicks, no pressure — just honest lessons that respect how kids really learn.
+          </p>
+        </div>
+      </section>
+
       {/* Section 2 — What We Offer */}
       <section className="bg-[#F9FAFB] px-4 py-16">
         <div className="mx-auto max-w-5xl">

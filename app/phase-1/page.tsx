@@ -1,24 +1,27 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/auth";
+import AuthModal from "@/components/AuthModal";
 
 const GRADES = [
-  { name: "Beta",    isBeta: true },
-  { name: "Grade 1", isBeta: false },
-  { name: "Grade 2", isBeta: false },
-  { name: "Grade 3", isBeta: false },
-  { name: "Grade 4", isBeta: false },
-  { name: "Grade 5", isBeta: false },
-  { name: "Grade 6", isBeta: false },
-  { name: "Grade 7", isBeta: false },
-  { name: "Grade 8", isBeta: false },
+  { name: "Beta",    isBeta: true,  price: undefined },
+  { name: "Grade 1", isBeta: false, price: undefined },
+  { name: "Grade 2", isBeta: false, price: undefined },
+  { name: "Grade 3", isBeta: false, price: undefined },
+  { name: "Grade 4", isBeta: false, price: "Rs. 1,500/mo" },
+  { name: "Grade 5", isBeta: false, price: undefined },
+  { name: "Grade 6", isBeta: false, price: undefined },
+  { name: "Grade 7", isBeta: false, price: undefined },
+  { name: "Grade 8", isBeta: false, price: undefined },
 ];
 
 export default function GradesPage() {
+  const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
+  const [authModalOpen, setAuthModalOpen] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -66,6 +69,19 @@ export default function GradesPage() {
 
                 {/* Grade name */}
                 <h2 className="mt-4 text-xl font-bold text-[#111827]">{g.name}</h2>
+                {g.price && (
+                  <p style={{
+                    fontSize: "28px",
+                    fontWeight: 800,
+                    background: "linear-gradient(135deg, #22C55E, #0F172A)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    marginTop: "8px",
+                    marginBottom: "8px",
+                  }}>
+                    Rs. 1,500<span style={{ fontSize: "16px", fontWeight: 600 }}>/month</span>
+                  </p>
+                )}
 
                 {/* Expandable */}
                 <button
@@ -84,12 +100,16 @@ export default function GradesPage() {
                 {/* Button */}
                 <div className="mt-5 flex-1 flex items-end">
                   {g.isBeta ? (
-                    <Link
-                      href={isLoggedIn ? "/dashboard" : "/signup"}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (isLoggedIn) router.push("/dashboard");
+                        else setAuthModalOpen(true);
+                      }}
                       className="flex w-full items-center justify-center rounded-xl bg-[#22C55E] py-3 text-sm font-semibold text-white hover:bg-[#16A34A] transition-colors"
                     >
                       Start Free →
-                    </Link>
+                    </button>
                   ) : (
                     <button
                       type="button"
@@ -105,6 +125,12 @@ export default function GradesPage() {
           })}
         </div>
       </div>
+
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        initialMode="signup"
+      />
     </main>
   );
 }

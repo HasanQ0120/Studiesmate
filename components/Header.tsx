@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { supabase } from "@/lib/auth";
+import AuthModal from "@/components/AuthModal";
 
 type SbMeta = {
   studentName?: string;
@@ -21,6 +22,8 @@ export default function Header() {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<"login" | "signup">("login");
 
   const menuRef = useRef<HTMLDivElement | null>(null);
   const mobileRef = useRef<HTMLDivElement | null>(null);
@@ -77,6 +80,7 @@ export default function Header() {
   ];
 
   return (
+    <>
     <header className="sticky top-0 z-50 border-b border-[#F3F4F6] bg-white">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
 
@@ -117,15 +121,15 @@ export default function Header() {
                 <div className="mx-auto max-w-6xl px-4 py-3">
                   <div className="grid grid-cols-2 gap-1 text-sm">
                     {navLinks.map(({ label, href }) => (
-                      <Link key={label} href={href} onClick={closeMobileNav} className="rounded-lg px-3 py-2 text-[#374151] hover:text-[#22C55E]">{label}</Link>
+                      <Link key={label} href={href} onClick={closeMobileNav} className={`rounded-lg px-3 py-2 ${pathname === href ? "text-[#22C55E] font-semibold" : "text-[#374151] hover:text-[#22C55E]"}`}>{label}</Link>
                     ))}
                     {!isLoggedIn ? (
                       <>
-                        <Link href="/login" onClick={closeMobileNav} className="rounded-lg px-3 py-2 text-[#374151] hover:text-[#22C55E]">Login</Link>
-                        <Link href="/signup" onClick={closeMobileNav} className="rounded-lg px-3 py-2 text-[#374151] hover:text-[#22C55E]">Sign Up</Link>
+                        <button type="button" onClick={() => { closeMobileNav(); setAuthMode("login"); setAuthModalOpen(true); }} className="rounded-lg px-3 py-2 text-[#374151] hover:text-[#22C55E] text-left">Login</button>
+                        <button type="button" onClick={() => { closeMobileNav(); setAuthMode("signup"); setAuthModalOpen(true); }} className="rounded-lg px-3 py-2 text-[#374151] hover:text-[#22C55E] text-left">Sign Up</button>
                       </>
                     ) : (
-                      <Link href="/dashboard" onClick={closeMobileNav} className="rounded-lg px-3 py-2 text-[#374151] hover:text-[#22C55E]">Dashboard</Link>
+                      <Link href="/dashboard" onClick={closeMobileNav} className={`rounded-lg px-3 py-2 ${pathname === "/dashboard" ? "text-[#22C55E] font-semibold" : "text-[#374151] hover:text-[#22C55E]"}`}>Dashboard</Link>
                     )}
                   </div>
                 </div>
@@ -136,12 +140,20 @@ export default function Header() {
           {/* Auth */}
           {!isLoggedIn ? (
             <>
-              <Link href="/login" className="hidden text-sm font-medium text-[#374151] transition-colors hover:text-[#22C55E] md:inline">
+              <button
+                type="button"
+                onClick={() => { setAuthMode("login"); setAuthModalOpen(true); }}
+                className="hidden text-sm font-medium text-[#374151] transition-colors hover:text-[#22C55E] md:inline"
+              >
                 Login
-              </Link>
-              <Link href="/signup" className="hidden rounded-full bg-[#22C55E] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#16A34A] md:inline-flex">
+              </button>
+              <button
+                type="button"
+                onClick={() => { setAuthMode("signup"); setAuthModalOpen(true); }}
+                className="hidden rounded-full bg-[#22C55E] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#16A34A] md:inline-flex"
+              >
                 Start Free Beta
-              </Link>
+              </button>
             </>
           ) : (
             <>
@@ -171,5 +183,12 @@ export default function Header() {
         </div>
       </div>
     </header>
+
+    <AuthModal
+      isOpen={authModalOpen}
+      onClose={() => setAuthModalOpen(false)}
+      initialMode={authMode}
+    />
+    </>
   );
 }

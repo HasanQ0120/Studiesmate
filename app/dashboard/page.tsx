@@ -29,6 +29,7 @@ export default function DashboardPage() {
   const [lessonCompletions, setLessonCompletions] = useState<Record<string, string>>({});
   const [lastActivityData, setLastActivityData] = useState<LastActivityData | null>(null);
   const [streak, setStreak] = useState(1);
+  const [currentStreak, setCurrentStreak] = useState(0);
   const [lastLessons, setLastLessons] = useState({ math: "", english: "", science: "" });
 
   const [explainCredits, setExplainCredits] = useState<number>(4);
@@ -58,6 +59,21 @@ export default function DashboardPage() {
       }
     };
     fetchCredits();
+  }, []);
+
+  // ── Supabase streak fetch ──
+  useEffect(() => {
+    const fetchStreak = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      const { data } = await supabase
+        .from("profiles")
+        .select("current_streak")
+        .eq("id", session.user.id)
+        .single();
+      if (data) setCurrentStreak(data.current_streak ?? 0);
+    };
+    fetchStreak();
   }, []);
 
   // ── Explain credits countdown ──
@@ -227,6 +243,19 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-[#F9FAFB] px-6 py-8 pb-24 md:pb-10" style={{ animation: "fadeIn 0.4s ease-out" }}>
         <div className="mx-auto max-w-5xl">
 
+          {/* ── MOBILE HOME BUTTON ── */}
+          <div className="md:hidden mb-4">
+            <button
+              type="button"
+              onClick={() => router.push("/")}
+              style={{ background: "none", border: "none", cursor: "pointer", padding: "4px", color: "#6B7280", display: "inline-flex", alignItems: "center" }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+            </button>
+          </div>
+
           {/* ── GREETING ── */}
           <div className="mb-6">
             <div className="flex items-start justify-between gap-4">
@@ -242,9 +271,15 @@ export default function DashboardPage() {
                 )}
               </div>
             </div>
-            <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#FEF3C7] px-3 py-1 text-xs font-semibold text-[#92400E]">
-              🔥 {streak} Day Streak{streak === 1 ? " — keep it up!" : ""}
-            </div>
+            {currentStreak > 0 ? (
+              <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#FEF3C7] px-3 py-1 text-xs font-semibold text-[#92400E]">
+                🔥 {currentStreak} Day Streak — keep it up!
+              </div>
+            ) : (
+              <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#F3F4F6] px-3 py-1 text-xs font-semibold text-[#6B7280]">
+                Start your streak today!
+              </div>
+            )}
           </div>
 
           {/* ── GRADE PROGRESS ── */}

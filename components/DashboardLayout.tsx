@@ -7,6 +7,7 @@ import {
   LayoutDashboard, Calculator, BookOpen, FlaskConical,
   ChevronDown, ChevronRight, FileText,
   PlayCircle, HelpCircle, TrendingUp, Home,
+  Copy, Check, Eye, EyeOff,
 } from "lucide-react";
 import { supabase } from "@/lib/auth";
 
@@ -28,6 +29,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [dropupOpen, setDropupOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showToast, setShowToast] = useState(false);
+  const [codeVisible, setCodeVisible] = useState(true);
+  const [codeCopied, setCodeCopied] = useState(false);
 
   const avatarRef = useRef<HTMLDivElement>(null);
 
@@ -106,6 +109,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   function handleLogout() {
     setDropupOpen(false);
     setShowLogoutModal(true);
+  }
+
+  function handleCopyCode() {
+    if (!connectCode) return;
+    navigator.clipboard.writeText(connectCode);
+    setCodeCopied(true);
+    setTimeout(() => setCodeCopied(false), 1500);
   }
 
   async function handleConfirmLogout() {
@@ -281,9 +291,41 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <span className="h-2 w-2 rounded-full bg-[#22C55E]" />
               <span className="text-sm font-medium text-white group-hover:text-[#22C55E] transition-colors">Connect Parent</span>
             </Link>
-            <p className="mt-1.5 font-mono text-xs text-[#22C55E]">
-              {connectCode ? `Code: ${connectCode}` : "Code: —"}
-            </p>
+            <div className="mt-1.5 flex items-center gap-1.5">
+              <span className="font-mono text-xs text-[#22C55E]">
+                {connectCode
+                  ? `Code: ${codeVisible ? connectCode : connectCode.replace(/-.+$/, "-••••")}`
+                  : "Code: —"}
+              </span>
+              {connectCode && (
+                <>
+                  <button
+                    type="button"
+                    onClick={handleCopyCode}
+                    title="Copy code"
+                    style={{ background: "none", border: "none", cursor: "pointer", padding: "1px", lineHeight: 1, color: codeCopied ? "#22C55E" : "#9CA3AF" }}
+                    className="hover:!text-white transition-colors"
+                  >
+                    {codeCopied
+                      ? <Check style={{ width: 14, height: 14 }} />
+                      : <Copy style={{ width: 14, height: 14 }} />
+                    }
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCodeVisible((v) => !v)}
+                    title={codeVisible ? "Hide code" : "Show code"}
+                    style={{ background: "none", border: "none", cursor: "pointer", padding: "1px", lineHeight: 1, color: "#9CA3AF" }}
+                    className="hover:!text-white transition-colors"
+                  >
+                    {codeVisible
+                      ? <EyeOff style={{ width: 14, height: 14 }} />
+                      : <Eye style={{ width: 14, height: 14 }} />
+                    }
+                  </button>
+                </>
+              )}
+            </div>
           </div>
 
           {/* Avatar row with dropup */}
@@ -327,7 +369,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-[#0F172A] flex items-center justify-around px-2 py-2">
         <Link href="/dashboard" className="flex flex-col items-center gap-1 text-[10px] font-semibold text-[#9CA3AF]">
           <LayoutDashboard className="h-5 w-5" />
-          Home
+          Dashboard
         </Link>
         <Link href="/subjects/maths/chapters/numbers" className="flex flex-col items-center gap-1 text-[10px] font-semibold text-[#22C55E]">
           <Calculator className="h-5 w-5" />
