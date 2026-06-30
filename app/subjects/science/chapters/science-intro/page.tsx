@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { FileText, Download, HelpCircle, ChevronRight } from "lucide-react";
 import { supabase } from "@/lib/auth";
+import { updateStreak } from "@/lib/streak";
 
 const VIDEO_IDS = {
   en: "https://studiesmate.b-cdn.net/StudiesMate_Habitats_Grade4_v2.pptx.mp4",
@@ -138,6 +139,9 @@ function ScienceLessonPageInner() {
       }));
       setLessonCompletions(completions);
     } catch {}
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user.id) updateStreak(session.user.id);
+    });
   }
 
   const isCompleted = !!lessonCompletions[CHAPTER_ID];

@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/auth";
-
-const PARENT_CODE_KEY = "parent_connected_code";
+import AuthModal from "@/components/AuthModal";
 
 const benefits = [
   "View your child's quiz scores and lesson progress",
@@ -15,17 +15,33 @@ const benefits = [
 ];
 
 export default function ParentPage() {
+  const router = useRouter();
   const [inputCode, setInputCode] = useState("");
   const [connecting, setConnecting] = useState(false);
   const [connectedCode, setConnectedCode] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [showAuth, setShowAuth] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(PARENT_CODE_KEY);
-      if (saved) setConnectedCode(saved);
-    } catch {}
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        router.push("/");
+        return;
+      }
+      supabase
+        .from("profiles")
+        .select("connect_code")
+        .eq("id", session.user.id)
+        .single()
+        .then(({ data }) => {
+          if (data?.connect_code) setConnectedCode(data.connect_code);
+          setAuthChecked(true);
+        });
+    });
   }, []);
+
+  if (!authChecked) return null;
 
   async function handleConnect() {
     const code = inputCode.trim().toUpperCase();
@@ -44,9 +60,6 @@ export default function ParentPage() {
       if (queryError || !data) {
         setError("Invalid code. Please enter the correct Connect Code.");
       } else {
-        try {
-          localStorage.setItem(PARENT_CODE_KEY, code);
-        } catch {}
         setConnectedCode(code);
       }
     } catch {
@@ -57,9 +70,6 @@ export default function ParentPage() {
   }
 
   function handleDisconnect() {
-    try {
-      localStorage.removeItem(PARENT_CODE_KEY);
-    } catch {}
     setConnectedCode(null);
     setInputCode("");
   }
@@ -135,9 +145,13 @@ export default function ParentPage() {
 
             <div className="mt-4 text-center text-sm text-[#475569]">
               No code yet?{" "}
-              <Link href="/signup" className="font-semibold text-[#0B2B5A] hover:underline">
+              <button
+                type="button"
+                onClick={() => setShowAuth(true)}
+                className="font-semibold text-[#0B2B5A] hover:underline"
+              >
                 Sign up as a Student first
-              </Link>
+              </button>
             </div>
           </div>
         )}
@@ -163,6 +177,8 @@ export default function ParentPage() {
         </div>
 
       </div>
+
+      <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} initialMode="signup" />
     </div>
   );
 }
