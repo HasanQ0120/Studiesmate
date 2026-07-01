@@ -40,7 +40,7 @@ function AuthConfirmInner() {
           <h1 className="text-xl font-bold text-[#111827]">Confirmation failed</h1>
           <p className="mt-2 text-sm text-[#6B7280]">{error}</p>
           <a
-            href="/login"
+            href="/"
             className="mt-6 inline-flex items-center justify-center rounded-xl bg-[#0F172A] px-6 py-3 text-sm font-semibold text-white hover:bg-[#1E293B] transition-colors"
           >
             Back to Login

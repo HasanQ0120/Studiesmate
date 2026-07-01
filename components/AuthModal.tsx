@@ -105,6 +105,7 @@ export default function AuthModal({ isOpen, onClose, initialMode }: AuthModalPro
           alignItems: "center",
           justifyContent: "center",
           overflowY: "auto",
+          padding: "16px",
         }}
         onClick={onClose}
       >
@@ -130,7 +131,9 @@ export default function AuthModal({ isOpen, onClose, initialMode }: AuthModalPro
           borderRadius: "20px",
           padding: "36px 40px",
           maxWidth: "480px",
-          width: "90%",
+          width: "90vw",
+          maxHeight: "90vh",
+          overflowY: "auto",
           position: "relative",
           boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
         }}

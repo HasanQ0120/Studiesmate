@@ -76,7 +76,7 @@ export default function AdminFeedbackPage({ adminPassword }: Props) {
 
       if (error || !data.user) {
         setAuthChecked(true);
-        router.replace("/login");
+        router.replace("/");
         return;
       }
 

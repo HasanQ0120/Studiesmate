@@ -115,7 +115,7 @@ export default function DashboardPage() {
   // ── Auth redirect + name fetch ──
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
-      if (!data.user) { router.push("/login"); return; }
+      if (!data.user) { router.push("/"); return; }
       const name = ((data.user.user_metadata?.studentName as string | undefined) || "").trim();
       const firstName = name.split(" ")[0] || "";
       setStudentName(firstName || (data.user.email || "").split("@")[0] || "Student");

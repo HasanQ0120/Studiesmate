@@ -86,13 +86,13 @@ export default function ForgotPasswordPage() {
 
                 <div className="flex items-center justify-between text-sm">
                   <Link
-                    href="/login"
+                    href="/"
                     className="text-[#0B2B5A] hover:underline"
                   >
                     ← Back to login
                   </Link>
                   <Link
-                    href="/signup"
+                    href="/"
                     className="text-slate-700 hover:underline"
                   >
                     Create new profile
@@ -113,7 +113,7 @@ export default function ForgotPasswordPage() {
 
               <div className="mt-8 flex justify-center">
                 <Link
-                  href="/login"
+                  href="/"
                   className="rounded-xl bg-[#0B2B5A] px-5 py-3 text-sm font-semibold text-white hover:bg-[#0A2550]"
                 >
                   Back to login
