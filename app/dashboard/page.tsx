@@ -79,7 +79,7 @@ export default function DashboardPage() {
 
   // ── Explain credits countdown ──
   useEffect(() => {
-    if (!resetAt || explainCredits > 3) { setCountdown(""); return; }
+    if (!resetAt || explainCredits === null || explainCredits > 3) { setCountdown(""); return; }
     function calcCountdown() {
       const resetPlusThree = new Date(new Date(resetAt!).getTime() + 3 * 24 * 60 * 60 * 1000);
       const diffMs = resetPlusThree.getTime() - Date.now();
