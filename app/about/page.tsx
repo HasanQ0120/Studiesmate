@@ -1,7 +1,9 @@
 import Link from "next/link";
+import PageFade from "@/components/PageFade";
 
 export default function AboutPage() {
   return (
+    <PageFade>
     <main>
 
       {/* Hero */}
@@ -122,5 +124,6 @@ export default function AboutPage() {
       </section>
 
     </main>
+    </PageFade>
   );
 }

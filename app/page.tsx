@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
+import PageFade from "@/components/PageFade";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/auth";
@@ -88,6 +89,7 @@ export default function HomePage() {
   };
 
   return (
+    <PageFade>
     <main className="min-h-screen bg-white text-[#111827]">
       <style>{`
         @keyframes borderTravel {
@@ -607,5 +609,6 @@ export default function HomePage() {
         initialMode={authMode}
       />
     </main>
+    </PageFade>
   );
 }

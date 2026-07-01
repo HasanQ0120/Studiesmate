@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import PageFade from "@/components/PageFade";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/lib/auth";
 
@@ -107,6 +108,7 @@ export default function FeedbackPage() {
   }
 
   return (
+    <PageFade>
     <div>
       {/* Top hero */}
       <div className="bg-[#F0FDF4] px-4 py-14 text-center">
@@ -217,5 +219,6 @@ export default function FeedbackPage() {
         </div>
       </div>
     </div>
+    </PageFade>
   );
 }

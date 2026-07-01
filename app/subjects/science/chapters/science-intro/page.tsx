@@ -6,6 +6,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { FileText, Download, HelpCircle, ChevronRight } from "lucide-react";
 import { supabase } from "@/lib/auth";
 import { updateStreak } from "@/lib/streak";
+import PageFade from "@/components/PageFade";
 
 const VIDEO_IDS = {
   en: "https://studiesmate.b-cdn.net/StudiesMate_Habitats_Grade4_v2.pptx.mp4",
@@ -387,8 +388,10 @@ function ScienceLessonPageInner() {
 
 export default function ScienceLessonPage() {
   return (
-    <Suspense fallback={null}>
-      <ScienceLessonPageInner />
-    </Suspense>
+    <PageFade>
+      <Suspense fallback={null}>
+        <ScienceLessonPageInner />
+      </Suspense>
+    </PageFade>
   );
 }

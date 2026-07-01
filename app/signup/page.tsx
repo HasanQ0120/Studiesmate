@@ -2,6 +2,7 @@
 "use client";
 
 import Link from "next/link";
+import PageFade from "@/components/PageFade";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState, useEffect, Suspense } from "react";
 import { Eye, EyeOff } from "lucide-react";
@@ -244,8 +245,10 @@ function SignupForm() {
 
 export default function SignupPage() {
   return (
-    <Suspense fallback={null}>
-      <SignupForm />
-    </Suspense>
+    <PageFade>
+      <Suspense fallback={null}>
+        <SignupForm />
+      </Suspense>
+    </PageFade>
   );
 }
