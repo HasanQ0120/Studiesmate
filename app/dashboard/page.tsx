@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import DashboardLayout from "@/components/DashboardLayout";
+import PageFade from "@/components/PageFade";
 import { supabase } from "@/lib/auth";
 
 const QUIZ_COMPLETIONS_KEY = "studiesmate_quiz_completions";
@@ -196,6 +197,7 @@ export default function DashboardPage() {
   // ── Welcome screen ──
   if (showWelcome) {
     return (
+      <PageFade>
       <div className="flex min-h-screen w-full flex-col items-center justify-center bg-white px-6 text-center">
         <div className="w-full max-w-lg">
           <h1 className="text-4xl font-bold text-[#0B2B5A] md:text-5xl">Welcome, {welcomeName}! 👋</h1>
@@ -222,6 +224,7 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+      </PageFade>
     );
   }
 
@@ -229,6 +232,7 @@ export default function DashboardPage() {
   const mathQuizDone = !!quizCompletions["math-npv"];
 
   return (
+    <PageFade>
     <DashboardLayout>
       <style>{`
         @keyframes fadeIn {
@@ -509,5 +513,6 @@ export default function DashboardPage() {
         </div>
       </div>
     </DashboardLayout>
+    </PageFade>
   );
 }

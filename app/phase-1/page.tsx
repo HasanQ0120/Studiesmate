@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/auth";
 import AuthModal from "@/components/AuthModal";
+import PageFade from "@/components/PageFade";
 
 const GRADES = [
   { name: "Beta",    isBeta: true,  price: undefined },
@@ -39,6 +40,7 @@ export default function GradesPage() {
   }
 
   return (
+    <PageFade>
     <main className="min-h-screen bg-[#F9FAFB] pb-16">
       <div className="mx-auto max-w-6xl px-4 py-12">
 
@@ -132,5 +134,6 @@ export default function GradesPage() {
         initialMode="signup"
       />
     </main>
+    </PageFade>
   );
 }

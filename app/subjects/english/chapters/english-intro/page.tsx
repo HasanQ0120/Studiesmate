@@ -6,6 +6,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { FileText, Download, HelpCircle, ChevronRight } from "lucide-react";
 import { supabase } from "@/lib/auth";
 import { updateStreak } from "@/lib/streak";
+import PageFade from "@/components/PageFade";
 
 const VIDEO_IDS = {
   en: "https://studiesmate.b-cdn.net/simple_sentence_english.mp4.mp4",
@@ -386,8 +387,10 @@ function EnglishLessonPageInner() {
 
 export default function EnglishLessonPage() {
   return (
-    <Suspense fallback={null}>
-      <EnglishLessonPageInner />
-    </Suspense>
+    <PageFade>
+      <Suspense fallback={null}>
+        <EnglishLessonPageInner />
+      </Suspense>
+    </PageFade>
   );
 }

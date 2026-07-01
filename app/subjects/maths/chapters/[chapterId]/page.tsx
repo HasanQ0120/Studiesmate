@@ -6,6 +6,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { FileText, Download, HelpCircle, ChevronRight } from "lucide-react";
 import { supabase } from "@/lib/auth";
 import { updateStreak } from "@/lib/streak";
+import PageFade from "@/components/PageFade";
 
 const VIDEO_IDS: Record<string, { en: string; ur: string }> = {
   numbers: {
@@ -418,8 +419,10 @@ function ChapterPageInner() {
 
 export default function ChapterPage() {
   return (
-    <Suspense fallback={null}>
-      <ChapterPageInner />
-    </Suspense>
+    <PageFade>
+      <Suspense fallback={null}>
+        <ChapterPageInner />
+      </Suspense>
+    </PageFade>
   );
 }

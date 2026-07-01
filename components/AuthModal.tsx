@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { signUpParentAccount, signInParentAccount, supabase } from "@/lib/auth";
 
@@ -48,8 +49,6 @@ export default function AuthModal({ isOpen, onClose, initialMode }: AuthModalPro
     }
   }, [isOpen, initialMode]);
 
-  if (!isOpen) return null;
-
   const canSubmit =
     mode === "signup"
       ? name.trim().length >= 2 && isValidEmail(email) && password.trim().length >= 6
@@ -90,19 +89,25 @@ export default function AuthModal({ isOpen, onClose, initialMode }: AuthModalPro
   }
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(0,0,0,0.6)",
-        zIndex: 100,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        overflowY: "auto",
-      }}
-      onClick={onClose}
-    >
+    <AnimatePresence>
+      {isOpen && (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
+        style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(0,0,0,0.6)",
+          zIndex: 100,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          overflowY: "auto",
+        }}
+        onClick={onClose}
+      >
       <style>{`
         .auth-input::placeholder { color: #9CA3AF; }
         .auth-input:focus { border-bottom-color: #22C55E !important; }
@@ -115,7 +120,11 @@ export default function AuthModal({ isOpen, onClose, initialMode }: AuthModalPro
         }
       `}</style>
 
-      <div
+      <motion.div
+        initial={{ opacity: 0, y: 60 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 60 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
         style={{
           background: "#FFFFFF",
           borderRadius: "20px",
@@ -299,7 +308,9 @@ export default function AuthModal({ isOpen, onClose, initialMode }: AuthModalPro
         <p style={{ textAlign: "center", marginTop: "12px", fontSize: "12px", color: "#9CA3AF" }}>
           By signing up you agree to our Terms and Privacy Policy
         </p>
-      </div>
-    </div>
+      </motion.div>
+      </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

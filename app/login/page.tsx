@@ -2,6 +2,7 @@
 "use client";
 
 import Link from "next/link";
+import PageFade from "@/components/PageFade";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
@@ -43,6 +44,7 @@ export default function LoginPage() {
   }
 
   return (
+    <PageFade>
     <div className="flex min-h-screen text-[#111827]">
 
       {/* Left panel */}
@@ -179,5 +181,6 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+    </PageFade>
   );
 }

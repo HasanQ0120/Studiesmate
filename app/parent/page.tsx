@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/auth";
 import AuthModal from "@/components/AuthModal";
+import PageFade from "@/components/PageFade";
 
 const benefits = [
   "View your child's quiz scores and lesson progress",
@@ -75,6 +76,7 @@ export default function ParentPage() {
   }
 
   return (
+    <PageFade>
     <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A]">
       <div className="mx-auto max-w-lg px-6 py-16">
 
@@ -180,5 +182,6 @@ export default function ParentPage() {
 
       <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} initialMode="signup" />
     </div>
+    </PageFade>
   );
 }

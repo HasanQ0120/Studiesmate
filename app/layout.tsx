@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
 import AnnouncementBanner from "@/components/AnnouncementBanner";
+import { Analytics } from '@vercel/analytics/react';
 
 export const metadata: Metadata = {
   title: "StudiesMate",
@@ -27,6 +28,7 @@ export default function RootLayout({
           <PageTransition>{children}</PageTransition>
         </main>
         <Footer />
+        <Analytics />
       </body>
     </html>
   );
