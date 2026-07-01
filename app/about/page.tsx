@@ -116,7 +116,7 @@ export default function AboutPage() {
         <h2 className="text-3xl font-bold text-white">Ready to start learning?</h2>
         <p className="mt-3 text-base text-[#9CA3AF]">Join the beta — completely free.</p>
         <Link
-          href="/signup"
+          href="/"
           className="mt-8 inline-flex items-center justify-center rounded-full bg-[#22C55E] px-8 py-3.5 text-base font-semibold text-white transition-colors hover:bg-[#16A34A]"
         >
           Start Free Beta →

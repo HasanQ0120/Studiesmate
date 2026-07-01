@@ -4,6 +4,7 @@ import Link from "next/link";
 import PageFade from "@/components/PageFade";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/lib/auth";
+import AuthModal from "@/components/AuthModal";
 
 type SbMeta = {
   studentName?: string;
@@ -14,6 +15,8 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_MIME = ["image/png", "image/jpeg", "image/webp"];
 
 export default function FeedbackPage() {
+  const [authOpen, setAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<"login" | "signup">("signup");
   const [studentName, setStudentName] = useState("");
   const [parentEmail, setParentEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -129,18 +132,20 @@ export default function FeedbackPage() {
               <p className="text-sm font-semibold text-[#16A34A]">Log in required</p>
               <p className="mt-1 text-sm text-[#374151]">Please log in or sign up to submit feedback.</p>
               <div className="mt-3 flex flex-wrap gap-2">
-                <Link
-                  href="/login"
+                <button
+                  type="button"
+                  onClick={() => { setAuthMode("login"); setAuthOpen(true); }}
                   className="rounded-lg border border-[#22C55E] px-3 py-2 text-sm font-semibold text-[#22C55E] hover:bg-[#F0FDF4] transition-colors"
                 >
                   Log in
-                </Link>
-                <Link
-                  href="/signup"
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setAuthMode("signup"); setAuthOpen(true); }}
                   className="rounded-lg border border-[#22C55E] px-3 py-2 text-sm font-semibold text-[#22C55E] hover:bg-[#F0FDF4] transition-colors"
                 >
                   Sign up
-                </Link>
+                </button>
               </div>
             </div>
           )}
@@ -219,6 +224,7 @@ export default function FeedbackPage() {
         </div>
       </div>
     </div>
+    <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} initialMode={authMode} />
     </PageFade>
   );
 }

@@ -1,8 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { motion, useInView } from "framer-motion";
-import PageFade from "@/components/PageFade";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/auth";
@@ -17,20 +16,6 @@ export default function HomePage() {
   const demoEnRef = useRef<HTMLVideoElement>(null);
   const demoUrRef = useRef<HTMLVideoElement>(null);
 
-  const howItWorksRef = useRef(null);
-  const howItWorksInView = useInView(howItWorksRef, { once: true, margin: "-100px" });
-
-  const subjectsRef = useRef(null);
-  const subjectsInView = useInView(subjectsRef, { once: true, margin: "-100px" });
-
-  const bilingualRef = useRef(null);
-  const bilingualInView = useInView(bilingualRef, { once: true, margin: "-100px" });
-
-  const founderRef = useRef(null);
-  const founderInView = useInView(founderRef, { once: true, margin: "-100px" });
-
-  const faqRef = useRef(null);
-  const faqInView = useInView(faqRef, { once: true, margin: "-100px" });
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const faqs = [
@@ -89,7 +74,7 @@ export default function HomePage() {
   };
 
   return (
-    <PageFade>
+    <>
     <main className="min-h-screen bg-white text-[#111827]">
       <style>{`
         @keyframes borderTravel {
@@ -112,46 +97,25 @@ export default function HomePage() {
                 ⚡ Free Beta
               </span>
 
-              <motion.h1
-                className="mt-5 text-4xl font-bold leading-tight tracking-tight text-[#111827] md:text-5xl"
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.9, ease: "easeOut", delay: 0.1 }}
-              >
+              <h1 className="mt-5 text-4xl font-bold leading-tight tracking-tight text-[#111827] md:text-5xl">
                 Smart learning for school students
-              </motion.h1>
-              <motion.div
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.9, ease: "easeOut", delay: 0.2 }}
-              >
+              </h1>
+              <div>
                 <span className="text-4xl font-bold leading-tight tracking-tight text-[#22C55E] md:text-5xl">without stress</span>
-              </motion.div>
+              </div>
 
-              <motion.p
-                className="mt-5 text-base leading-7 text-[#6B7280] md:text-lg"
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.9, ease: "easeOut", delay: 0.3 }}
-              >
+              <p className="mt-5 text-base leading-7 text-[#6B7280] md:text-lg">
                 Bilingual video lessons in English and Urdu for Grades 1–8. Watch, quiz, and practice — designed for Pakistani school students.
-              </motion.p>
+              </p>
 
-              <motion.div
-                className="mt-8 flex flex-wrap items-center gap-3"
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.9, ease: "easeOut", delay: 0.4 }}
-              >
-                <motion.button
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <button
                   type="button"
                   onClick={handleStartBeta}
                   className="rounded-full bg-[#22C55E] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#16A34A]"
-                  animate={{ scale: [1, 1.03, 1] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", repeatDelay: 1 }}
                 >
                   Start Free Beta →
-                </motion.button>
+                </button>
                 <button
                   type="button"
                   onClick={() => document.getElementById("demo-video")?.scrollIntoView({ behavior: "smooth" })}
@@ -159,21 +123,12 @@ export default function HomePage() {
                 >
                   ▶ Watch Demo
                 </button>
-              </motion.div>
+              </div>
 
             </div>
 
             {/* Right — Student card */}
-            <motion.div
-              className="w-full flex-shrink-0 md:w-80"
-              initial={{ opacity: 0, x: 150 }}
-              animate={{ opacity: 1, x: 0, scale: [1, 1.012, 1] }}
-              transition={{
-                opacity: { duration: 1.0, ease: "easeOut", delay: 0.3 },
-                x: { duration: 1.0, ease: "easeOut", delay: 0.3 },
-                scale: { duration: 3.5, repeat: Infinity, ease: "easeInOut" },
-              }}
-            >
+            <div className="w-full flex-shrink-0 md:w-80">
               <div className="rounded-2xl bg-white p-6 shadow-[0_8px_40px_rgba(0,0,0,0.1)]">
                 {/* Student header */}
                 <div className="flex items-center gap-3">
@@ -208,14 +163,14 @@ export default function HomePage() {
                 </div>
 
               </div>
-            </motion.div>
+            </div>
 
           </div>
         </div>
       </section>
 
       {/* ── SECTION 2: HOW IT WORKS ── */}
-      <section className="bg-[#F9FAFB]" ref={howItWorksRef}>
+      <section className="bg-[#F9FAFB]">
         <div className="mx-auto max-w-6xl px-4 py-16">
           <div className="text-center">
             <h2 className="text-3xl font-bold text-[#111827]">How StudiesMate Works</h2>
@@ -236,9 +191,6 @@ export default function HomePage() {
                 ),
                 title: "Watch a Short Lesson",
                 desc: "Bite-sized video lessons designed for the Pakistani curriculum. Toggle between English and Urdu anytime.",
-                xFrom: -150,
-                delay: 0.1,
-                breathDuration: 3,
               },
               {
                 num: "02",
@@ -251,9 +203,6 @@ export default function HomePage() {
                 ),
                 title: "Take the Quiz",
                 desc: "Quick quizzes after each lesson reinforce learning. Instant feedback so students know what to review.",
-                xFrom: 150,
-                delay: 0.25,
-                breathDuration: 3.4,
               },
               {
                 num: "03",
@@ -266,22 +215,11 @@ export default function HomePage() {
                 ),
                 title: "Download the Worksheet",
                 desc: "Print and practice on paper. Parents can track results on the connected dashboard.",
-                xFrom: -150,
-                delay: 0.4,
-                breathDuration: 3.8,
               },
-            ].map(({ num, iconBg, iconColor, icon, title, desc, xFrom, delay, breathDuration }) => (
-              <motion.div
+            ].map(({ num, iconBg, iconColor, icon, title, desc }) => (
+              <div
                 key={num}
                 className="relative overflow-hidden rounded-2xl bg-white p-6 shadow-sm"
-                initial={{ opacity: 0, x: xFrom }}
-                animate={howItWorksInView ? { opacity: 1, x: 0, scale: [1, 1.012, 1] } : {}}
-                transition={{
-                  opacity: { duration: 0.9, ease: "easeOut", delay },
-                  x: { duration: 0.9, ease: "easeOut", delay },
-                  scale: { duration: breathDuration, repeat: Infinity, ease: "easeInOut" },
-                }}
-                whileHover={{ y: -4 }}
               >
                 <div className="text-6xl font-black text-[#F3F4F6] absolute right-4 top-2 leading-none select-none">{num}</div>
                 <div className="relative">
@@ -291,14 +229,14 @@ export default function HomePage() {
                   <h3 className="mt-4 text-lg font-bold text-[#111827]">{title}</h3>
                   <p className="mt-2 text-sm leading-6 text-[#6B7280]">{desc}</p>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* ── SECTION 3: SUBJECTS ── */}
-      <section className="bg-white" ref={subjectsRef}>
+      <section className="bg-white">
         <div className="mx-auto max-w-6xl px-4 py-16">
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
@@ -310,17 +248,7 @@ export default function HomePage() {
 
           <div className="mt-10 grid gap-6 md:grid-cols-3">
             {/* Mathematics */}
-            <motion.div
-              className="rounded-2xl bg-[#F0FDF4] p-6"
-              initial={{ opacity: 0, x: -150 }}
-              animate={subjectsInView ? { opacity: 1, x: 0, scale: [1, 1.012, 1] } : {}}
-              transition={{
-                opacity: { duration: 0.9, ease: "easeOut", delay: 0.1 },
-                x: { duration: 0.9, ease: "easeOut", delay: 0.1 },
-                scale: { duration: 3.2, repeat: Infinity, ease: "easeInOut" },
-              }}
-              whileHover={{ y: -4 }}
-            >
+            <div className="rounded-2xl bg-[#F0FDF4] p-6">
               <div className="flex items-start justify-between">
                 <span className="inline-flex rounded-full bg-[#DCFCE7] px-3 py-1 text-xs font-semibold text-[#16A34A]">Grade 1–8</span>
                 <span className="text-2xl">🧮</span>
@@ -335,22 +263,12 @@ export default function HomePage() {
               </ul>
               <div className="mt-5 flex items-center justify-between">
                 <span className="text-xs text-[#6B7280]">1 lesson in Beta</span>
-                <Link href="/signup" className="text-sm font-semibold text-[#22C55E] hover:text-[#16A34A]">Start →</Link>
+                <button type="button" onClick={handleStartBeta} className="text-sm font-semibold text-[#22C55E] hover:text-[#16A34A]">Start →</button>
               </div>
-            </motion.div>
+            </div>
 
             {/* English */}
-            <motion.div
-              className="rounded-2xl bg-[#EFF6FF] p-6"
-              initial={{ opacity: 0, x: 150 }}
-              animate={subjectsInView ? { opacity: 1, x: 0, scale: [1, 1.012, 1] } : {}}
-              transition={{
-                opacity: { duration: 0.9, ease: "easeOut", delay: 0.25 },
-                x: { duration: 0.9, ease: "easeOut", delay: 0.25 },
-                scale: { duration: 3.6, repeat: Infinity, ease: "easeInOut" },
-              }}
-              whileHover={{ y: -4 }}
-            >
+            <div className="rounded-2xl bg-[#EFF6FF] p-6">
               <div className="flex items-start justify-between">
                 <span className="inline-flex rounded-full bg-[#DBEAFE] px-3 py-1 text-xs font-semibold text-[#2563EB]">Grade 1–8</span>
                 <span className="text-2xl">📚</span>
@@ -365,22 +283,12 @@ export default function HomePage() {
               </ul>
               <div className="mt-5 flex items-center justify-between">
                 <span className="text-xs text-[#6B7280]">1 lesson in Beta</span>
-                <Link href="/signup" className="text-sm font-semibold text-[#3B82F6] hover:text-[#2563EB]">Start →</Link>
+                <button type="button" onClick={handleStartBeta} className="text-sm font-semibold text-[#3B82F6] hover:text-[#2563EB]">Start →</button>
               </div>
-            </motion.div>
+            </div>
 
             {/* Science */}
-            <motion.div
-              className="rounded-2xl bg-[#FEFCE8] p-6"
-              initial={{ opacity: 0, x: -150 }}
-              animate={subjectsInView ? { opacity: 1, x: 0, scale: [1, 1.012, 1] } : {}}
-              transition={{
-                opacity: { duration: 0.9, ease: "easeOut", delay: 0.4 },
-                x: { duration: 0.9, ease: "easeOut", delay: 0.4 },
-                scale: { duration: 4, repeat: Infinity, ease: "easeInOut" },
-              }}
-              whileHover={{ y: -4 }}
-            >
+            <div className="rounded-2xl bg-[#FEFCE8] p-6">
               <div className="flex items-start justify-between">
                 <span className="inline-flex rounded-full bg-[#FEF3C7] px-3 py-1 text-xs font-semibold text-[#D97706]">Grade 1–8</span>
                 <span className="text-2xl">🔬</span>
@@ -395,21 +303,17 @@ export default function HomePage() {
               </ul>
               <div className="mt-5 flex items-center justify-between">
                 <span className="text-xs text-[#6B7280]">1 lesson in Beta</span>
-                <Link href="/signup" className="text-sm font-semibold text-[#F97316] hover:text-[#EA580C]">Start →</Link>
+                <button type="button" onClick={handleStartBeta} className="text-sm font-semibold text-[#F97316] hover:text-[#EA580C]">Start →</button>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ── SECTION 4: BILINGUAL FEATURE ── */}
-      <motion.section
+      <section
         id="demo-video"
         className="bg-[#0F172A] text-white"
-        ref={bilingualRef}
-        initial={{ opacity: 0, y: 50 }}
-        animate={bilingualInView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 1.0, ease: "easeOut" }}
       >
         <div className="mx-auto max-w-6xl px-4 py-16">
           <div className="grid items-center gap-12 md:grid-cols-2">
@@ -433,17 +337,14 @@ export default function HomePage() {
                   "Roman Urdu narration for all Grade 1 lessons",
                   "Practice questions in both languages",
                   "Built for the Pakistani classroom",
-                ].map((item, i) => (
-                  <motion.li
+                ].map((item) => (
+                  <li
                     key={item}
                     className="flex items-start gap-3 text-sm text-white/80"
-                    initial={{ opacity: 0, x: -40 }}
-                    animate={bilingualInView ? { opacity: 1, x: 0 } : {}}
-                    transition={{ duration: 0.4, ease: "easeOut", delay: 0.2 + i * 0.1 }}
                   >
                     <span className="mt-0.5 font-bold text-[#22C55E]">✓</span>
                     {item}
-                  </motion.li>
+                  </li>
                 ))}
               </ul>
             </div>
@@ -496,22 +397,13 @@ export default function HomePage() {
 
           </div>
         </div>
-      </motion.section>
+      </section>
 
       {/* ── SECTION 5: FOUNDER NOTE ── */}
       <section className="bg-white">
         <div className="mx-auto max-w-6xl px-4 py-16">
           <div className="mx-auto max-w-2xl">
-            <motion.div
-              ref={founderRef}
-              className="rounded-2xl border border-[#E5E7EB] bg-white p-8 shadow-[0_4px_20px_rgba(0,0,0,0.06)]"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={founderInView ? { opacity: 1, scale: [1, 1.010, 1] } : {}}
-              transition={{
-                opacity: { duration: 0.9, ease: "easeOut" },
-                scale: { duration: 4, repeat: Infinity, ease: "easeInOut" },
-              }}
-            >
+            <div className="rounded-2xl border border-[#E5E7EB] bg-white p-8 shadow-[0_4px_20px_rgba(0,0,0,0.06)]">
               <div className="text-center">
                 <img src="/favicon.png" alt="StudiesMate" style={{ width: "48px", height: "48px", borderRadius: "8px", marginBottom: "12px", display: "inline-block" }} />
               </div>
@@ -533,7 +425,7 @@ export default function HomePage() {
               <p className="mt-6 text-sm font-semibold text-[#0F172A]">
                 — Muhammad Hasan &amp; Muhammad Umer, Founders of StudiesMate
               </p>
-            </motion.div>
+            </div>
 
           </div>
         </div>
@@ -550,12 +442,7 @@ export default function HomePage() {
       {/* ── SECTION 6: FAQ ── */}
       <section className="bg-white">
         <div className="mx-auto max-w-[700px] px-6 py-20">
-          <motion.div
-            ref={faqRef}
-            initial={{ opacity: 0, y: 40 }}
-            animate={faqInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          >
+          <div>
             <h2 style={{ color: "#0F172A", fontSize: "32px", fontWeight: 700, textAlign: "center", margin: 0 }}>
               Common Questions
             </h2>
@@ -599,16 +486,15 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
-      <AuthModal
-        isOpen={authModalOpen}
-        onClose={() => setAuthModalOpen(false)}
-        initialMode={authMode}
-      />
     </main>
-    </PageFade>
+    {typeof window !== "undefined" && createPortal(
+      <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} initialMode={authMode} />,
+      document.body
+    )}
+    </>
   );
 }
