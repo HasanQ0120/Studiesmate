@@ -33,7 +33,7 @@ export default function DashboardPage() {
   const [currentStreak, setCurrentStreak] = useState(0);
   const [lastLessons, setLastLessons] = useState({ math: "", english: "", science: "" });
 
-  const [explainCredits, setExplainCredits] = useState<number>(4);
+  const [explainCredits, setExplainCredits] = useState<number | null>(null);
   const [resetAt, setResetAt] = useState<string | null>(null);
   const [countdown, setCountdown] = useState("");
 
@@ -267,11 +267,15 @@ export default function DashboardPage() {
                 Welcome back, {studentName || "Student"}! 👋
               </h1>
               <div className="flex-shrink-0 text-right">
-                <div style={{ background: "#F0FDF4", border: "1px solid #22C55E", borderRadius: "9999px", padding: "6px 14px", display: "inline-block" }}>
-                  <span style={{ color: "#16A34A", fontSize: "13px", fontWeight: 500 }}>🧠 {explainCredits} credits left</span>
-                </div>
-                {explainCredits <= 3 && resetAt && countdown && (
-                  <p className="mt-1 text-xs text-[#9CA3AF]">Resets in: {countdown}</p>
+                {explainCredits !== null && (
+                  <>
+                    <div style={{ background: "#F0FDF4", border: "1px solid #22C55E", borderRadius: "9999px", padding: "6px 14px", display: "inline-block" }}>
+                      <span style={{ color: "#16A34A", fontSize: "13px", fontWeight: 500 }}>🧠 {explainCredits} credits left</span>
+                    </div>
+                    {explainCredits <= 3 && resetAt && countdown && (
+                      <p className="mt-1 text-xs text-[#9CA3AF]">Resets in: {countdown}</p>
+                    )}
+                  </>
                 )}
               </div>
             </div>

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { supabase } from "@/lib/auth";
 import AuthModal from "@/components/AuthModal";
@@ -15,6 +15,7 @@ type SbMeta = {
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
 
   const [sbStudentName, setSbStudentName] = useState("");
   const [sbStudentClass, setSbStudentClass] = useState("");
@@ -24,6 +25,8 @@ export default function Header() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showToast, setShowToast] = useState(false);
 
   const menuRef = useRef<HTMLDivElement | null>(null);
   const mobileRef = useRef<HTMLDivElement | null>(null);
@@ -71,6 +74,15 @@ export default function Header() {
   function closeMobileNav() { setMobileNavOpen(false); }
   function toggleMobileNav() { setMenuOpen(false); setMobileNavOpen((v) => !v); }
   function toggleAccountMenu() { setMobileNavOpen(false); setMenuOpen((v) => !v); }
+
+  function handleLogout() { setMenuOpen(false); setShowLogoutModal(true); }
+
+  async function handleConfirmLogout() {
+    await supabase.auth.signOut();
+    setShowLogoutModal(false);
+    setShowToast(true);
+    setTimeout(() => router.push("/"), 2000);
+  }
 
   const navLinks = [
     { label: "Home", href: "/" },
@@ -175,6 +187,13 @@ export default function Header() {
                     </div>
                     <div className="my-2 h-px bg-[#F3F4F6]" />
                     <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="block rounded-lg px-3 py-2 text-sm hover:bg-[#F9FAFB]">Dashboard</Link>
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#111827] hover:bg-[#F9FAFB] transition-colors"
+                    >
+                      🚪 Logout
+                    </button>
                   </div>
                 )}
               </div>
@@ -189,6 +208,38 @@ export default function Header() {
       onClose={() => setAuthModalOpen(false)}
       initialMode={authMode}
     />
+
+    {showToast && (
+      <div style={{ position: "fixed", top: "20px", right: "20px", background: "#22C55E", color: "white", padding: "12px 20px", borderRadius: "12px", fontSize: "14px", fontWeight: 600, zIndex: 9999, boxShadow: "0 4px 12px rgba(0,0,0,0.15)", maxWidth: "320px" }}>
+        You have been logged out successfully.
+      </div>
+    )}
+
+    {showLogoutModal && (
+      <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 9998, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ background: "white", borderRadius: "16px", padding: "32px", maxWidth: "380px", width: "90%", textAlign: "center", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
+          <p style={{ fontSize: "48px", marginBottom: "12px" }}>👋</p>
+          <h2 style={{ fontSize: "22px", fontWeight: 700, color: "#0F172A" }}>Leaving so soon?</h2>
+          <p style={{ fontSize: "14px", color: "#6B7280", marginTop: "8px" }}>Your progress is saved. We&apos;ll be here when you come back.</p>
+          <div style={{ display: "flex", gap: "12px", justifyContent: "center", marginTop: "24px" }}>
+            <button
+              type="button"
+              onClick={() => setShowLogoutModal(false)}
+              style={{ background: "#22C55E", color: "white", borderRadius: "9999px", padding: "10px 24px", fontWeight: 600, border: "none", cursor: "pointer", fontSize: "14px" }}
+            >
+              Stay &amp; Learn
+            </button>
+            <button
+              type="button"
+              onClick={handleConfirmLogout}
+              style={{ background: "white", border: "1.5px solid #EF4444", color: "#EF4444", borderRadius: "9999px", padding: "10px 24px", fontWeight: 600, cursor: "pointer", fontSize: "14px" }}
+            >
+              Yes, Log out
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
     </>
   );
 }

@@ -29,7 +29,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [dropupOpen, setDropupOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showToast, setShowToast] = useState(false);
-  const [codeVisible, setCodeVisible] = useState(true);
+  const [codeVisible, setCodeVisible] = useState(false);
   const [codeCopied, setCodeCopied] = useState(false);
 
   const avatarRef = useRef<HTMLDivElement>(null);
@@ -103,6 +103,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       return next;
     });
   }
+
+  useEffect(() => {
+    setCodeVisible(false);
+  }, [pathname]);
 
   function isActive(href: string) { return pathname === href; }
 
