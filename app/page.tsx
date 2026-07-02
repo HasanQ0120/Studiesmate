@@ -376,14 +376,14 @@ export default function HomePage() {
               </div>
               <video
                 ref={demoEnRef}
-                src="https://studiesmate.b-cdn.net/simple_sentence_english.mp4.mp4"
+                src="https://studiesmate.b-cdn.net/simple_sentences_english.mp4.mp4"
                 controls
                 width="100%"
                 style={{ borderRadius: "12px", background: "black", display: demoLang === "english" ? "block" : "none" }}
               />
               <video
                 ref={demoUrRef}
-                src="https://studiesmate.b-cdn.net/Copy%20of%20StudiesMate_SimpleSentences_Grade4_v3.pptx.mp4"
+                src="https://studiesmate.b-cdn.net/simple_sentence_urdu.mp4.mp4"
                 controls
                 width="100%"
                 style={{ borderRadius: "12px", background: "black", display: demoLang === "urdu" ? "block" : "none" }}

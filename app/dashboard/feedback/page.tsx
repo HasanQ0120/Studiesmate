@@ -10,7 +10,10 @@ type FeedbackRow = {
   created_at: string | null;
   user_email: string | null;
   student_name: string | null;
-  message: string;
+  message: string | null;
+  comment: string | null;
+  rating: number | null;
+  selected_tags: string[] | null;
   page: string | null;
   screenshot_url: string | null;
 };
@@ -124,7 +127,14 @@ export default function AdminFeedbackPage({ adminPassword }: Props) {
             return;
           }
 
-          setRows(((json.rows || []) as FeedbackRow[]) ?? []);
+          const apiRows = (json.rows || []) as FeedbackRow[];
+          console.log("[FeedbackAdmin] API returned", apiRows.length, "rows");
+          if (apiRows[0]) {
+            const first = apiRows[0];
+            console.log("[FeedbackAdmin] First row keys:", Object.keys(first));
+            console.log("[FeedbackAdmin] First row rating:", first.rating, "| selected_tags:", first.selected_tags, "| comment:", first.comment);
+          }
+          setRows(apiRows);
           setStatus("idle");
           return;
         } catch (e: any) {
@@ -137,7 +147,7 @@ export default function AdminFeedbackPage({ adminPassword }: Props) {
       // Existing dashboard-admin route keeps supabase fetch
       const { data, error } = await supabase
         .from("feedback")
-        .select("id, created_at, user_email, student_name, message, page, screenshot_url")
+        .select("id, created_at, user_email, student_name, message, comment, rating, selected_tags, page, screenshot_url")
         .order("created_at", { ascending: false })
         .limit(300);
 
@@ -163,8 +173,11 @@ export default function AdminFeedbackPage({ adminPassword }: Props) {
         r.user_email || "",
         r.student_name || "",
         r.message || "",
+        r.comment || "",
         r.page || "",
         r.screenshot_url || "",
+        Array.isArray(r.selected_tags) ? r.selected_tags.join(" ") : "",
+        r.rating != null ? String(r.rating) : "",
       ]
         .join(" ")
         .toLowerCase();
@@ -250,7 +263,9 @@ export default function AdminFeedbackPage({ adminPassword }: Props) {
             </div>
           ) : (
             <div className="mt-5 space-y-4">
-              {visible.map((r) => (
+              {visible.map((r) => {
+                console.log(`[FeedbackAdmin] Row ${r.id?.slice(0,8)} — rating:`, r.rating, "| tags:", r.selected_tags, "| comment:", r.comment);
+                return (
                 <div key={r.id} className="rounded-xl border border-gray-200 bg-white p-4">
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0">
@@ -279,11 +294,29 @@ export default function AdminFeedbackPage({ adminPassword }: Props) {
                     </div>
                   </div>
 
-                  <div className="mt-3 whitespace-pre-wrap text-sm text-gray-800">{r.message}</div>
+                  {r.rating != null && (
+                    <div className="mt-3 flex items-center gap-1">
+                      {[1,2,3,4,5].map((s) => (
+                        <span key={s} style={{ color: r.rating! >= s ? "#F97316" : "#D1D5DB", fontSize: "16px" }}>★</span>
+                      ))}
+                      <span className="ml-1 text-xs text-gray-500">{r.rating}/5</span>
+                    </div>
+                  )}
+                  {Array.isArray(r.selected_tags) && r.selected_tags.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {r.selected_tags.map((tag) => (
+                        <span key={tag} className="rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5 text-xs text-gray-600">{tag}</span>
+                      ))}
+                    </div>
+                  )}
+                  {(r.comment || r.message) && (
+                    <div className="mt-3 whitespace-pre-wrap text-sm text-gray-800">{r.comment || r.message}</div>
+                  )}
 
                   <div className="mt-3 text-xs text-gray-400">ID: {r.id}</div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
