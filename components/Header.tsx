@@ -27,6 +27,7 @@ export default function Header() {
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showToast, setShowToast] = useState(false);
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(true);
 
   const menuRef = useRef<HTMLDivElement | null>(null);
   const mobileRef = useRef<HTMLDivElement | null>(null);
@@ -38,6 +39,39 @@ export default function Header() {
     setSbStudentClass((meta.studentClass || "").trim());
     setSbParentEmail((user?.email || (meta.parentEmail as string | undefined) || "").trim());
   }
+
+  useEffect(() => {
+    // Hide dot immediately when feedback is submitted in the same tab
+    function onFeedbackSubmitted() {
+      setFeedbackSubmitted(true);
+    }
+    window.addEventListener("feedback_submitted", onFeedbackSubmitted);
+    return () => window.removeEventListener("feedback_submitted", onFeedbackSubmitted);
+  }, []);
+
+  useEffect(() => {
+    try {
+      // Never show dot once feedback has been submitted
+      if (localStorage.getItem("feedback_submitted") === "true") return;
+
+      // Record first visit time if this is a new visitor
+      let firstVisit = localStorage.getItem("first_visit_timestamp");
+      if (!firstVisit) {
+        firstVisit = Date.now().toString();
+        localStorage.setItem("first_visit_timestamp", firstVisit);
+      }
+
+      const elapsed = Date.now() - parseInt(firstVisit, 10);
+      const remaining = Math.max(0, 15000 - elapsed);
+
+      if (remaining === 0) {
+        setFeedbackSubmitted(false);
+      } else {
+        const timer = setTimeout(() => setFeedbackSubmitted(false), remaining);
+        return () => clearTimeout(timer);
+      }
+    } catch {}
+  }, []);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -104,8 +138,11 @@ export default function Header() {
         {/* Desktop nav */}
         <nav className="hidden items-center gap-8 text-sm font-medium text-[#374151] md:flex">
           {navLinks.map(({ label, href }) => (
-            <Link key={label} href={href} className="transition-colors hover:text-[#22C55E]">
+            <Link key={label} href={href} className="relative transition-colors hover:text-[#22C55E]">
               {label}
+              {label === "Feedback" && !feedbackSubmitted && (
+                <span style={{ position: "absolute", top: -3, right: -7, width: 8, height: 8, background: "#EF4444", borderRadius: "50%", display: "block" }} />
+              )}
             </Link>
           ))}
           {isLoggedIn && (
@@ -133,7 +170,12 @@ export default function Header() {
                 <div className="mx-auto max-w-6xl px-4 py-3">
                   <div className="grid grid-cols-2 gap-1 text-sm">
                     {navLinks.map(({ label, href }) => (
-                      <Link key={label} href={href} onClick={closeMobileNav} className={`rounded-lg px-3 py-2 ${pathname === href ? "text-[#22C55E] font-semibold" : "text-[#374151] hover:text-[#22C55E]"}`}>{label}</Link>
+                      <Link key={label} href={href} onClick={closeMobileNav} className={`relative rounded-lg px-3 py-2 ${pathname === href ? "text-[#22C55E] font-semibold" : "text-[#374151] hover:text-[#22C55E]"}`}>
+                        {label}
+                        {label === "Feedback" && !feedbackSubmitted && (
+                          <span style={{ position: "absolute", top: 6, marginLeft: 3, width: 7, height: 7, background: "#EF4444", borderRadius: "50%", display: "inline-block" }} />
+                        )}
+                      </Link>
                     ))}
                     {!isLoggedIn ? (
                       <>

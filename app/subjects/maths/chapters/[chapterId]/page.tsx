@@ -10,9 +10,8 @@ import PageFade from "@/components/PageFade";
 
 const VIDEO_IDS: Record<string, { en: string; ur: string }> = {
   numbers: {
-    // CDN filenames are swapped at source — urdu-named file contains English content and vice versa
-    en: "https://studiesmate.b-cdn.net/place_value_urdu.mp4.mp4",
-    ur: "https://studiesmate.b-cdn.net/place_value_english.mp4.mp4",
+    en: "https://studiesmate.b-cdn.net/place_value_english.mp4.mp4",
+    ur: "https://studiesmate.b-cdn.net/place_value_urdu.mp4.mp4",
   },
 };
 

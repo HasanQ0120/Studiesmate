@@ -9,8 +9,8 @@ import { updateStreak } from "@/lib/streak";
 import PageFade from "@/components/PageFade";
 
 const VIDEO_IDS = {
-  en: "https://studiesmate.b-cdn.net/StudiesMate_Habitats_Grade4_v2.pptx.mp4",
-  ur: "https://studiesmate.b-cdn.net/Copy%20of%20StudiesMate_Habitats_Grade4_v2.pptx.mp4",
+  en: "https://studiesmate.b-cdn.net/habitat_english.mp4.mp4",
+  ur: "https://studiesmate.b-cdn.net/habitat_urdu.mp4.mp4",
 };
 const CHAPTER_ID = "science-intro";
 

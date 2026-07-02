@@ -9,8 +9,8 @@ import { updateStreak } from "@/lib/streak";
 import PageFade from "@/components/PageFade";
 
 const VIDEO_IDS = {
-  en: "https://studiesmate.b-cdn.net/simple_sentence_english.mp4.mp4",
-  ur: "https://studiesmate.b-cdn.net/Copy%20of%20StudiesMate_SimpleSentences_Grade4_v3.pptx.mp4",
+  en: "https://studiesmate.b-cdn.net/simple_sentences_english.mp4.mp4",
+  ur: "https://studiesmate.b-cdn.net/simple_sentence_urdu.mp4.mp4",
 };
 const CHAPTER_ID = "english-intro";
 
