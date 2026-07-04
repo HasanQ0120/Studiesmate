@@ -127,14 +127,7 @@ export default function AdminFeedbackPage({ adminPassword }: Props) {
             return;
           }
 
-          const apiRows = (json.rows || []) as FeedbackRow[];
-          console.log("[FeedbackAdmin] API returned", apiRows.length, "rows");
-          if (apiRows[0]) {
-            const first = apiRows[0];
-            console.log("[FeedbackAdmin] First row keys:", Object.keys(first));
-            console.log("[FeedbackAdmin] First row rating:", first.rating, "| selected_tags:", first.selected_tags, "| comment:", first.comment);
-          }
-          setRows(apiRows);
+          setRows((json.rows || []) as FeedbackRow[]);
           setStatus("idle");
           return;
         } catch (e: any) {
@@ -263,9 +256,7 @@ export default function AdminFeedbackPage({ adminPassword }: Props) {
             </div>
           ) : (
             <div className="mt-5 space-y-4">
-              {visible.map((r) => {
-                console.log(`[FeedbackAdmin] Row ${r.id?.slice(0,8)} — rating:`, r.rating, "| tags:", r.selected_tags, "| comment:", r.comment);
-                return (
+              {visible.map((r) => (
                 <div key={r.id} className="rounded-xl border border-gray-200 bg-white p-4">
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0">
@@ -315,8 +306,7 @@ export default function AdminFeedbackPage({ adminPassword }: Props) {
 
                   <div className="mt-3 text-xs text-gray-400">ID: {r.id}</div>
                 </div>
-                );
-              })}
+              ))}
             </div>
           )}
 
