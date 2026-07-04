@@ -405,8 +405,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Logout confirmation modal */}
       {showLogoutModal && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ background: "white", borderRadius: "16px", padding: "32px", maxWidth: "380px", width: "90%", textAlign: "center", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
+        <>
+          <style>{`
+            @keyframes popupFadeIn {
+              from { opacity: 0; transform: scale(0.95); }
+              to { opacity: 1; transform: scale(1); }
+            }
+            @keyframes backdropFadeIn {
+              from { opacity: 0; }
+              to { opacity: 1; }
+            }
+            .logout-backdrop { animation: backdropFadeIn 0.2s ease-out; }
+            .logout-popup { animation: popupFadeIn 0.2s ease-out; }
+          `}</style>
+          <div className="logout-backdrop" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div className="logout-popup" style={{ background: "white", borderRadius: "16px", padding: "32px", maxWidth: "380px", width: "90%", textAlign: "center", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
             <p style={{ fontSize: "48px", marginBottom: "12px" }}>👋</p>
             <h2 style={{ fontSize: "22px", fontWeight: 700, color: "#0F172A" }}>Leaving so soon?</h2>
             <p style={{ fontSize: "14px", color: "#6B7280", marginTop: "8px" }}>Your progress is saved. We&apos;ll be here when you come back.</p>
@@ -428,6 +441,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
           </div>
         </div>
+        </>
       )}
     </div>
   );
