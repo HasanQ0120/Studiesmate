@@ -44,37 +44,23 @@ export default function DashboardPage() {
   // Connect code fetch + upsert (creates the code if none exists; displayed in sidebar)
   const [connectCode, setConnectCode] = useState<string>("");
 
-  // ── Explain credits fetch ──
+  // ── Profile fetch (credits + streak in one query) ──
   useEffect(() => {
-    const fetchCredits = async () => {
+    const fetchProfile = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
       const { data } = await supabase
         .from("profiles")
-        .select("explain_credits, explain_credits_reset_at")
+        .select("explain_credits, explain_credits_reset_at, current_streak")
         .eq("id", session.user.id)
-        .single();
+        .maybeSingle();
       if (data) {
         setExplainCredits(data.explain_credits ?? 4);
         setResetAt(data.explain_credits_reset_at ?? null);
+        setCurrentStreak(data.current_streak ?? 0);
       }
     };
-    fetchCredits();
-  }, []);
-
-  // ── Supabase streak fetch ──
-  useEffect(() => {
-    const fetchStreak = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
-      const { data } = await supabase
-        .from("profiles")
-        .select("current_streak")
-        .eq("id", session.user.id)
-        .single();
-      if (data) setCurrentStreak(data.current_streak ?? 0);
-    };
-    fetchStreak();
+    fetchProfile();
   }, []);
 
   // ── Explain credits countdown ──
