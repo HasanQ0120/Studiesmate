@@ -55,7 +55,12 @@ export default function AuthModal({ isOpen, onClose, initialMode }: AuthModalPro
       : isValidEmail(email) && password.trim().length >= 6;
 
   async function handleGoogleSignIn() {
-    await supabase.auth.signInWithOAuth({ provider: "google" });
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/google-callback`,
+      },
+    });
   }
 
   async function handleSubmit(e: React.FormEvent) {
