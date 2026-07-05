@@ -53,11 +53,28 @@ export default function ConfirmNamePage() {
     setSaving(true);
     setError("");
 
-    const { error: dbError } = await supabase
+    const { data: existingProfile } = await supabase
       .from("profiles")
-      .upsert({ id: userId, student_name: trimmed }, { onConflict: "id" });
+      .select("connect_code")
+      .eq("id", userId)
+      .maybeSingle();
+
+    let dbError;
+    if (existingProfile) {
+      ({ error: dbError } = await supabase
+        .from("profiles")
+        .update({ student_name: trimmed })
+        .eq("id", userId));
+    } else {
+      const connectCode = "SM-" + Math.floor(1000 + Math.random() * 9000);
+      ({ error: dbError } = await supabase
+        .from("profiles")
+        .insert({ id: userId, student_name: trimmed, connect_code: connectCode }));
+    }
 
     if (dbError) {
+      console.error("UPSERT ERROR CODE:", dbError.code);
+      console.error("UPSERT ERROR MESSAGE:", dbError.message);
       setSaving(false);
       setError("Failed to save. Please try again.");
       return;
