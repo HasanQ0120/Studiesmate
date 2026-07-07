@@ -75,6 +75,7 @@ function ChapterPageInner() {
   const [lang, setLang] = useState<"en" | "ur">("en");
   const [lessonCompletions, setLessonCompletions] = useState<Record<string, string>>({});
   const [transcriptOpen, setTranscriptOpen] = useState(false);
+  const [notesOpen, setNotesOpen] = useState(false);
   const [explanation, setExplanation] = useState("");
   const [isExplaining, setIsExplaining] = useState(false);
   const [creditsLeft, setCreditsLeft] = useState<number | null>(null);
@@ -311,6 +312,60 @@ function ChapterPageInner() {
                       <p style={{ fontSize: "14px", lineHeight: "1.8", color: "#475569", whiteSpace: "pre-line" }}>
                         {meta.transcript}
                       </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Notes card */}
+                <div className="rounded-xl border border-[#F3F4F6] bg-white shadow-sm">
+                  <button
+                    type="button"
+                    onClick={() => setNotesOpen((v) => !v)}
+                    className="flex w-full items-center gap-3 p-4"
+                  >
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F3F4F6]">
+                      <FileText className="h-4 w-4 text-[#6B7280]" />
+                    </div>
+                    <span className="flex-1 text-left text-sm font-bold text-[#111827]">Read Notes</span>
+                    <ChevronRight
+                      className="h-4 w-4 text-[#9CA3AF] transition-transform duration-200"
+                      style={{ transform: notesOpen ? "rotate(90deg)" : "rotate(0deg)" }}
+                    />
+                  </button>
+                  <div
+                    className="overflow-hidden transition-all duration-300"
+                    style={{ maxHeight: notesOpen ? "6000px" : "0px" }}
+                  >
+                    <div className="border-t border-[#F3F4F6] px-4 pb-4 pt-3 flex flex-col gap-3">
+                      <p className="text-xs text-[#6B7280]">🟡 Yellow = Most Important &nbsp;|&nbsp; 🟢 Green = Good to Know</p>
+                      <div style={{ background: "#FEFCE8", borderLeft: "3px solid #EAB308", borderRadius: "8px", padding: "12px 14px" }}>
+                        <p className="text-xs font-bold text-[#92400E] mb-1">🟡 Core Concept</p>
+                        <p style={{ fontSize: "14px", lineHeight: "1.7", color: "#44403C" }}>{"Place value is one of the most important ideas in math. It means that the SAME digit can represent completely different amounts depending on WHERE it sits in a number. A '5' sitting in the ones place means just 5 — but that same '5' sitting in the ten thousands place means 50,000! This is why understanding place value is the foundation for everything else in math."}</p>
+                      </div>
+                      <div style={{ background: "#F0FDF4", borderLeft: "3px solid #22C55E", borderRadius: "8px", padding: "12px 14px" }}>
+                        <p className="text-xs font-bold text-[#166534] mb-1">🟢 The Place Value Chart</p>
+                        <p style={{ fontSize: "14px", lineHeight: "1.7", color: "#14532D" }}>{"Ones → Tens → Hundreds → Thousands → Ten Thousands → Hundred Thousands. Each step to the left multiplies the value by 10."}</p>
+                      </div>
+                      <div style={{ background: "#FEFCE8", borderLeft: "3px solid #EAB308", borderRadius: "8px", padding: "12px 14px" }}>
+                        <p className="text-xs font-bold text-[#92400E] mb-1">🟡 Solved Example 1: What is the value of 7 in 47,392?</p>
+                        <p style={{ fontSize: "14px", lineHeight: "1.7", color: "#44403C" }}>{"Step 1: Identify the position of 7 — count from the right: 2(ones), 9(tens), 3(hundreds), 7(thousands). Step 2: The 7 is in the thousands place. "}<strong>{"Answer: Its value is 7,000"}</strong></p>
+                      </div>
+                      <div style={{ background: "#FEFCE8", borderLeft: "3px solid #EAB308", borderRadius: "8px", padding: "12px 14px" }}>
+                        <p className="text-xs font-bold text-[#92400E] mb-1">🟡 Solved Example 2: What is the value of 3 in 356,891?</p>
+                        <p style={{ fontSize: "14px", lineHeight: "1.7", color: "#44403C" }}>{"Step 1: Count positions from the right: 1,9,8,6,5,3. Step 2: The 3 is the 6th digit from the right — hundred thousands place. "}<strong>{"Answer: Its value is 300,000"}</strong></p>
+                      </div>
+                      <div style={{ background: "#FEFCE8", borderLeft: "3px solid #EAB308", borderRadius: "8px", padding: "12px 14px" }}>
+                        <p className="text-xs font-bold text-[#92400E] mb-1">🟡 Solved Example 3: Break down 62,504 into its place values</p>
+                        <p style={{ fontSize: "14px", lineHeight: "1.7", color: "#44403C" }}>{"Step 1: Write each digit with its place: 6(ten thousands), 2(thousands), 5(hundreds), 0(tens), 4(ones). Step 2: Multiply each digit by its place value: 60,000 + 2,000 + 500 + 0 + 4. "}<strong>{"Answer: 62,504 = 60,000 + 2,000 + 500 + 0 + 4"}</strong></p>
+                      </div>
+                      <div style={{ background: "#FEFCE8", borderLeft: "3px solid #EAB308", borderRadius: "8px", padding: "12px 14px" }}>
+                        <p className="text-xs font-bold text-[#92400E] mb-1">🟡 Solved Example 4: Which number is bigger: 45,231 or 45,321?</p>
+                        <p style={{ fontSize: "14px", lineHeight: "1.7", color: "#44403C" }}>{"Step 1: Both numbers start with the same digits — 4 and 5 — so compare the next digit. Step 2: In 45,231 the hundreds digit is 2. In 45,321 the hundreds digit is 3. Step 3: Since 3 is greater than 2, the second number is bigger. "}<strong>{"Answer: 45,321 is bigger"}</strong></p>
+                      </div>
+                      <div style={{ background: "#F0FDF4", borderLeft: "3px solid #22C55E", borderRadius: "8px", padding: "12px 14px" }}>
+                        <p className="text-xs font-bold text-[#166534] mb-1">🟢 Common Mistake to Avoid</p>
+                        <p style={{ fontSize: "14px", lineHeight: "1.7", color: "#14532D" }}>{"Many students think a number with MORE digits is always bigger — that's true! But when two numbers have the SAME number of digits, you must compare digit by digit from left to right until you find a difference."}</p>
+                      </div>
                     </div>
                   </div>
                 </div>

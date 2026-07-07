@@ -73,15 +73,13 @@ export default function GradesPage() {
                 <h2 className="mt-4 text-xl font-bold text-[#111827]">{g.name}</h2>
                 {g.price && (
                   <p style={{
-                    fontSize: "28px",
-                    fontWeight: 800,
-                    background: "linear-gradient(135deg, #22C55E, #0F172A)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
+                    fontSize: "14px",
+                    fontWeight: 500,
+                    color: "#9CA3AF",
                     marginTop: "8px",
                     marginBottom: "8px",
                   }}>
-                    Rs. 1,500<span style={{ fontSize: "16px", fontWeight: 600 }}>/month</span>
+                    Price coming soon
                   </p>
                 )}
 
