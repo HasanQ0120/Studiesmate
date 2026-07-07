@@ -58,6 +58,7 @@ function EnglishLessonPageInner() {
   const [lang, setLang] = useState<"en" | "ur">("en");
   const [lessonCompletions, setLessonCompletions] = useState<Record<string, string>>({});
   const [transcriptOpen, setTranscriptOpen] = useState(false);
+  const [notesOpen, setNotesOpen] = useState(false);
   const [explanation, setExplanation] = useState("");
   const [isExplaining, setIsExplaining] = useState(false);
   const [creditsLeft, setCreditsLeft] = useState<number | null>(null);
@@ -280,6 +281,64 @@ function EnglishLessonPageInner() {
                       <p style={{ fontSize: "14px", lineHeight: "1.8", color: "#475569", whiteSpace: "pre-line" }}>
                         {TRANSCRIPT}
                       </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Notes card */}
+                <div className="rounded-xl border border-[#F3F4F6] bg-white shadow-sm">
+                  <button
+                    type="button"
+                    onClick={() => setNotesOpen((v) => !v)}
+                    className="flex w-full items-center gap-3 p-4"
+                  >
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F3F4F6]">
+                      <FileText className="h-4 w-4 text-[#6B7280]" />
+                    </div>
+                    <span className="flex-1 text-left text-sm font-bold text-[#111827]">Read Notes</span>
+                    <ChevronRight
+                      className="h-4 w-4 text-[#9CA3AF] transition-transform duration-200"
+                      style={{ transform: notesOpen ? "rotate(90deg)" : "rotate(0deg)" }}
+                    />
+                  </button>
+                  <div
+                    className="overflow-hidden transition-all duration-300"
+                    style={{ maxHeight: notesOpen ? "6000px" : "0px" }}
+                  >
+                    <div className="border-t border-[#F3F4F6] px-4 pb-4 pt-3 flex flex-col gap-3">
+                      <p className="text-xs text-[#6B7280]">🟡 Yellow = Most Important &nbsp;|&nbsp; 🟢 Green = Good to Know</p>
+                      <div style={{ background: "#FEFCE8", borderLeft: "3px solid #EAB308", borderRadius: "8px", padding: "12px 14px" }}>
+                        <p className="text-xs font-bold text-[#92400E] mb-1">🟡 Core Concept</p>
+                        <p style={{ fontSize: "14px", lineHeight: "1.7", color: "#44403C" }}>{"A sentence is like a complete package — if any piece is missing, the whole thing falls apart. Every complete sentence needs exactly two essential parts: a SUBJECT (who or what the sentence is about) and a VERB (the action that subject performs). Without both working together, what you have is just a fragment."}</p>
+                      </div>
+                      <div style={{ background: "#F0FDF4", borderLeft: "3px solid #22C55E", borderRadius: "8px", padding: "12px 14px" }}>
+                        <p className="text-xs font-bold text-[#166534] mb-1">🟢 How to Find the Subject</p>
+                        <p style={{ fontSize: "14px", lineHeight: "1.7", color: "#14532D" }}>{"Ask yourself: 'Who or what is doing something in this sentence?' That answer is your subject."}</p>
+                      </div>
+                      <div style={{ background: "#F0FDF4", borderLeft: "3px solid #22C55E", borderRadius: "8px", padding: "12px 14px" }}>
+                        <p className="text-xs font-bold text-[#166534] mb-1">🟢 How to Find the Verb</p>
+                        <p style={{ fontSize: "14px", lineHeight: "1.7", color: "#14532D" }}>{"Ask yourself: 'What action is happening?' That answer is your verb."}</p>
+                      </div>
+                      <div style={{ background: "#FEFCE8", borderLeft: "3px solid #EAB308", borderRadius: "8px", padding: "12px 14px" }}>
+                        <p className="text-xs font-bold text-[#92400E] mb-1">{'🟡 Solved Example 1: "The teacher explains the lesson."'}</p>
+                        <p style={{ fontSize: "14px", lineHeight: "1.7", color: "#44403C" }}>{"Step 1: Who is this about? The teacher → Subject: teacher. Step 2: What does the teacher do? Explains → Verb: explains. "}<strong>{"Answer: Complete sentence — has both subject and verb"}</strong></p>
+                      </div>
+                      <div style={{ background: "#FEFCE8", borderLeft: "3px solid #EAB308", borderRadius: "8px", padding: "12px 14px" }}>
+                        <p className="text-xs font-bold text-[#92400E] mb-1">{'🟡 Solved Example 2: "Birds fly south in winter."'}</p>
+                        <p style={{ fontSize: "14px", lineHeight: "1.7", color: "#44403C" }}>{"Step 1: Who is this about? Birds → Subject: Birds. Step 2: What do birds do? Fly → Verb: fly. "}<strong>{"Answer: Complete sentence"}</strong></p>
+                      </div>
+                      <div style={{ background: "#FEFCE8", borderLeft: "3px solid #EAB308", borderRadius: "8px", padding: "12px 14px" }}>
+                        <p className="text-xs font-bold text-[#92400E] mb-1">{'🟡 Solved Example 3: Is this complete? "Ate the whole cake."'}</p>
+                        <p style={{ fontSize: "14px", lineHeight: "1.7", color: "#44403C" }}>{"Step 1: Who ate the cake? We don't know! "}<strong>{"Answer: Incomplete — missing the subject."}</strong>{' Fixed version: "She ate the whole cake."'}</p>
+                      </div>
+                      <div style={{ background: "#FEFCE8", borderLeft: "3px solid #EAB308", borderRadius: "8px", padding: "12px 14px" }}>
+                        <p className="text-xs font-bold text-[#92400E] mb-1">{'🟡 Solved Example 4: Fix this sentence: "The clever fox."'}</p>
+                        <p style={{ fontSize: "14px", lineHeight: "1.7", color: "#44403C" }}>{"Step 1: We know who (the clever fox) but what did the fox do? Nothing is stated! "}<strong>{"Answer: Incomplete — missing the verb."}</strong>{' Fixed version: "The clever fox ran."'}</p>
+                      </div>
+                      <div style={{ background: "#F0FDF4", borderLeft: "3px solid #22C55E", borderRadius: "8px", padding: "12px 14px" }}>
+                        <p className="text-xs font-bold text-[#166534] mb-1">🟢 Common Mistake to Avoid</p>
+                        <p style={{ fontSize: "14px", lineHeight: "1.7", color: "#14532D" }}>{"Students often think a sentence just needs to 'sound complete' — but the real test is checking for BOTH a subject and a verb specifically. Read your sentence and ask: Do I know WHO or WHAT, and do I know the ACTION? If either answer is no, the sentence needs fixing."}</p>
+                      </div>
                     </div>
                   </div>
                 </div>

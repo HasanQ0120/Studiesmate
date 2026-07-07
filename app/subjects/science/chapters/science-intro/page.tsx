@@ -59,6 +59,7 @@ function ScienceLessonPageInner() {
   const [lang, setLang] = useState<"en" | "ur">("en");
   const [lessonCompletions, setLessonCompletions] = useState<Record<string, string>>({});
   const [transcriptOpen, setTranscriptOpen] = useState(false);
+  const [notesOpen, setNotesOpen] = useState(false);
   const [explanation, setExplanation] = useState("");
   const [isExplaining, setIsExplaining] = useState(false);
   const [creditsLeft, setCreditsLeft] = useState<number | null>(null);
@@ -281,6 +282,64 @@ function ScienceLessonPageInner() {
                       <p style={{ fontSize: "14px", lineHeight: "1.8", color: "#475569", whiteSpace: "pre-line" }}>
                         {TRANSCRIPT}
                       </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Notes card */}
+                <div className="rounded-xl border border-[#F3F4F6] bg-white shadow-sm">
+                  <button
+                    type="button"
+                    onClick={() => setNotesOpen((v) => !v)}
+                    className="flex w-full items-center gap-3 p-4"
+                  >
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F3F4F6]">
+                      <FileText className="h-4 w-4 text-[#6B7280]" />
+                    </div>
+                    <span className="flex-1 text-left text-sm font-bold text-[#111827]">Read Notes</span>
+                    <ChevronRight
+                      className="h-4 w-4 text-[#9CA3AF] transition-transform duration-200"
+                      style={{ transform: notesOpen ? "rotate(90deg)" : "rotate(0deg)" }}
+                    />
+                  </button>
+                  <div
+                    className="overflow-hidden transition-all duration-300"
+                    style={{ maxHeight: notesOpen ? "6000px" : "0px" }}
+                  >
+                    <div className="border-t border-[#F3F4F6] px-4 pb-4 pt-3 flex flex-col gap-3">
+                      <p className="text-xs text-[#6B7280]">🟡 Yellow = Most Important &nbsp;|&nbsp; 🟢 Green = Good to Know</p>
+                      <div style={{ background: "#FEFCE8", borderLeft: "3px solid #EAB308", borderRadius: "8px", padding: "12px 14px" }}>
+                        <p className="text-xs font-bold text-[#92400E] mb-1">🟡 Core Concept</p>
+                        <p style={{ fontSize: "14px", lineHeight: "1.7", color: "#44403C" }}>{"A habitat is the natural home of a living thing — the specific place in nature where an animal or plant lives and grows. Every habitat must provide four essential things: food for energy, water to drink, air to breathe, and shelter to stay safe. Without even one of these, animals and plants cannot survive."}</p>
+                      </div>
+                      <div style={{ background: "#F0FDF4", borderLeft: "3px solid #22C55E", borderRadius: "8px", padding: "12px 14px" }}>
+                        <p className="text-xs font-bold text-[#166534] mb-1">🟢 Types of Habitats</p>
+                        <p style={{ fontSize: "14px", lineHeight: "1.7", color: "#14532D" }}>{"Deserts — hot and dry. Arctic — freezing cold. Oceans — full of salt water. Forests — filled with trees and dense plant life."}</p>
+                      </div>
+                      <div style={{ background: "#FEFCE8", borderLeft: "3px solid #EAB308", borderRadius: "8px", padding: "12px 14px" }}>
+                        <p className="text-xs font-bold text-[#92400E] mb-1">🟡 What Are Adaptations</p>
+                        <p style={{ fontSize: "14px", lineHeight: "1.7", color: "#44403C" }}>{"Animals develop special features called adaptations that help them survive specifically in their habitat. These features develop over generations to match exactly what that environment demands."}</p>
+                      </div>
+                      <div style={{ background: "#FEFCE8", borderLeft: "3px solid #EAB308", borderRadius: "8px", padding: "12px 14px" }}>
+                        <p className="text-xs font-bold text-[#92400E] mb-1">🟡 Solved Example 1: Where does a penguin live, and what habitat is that?</p>
+                        <p style={{ fontSize: "14px", lineHeight: "1.7", color: "#44403C" }}>{"Step 1: Penguins are found in extremely cold regions. "}<strong>{"Answer: Penguins live in the Arctic/Antarctic — a freezing cold habitat"}</strong></p>
+                      </div>
+                      <div style={{ background: "#FEFCE8", borderLeft: "3px solid #EAB308", borderRadius: "8px", padding: "12px 14px" }}>
+                        <p className="text-xs font-bold text-[#92400E] mb-1">{"🟡 Solved Example 2: True or False — A fish tank is a fish's natural habitat."}</p>
+                        <p style={{ fontSize: "14px", lineHeight: "1.7", color: "#44403C" }}>{"Step 1: Is a fish tank found in nature, or made by humans? "}<strong>{"Answer: False — a fish tank is man-made."}</strong>{"  A fish's REAL natural habitat is a river, lake, or ocean"}</p>
+                      </div>
+                      <div style={{ background: "#FEFCE8", borderLeft: "3px solid #EAB308", borderRadius: "8px", padding: "12px 14px" }}>
+                        <p className="text-xs font-bold text-[#92400E] mb-1">🟡 Solved Example 3: Why do desert plants like cacti have thick stems?</p>
+                        <p style={{ fontSize: "14px", lineHeight: "1.7", color: "#44403C" }}>{"Step 1: Think about what deserts lack — rain and water. "}<strong>{"Answer: Cacti store water in their thick stems because deserts rarely get rain, and this stored water keeps them alive during long dry periods"}</strong></p>
+                      </div>
+                      <div style={{ background: "#FEFCE8", borderLeft: "3px solid #EAB308", borderRadius: "8px", padding: "12px 14px" }}>
+                        <p className="text-xs font-bold text-[#92400E] mb-1">🟡 Solved Example 4: Name one adaptation that helps a fish survive underwater.</p>
+                        <p style={{ fontSize: "14px", lineHeight: "1.7", color: "#44403C" }}>{"Step 1: Think about what fish need that's different from land animals. "}<strong>{"Answer: Gills — they allow fish to breathe underwater by extracting oxygen from water, unlike humans who need to breathe air"}</strong></p>
+                      </div>
+                      <div style={{ background: "#F0FDF4", borderLeft: "3px solid #22C55E", borderRadius: "8px", padding: "12px 14px" }}>
+                        <p className="text-xs font-bold text-[#166534] mb-1">🟢 Common Mistake to Avoid</p>
+                        <p style={{ fontSize: "14px", lineHeight: "1.7", color: "#14532D" }}>{"Students often confuse 'habitat' with just 'where an animal is kept' — like a zoo enclosure or fish tank. Remember: a TRUE habitat is always found in NATURE, not created by humans, even if humans try to recreate similar conditions."}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
