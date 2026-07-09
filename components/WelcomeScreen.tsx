@@ -14,7 +14,7 @@ export default function WelcomeScreen({ name, onContinue }: WelcomeScreenProps) 
         </h1>
         <p className="mt-6 text-base leading-8 text-slate-700 md:text-lg">
           You have just joined the StudiesMate family. We are proud to have you here.
-          Your learning journey starts today — one small step at a time.
+          Your learning journey starts today, one small step at a time.
         </p>
 
         <div className="mt-10 flex flex-col items-center gap-4">

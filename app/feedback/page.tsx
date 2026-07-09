@@ -102,7 +102,7 @@ export default function FeedbackPage() {
               Your feedback has been submitted.
             </p>
             <p style={{ color: "#6B7280", fontSize: "15px", lineHeight: 1.7, marginBottom: "12px" }}>
-              If you ever face any issue or bug while using StudiesMate, please report it here anytime — we fix things fast.
+              If you ever face any issue or bug while using StudiesMate, please report it here anytime. We fix things fast.
             </p>
             <p style={{ color: "#6B7280", fontSize: "15px", lineHeight: 1.7, marginBottom: "32px" }}>
               Have questions or want updates?{" "}
@@ -117,6 +117,7 @@ export default function FeedbackPage() {
             </p>
             <Link
               href="/dashboard"
+              onClick={() => { try { localStorage.removeItem("last_selected_subject"); } catch {} }}
               style={{
                 display: "inline-flex",
                 alignItems: "center",

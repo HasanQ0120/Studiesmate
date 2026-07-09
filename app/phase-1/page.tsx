@@ -46,14 +46,14 @@ export default function GradesPage() {
 
         <h1 className="text-3xl font-bold text-[#111827] md:text-4xl">All Grade Tracks</h1>
         <p className="mt-2 text-base font-medium text-[#22C55E]">
-          From Beta to Grade 8 — your complete learning journey
+          From Beta to Grade 8, your complete learning journey
         </p>
 
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {GRADES.map((g) => {
             const isExpanded = expandedCards.has(g.name);
             return (
-              <div key={g.name} className="flex flex-col rounded-xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
+              <div key={g.name} className="flex flex-col rounded-xl border border-[#E5E7EB] bg-white p-6 shadow-sm premium-card-hover">
 
                 {/* Badge row */}
                 <div className="flex items-center justify-between">
@@ -103,7 +103,7 @@ export default function GradesPage() {
                     <button
                       type="button"
                       onClick={() => {
-                        if (isLoggedIn) router.push("/dashboard");
+                        if (isLoggedIn) { try { localStorage.removeItem("last_selected_subject"); } catch {} router.push("/dashboard"); }
                         else setAuthModalOpen(true);
                       }}
                       className="flex w-full items-center justify-center rounded-xl bg-[#22C55E] py-3 text-sm font-semibold text-white hover:bg-[#16A34A] transition-colors"

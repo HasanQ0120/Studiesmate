@@ -3,11 +3,13 @@ import { supabase } from "@/lib/auth";
 export async function updateStreak(userId: string) {
   const today = new Date().toISOString().split("T")[0];
 
-  let { data: profile } = await supabase
+  const { data: profile, error: fetchErr } = await supabase
     .from("profiles")
     .select("current_streak, last_active_date")
     .eq("id", userId)
     .maybeSingle();
+
+  if (fetchErr) return;
 
   if (!profile) {
     await supabase.from("profiles").upsert({

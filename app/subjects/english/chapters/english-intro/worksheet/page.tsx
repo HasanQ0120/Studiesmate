@@ -14,11 +14,12 @@ export default function SimpleSentenceWorksheetPage() {
         href: "/subjects/english/chapters/english-intro/worksheet",
         timestamp: new Date().toISOString(),
       }));
+      localStorage.setItem("last_view_english", JSON.stringify({ section: "worksheet", topicId: "simple-sentences" }));
     } catch {}
   }, []);
 
   return (
-    <DashboardLayout>
+    <DashboardLayout selectedSubject="english" onSubjectChange={() => {}}>
       <main className="min-h-screen bg-white text-[#0F172A] pb-20 md:pb-16">
         <div className="mx-auto max-w-4xl px-6 py-10">
           <button

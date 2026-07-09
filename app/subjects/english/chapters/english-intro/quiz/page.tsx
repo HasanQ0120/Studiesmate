@@ -15,6 +15,7 @@ export default function EnglishQuizPage() {
         href: "/subjects/english/chapters/english-intro/quiz",
         timestamp: new Date().toISOString(),
       }));
+      localStorage.setItem("last_view_english", JSON.stringify({ section: "quiz", topicId: "simple-sentences" }));
     } catch {}
   }, []);
 
@@ -48,7 +49,7 @@ export default function EnglishQuizPage() {
   }, []);
 
   return (
-    <DashboardLayout>
+    <DashboardLayout selectedSubject="english" onSubjectChange={() => {}}>
       <main className="min-h-screen bg-white text-[#0F172A] pb-20 md:pb-16">
         <div className="mx-auto max-w-4xl px-6 py-10">
           <BackButton href="/dashboard" label="Back to Dashboard" />

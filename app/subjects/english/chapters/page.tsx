@@ -18,8 +18,7 @@ export default function EnglishChaptersPage() {
   return (
     <div className="min-h-screen bg-white px-6 py-10">
       <div className="max-w-6xl mx-auto">
-        {/* ✅ Back should go to the selected subjects dashboard */}
-        <BackButton href="/dashboard" label="Back to Dashboard" />
+        <BackButton href="/dashboard" label="Back to Dashboard" onClick={() => { try { localStorage.removeItem("last_selected_subject"); } catch {} }} />
 
         <h1 className="mt-6 text-3xl font-bold text-gray-900 mb-2">English</h1>
         <p className="text-gray-600 mb-10">

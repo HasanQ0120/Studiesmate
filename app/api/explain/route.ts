@@ -3,16 +3,32 @@ import { createClient } from "@supabase/supabase-js";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
-if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE || !GROQ_API_KEY) {
-  throw new Error("explain route: missing NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, or GROQ_API_KEY");
+if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE || !SUPABASE_ANON_KEY || !GROQ_API_KEY) {
+  throw new Error("explain route: missing NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, NEXT_PUBLIC_SUPABASE_ANON_KEY, or GROQ_API_KEY");
 }
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE);
 
 export async function POST(req: NextRequest) {
   try {
+    // Verify the caller is an authenticated session owner
+    const authHeader = req.headers.get("Authorization");
+    const token = authHeader?.replace(/^Bearer\s+/i, "");
+    if (!token) {
+      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    }
+    const userClient = createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+      auth: { persistSession: false },
+    });
+    const { data: { user }, error: authErr } = await userClient.auth.getUser();
+    if (authErr || !user) {
+      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    }
+
     const body = await req.json().catch(() => null);
     if (!body) {
       return NextResponse.json({ error: "invalid_request" }, { status: 400 });
@@ -26,6 +42,11 @@ export async function POST(req: NextRequest) {
       typeof language !== "string" || typeof userId !== "string"
     ) {
       return NextResponse.json({ error: "missing_fields" }, { status: 400 });
+    }
+
+    // Ensure the session user matches the requested userId
+    if (user.id !== userId) {
+      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }
 
     let { data: profile } = await supabase

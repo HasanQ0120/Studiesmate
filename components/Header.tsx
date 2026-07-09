@@ -41,29 +41,21 @@ export default function Header() {
   }
 
   useEffect(() => {
-    // Hide dot immediately when feedback is submitted in the same tab
-    function onFeedbackSubmitted() {
-      setFeedbackSubmitted(true);
-    }
+    function onFeedbackSubmitted() { setFeedbackSubmitted(true); }
     window.addEventListener("feedback_submitted", onFeedbackSubmitted);
     return () => window.removeEventListener("feedback_submitted", onFeedbackSubmitted);
   }, []);
 
   useEffect(() => {
     try {
-      // Never show dot once feedback has been submitted
       if (localStorage.getItem("feedback_submitted") === "true") return;
-
-      // Record first visit time if this is a new visitor
       let firstVisit = localStorage.getItem("first_visit_timestamp");
       if (!firstVisit) {
         firstVisit = Date.now().toString();
         localStorage.setItem("first_visit_timestamp", firstVisit);
       }
-
       const elapsed = Date.now() - parseInt(firstVisit, 10);
       const remaining = Math.max(0, 15000 - elapsed);
-
       if (remaining === 0) {
         setFeedbackSubmitted(false);
       } else {
@@ -108,7 +100,6 @@ export default function Header() {
   function closeMobileNav() { setMobileNavOpen(false); }
   function toggleMobileNav() { setMenuOpen(false); setMobileNavOpen((v) => !v); }
   function toggleAccountMenu() { setMobileNavOpen(false); setMenuOpen((v) => !v); }
-
   function handleLogout() { setMenuOpen(false); setShowLogoutModal(true); }
 
   async function handleConfirmLogout() {
@@ -125,6 +116,13 @@ export default function Header() {
     { label: "Feedback", href: "/feedback" },
   ];
 
+  const loggedInLinks = [
+    { label: "Dashboard", href: "/dashboard" },
+    { label: "Grades", href: "/phase-1" },
+    { label: "Feedback", href: "/feedback" },
+    { label: "About", href: "/about" },
+  ];
+
   return (
     <>
     <header className="sticky top-0 z-50 border-b border-[#F3F4F6] bg-white">
@@ -137,19 +135,19 @@ export default function Header() {
 
         {/* Desktop nav */}
         <nav className="hidden items-center gap-8 text-sm font-medium text-[#374151] md:flex">
-          {navLinks.map(({ label, href }) => (
-            <Link key={label} href={href} className="relative transition-colors hover:text-[#22C55E]">
+          {(!isLoggedIn ? navLinks : loggedInLinks).map(({ label, href }) => (
+            <Link
+              key={label}
+              href={href}
+              onClick={() => { if (href === "/dashboard") { try { localStorage.removeItem("last_selected_subject"); } catch {} } }}
+              className={`relative transition-colors hover:text-[#22C55E] ${pathname === href ? "text-[#22C55E] font-semibold" : ""}`}
+            >
               {label}
               {label === "Feedback" && !feedbackSubmitted && (
                 <span style={{ position: "absolute", top: -3, right: -7, width: 8, height: 8, background: "#EF4444", borderRadius: "50%", display: "block" }} />
               )}
             </Link>
           ))}
-          {isLoggedIn && (
-            <Link href="/dashboard" className="transition-colors hover:text-[#22C55E]">
-              Dashboard
-            </Link>
-          )}
         </nav>
 
         {/* Right side */}
@@ -166,24 +164,27 @@ export default function Header() {
             </button>
 
             {mobileNavOpen && (
-              <div className="absolute left-0 right-0 top-full border-t border-[#F3F4F6] bg-white shadow-lg">
+              <div className="absolute left-0 right-0 top-full border-t border-[#F3F4F6] bg-white shadow-lg" style={{ animation: "slideDown 0.2s ease-out" }}>
                 <div className="mx-auto max-w-6xl px-4 py-3">
                   <div className="grid grid-cols-2 gap-1 text-sm">
-                    {navLinks.map(({ label, href }) => (
-                      <Link key={label} href={href} onClick={closeMobileNav} className={`relative rounded-lg px-3 py-2 ${pathname === href ? "text-[#22C55E] font-semibold" : "text-[#374151] hover:text-[#22C55E]"}`}>
+                    {(!isLoggedIn ? navLinks : loggedInLinks).map(({ label, href }) => (
+                      <Link
+                        key={label}
+                        href={href}
+                        onClick={() => { closeMobileNav(); if (href === "/dashboard") { try { localStorage.removeItem("last_selected_subject"); } catch {} } }}
+                        className={`relative rounded-lg px-3 py-2 ${pathname === href ? "text-[#22C55E] font-semibold" : "text-[#374151] hover:text-[#22C55E]"}`}
+                      >
                         {label}
                         {label === "Feedback" && !feedbackSubmitted && (
                           <span style={{ position: "absolute", top: 6, marginLeft: 3, width: 7, height: 7, background: "#EF4444", borderRadius: "50%", display: "inline-block" }} />
                         )}
                       </Link>
                     ))}
-                    {!isLoggedIn ? (
+                    {!isLoggedIn && (
                       <>
                         <button type="button" onClick={() => { closeMobileNav(); setAuthMode("login"); setAuthModalOpen(true); }} className="rounded-lg px-3 py-2 text-[#374151] hover:text-[#22C55E] text-left">Login</button>
                         <button type="button" onClick={() => { closeMobileNav(); setAuthMode("signup"); setAuthModalOpen(true); }} className="rounded-lg px-3 py-2 text-[#374151] hover:text-[#22C55E] text-left">Sign Up</button>
                       </>
-                    ) : (
-                      <Link href="/dashboard" onClick={closeMobileNav} className={`rounded-lg px-3 py-2 ${pathname === "/dashboard" ? "text-[#22C55E] font-semibold" : "text-[#374151] hover:text-[#22C55E]"}`}>Dashboard</Link>
                     )}
                   </div>
                 </div>
@@ -210,36 +211,34 @@ export default function Header() {
               </button>
             </>
           ) : (
-            <>
-              <div className="relative" ref={menuRef}>
-                <button
-                  type="button"
-                  onClick={toggleAccountMenu}
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-[#22C55E] text-sm font-semibold text-white hover:bg-[#16A34A]"
-                  aria-label="Account menu"
-                >
-                  {avatarLetter}
-                </button>
+            <div className="relative" ref={menuRef}>
+              <button
+                type="button"
+                onClick={toggleAccountMenu}
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-[#22C55E] text-sm font-semibold text-white hover:bg-[#16A34A]"
+                aria-label="Account menu"
+              >
+                {avatarLetter}
+              </button>
 
-                {menuOpen && (
-                  <div className="absolute right-0 mt-3 w-60 rounded-xl border border-[#F3F4F6] bg-white p-2 text-[#111827] shadow-lg">
-                    <div className="px-3 py-2">
-                      <div className="text-sm font-semibold text-[#111827]">{displayName || "Student"}</div>
-                      <div className="mt-0.5 break-all text-xs text-[#6B7280]">{displayEmail || "No parent email"}</div>
-                    </div>
-                    <div className="my-2 h-px bg-[#F3F4F6]" />
-                    <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="block rounded-lg px-3 py-2 text-sm hover:bg-[#F9FAFB]">Dashboard</Link>
-                    <button
-                      type="button"
-                      onClick={handleLogout}
-                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#111827] hover:bg-[#F9FAFB] transition-colors"
-                    >
-                      🚪 Logout
-                    </button>
+              {menuOpen && (
+                <div className="absolute right-0 mt-3 w-60 rounded-xl border border-[#F3F4F6] bg-white p-2 text-[#111827] shadow-lg" style={{ animation: "dropdownIn 0.15s ease-out", transformOrigin: "top right" }}>
+                  <div className="px-3 py-2">
+                    <div className="text-sm font-semibold text-[#111827]">{displayName || "Student"}</div>
+                    <div className="mt-0.5 break-all text-xs text-[#6B7280]">{displayEmail || "No parent email"}</div>
                   </div>
-                )}
-              </div>
-            </>
+                  <div className="my-2 h-px bg-[#F3F4F6]" />
+                  <Link href="/dashboard" onClick={() => { setMenuOpen(false); try { localStorage.removeItem("last_selected_subject"); } catch {}; }} className="block rounded-lg px-3 py-2 text-sm hover:bg-[#F9FAFB]">Dashboard</Link>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#111827] hover:bg-[#F9FAFB] transition-colors"
+                  >
+                    🚪 Logout
+                  </button>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>
@@ -252,14 +251,14 @@ export default function Header() {
     />
 
     {showToast && (
-      <div style={{ position: "fixed", top: "20px", right: "20px", background: "#22C55E", color: "white", padding: "12px 20px", borderRadius: "12px", fontSize: "14px", fontWeight: 600, zIndex: 9999, boxShadow: "0 4px 12px rgba(0,0,0,0.15)", maxWidth: "320px" }}>
+      <div className="toast-slide-in" style={{ position: "fixed", top: "20px", right: "20px", background: "#22C55E", color: "white", padding: "12px 20px", borderRadius: "12px", fontSize: "14px", fontWeight: 600, zIndex: 9999, boxShadow: "0 4px 12px rgba(0,0,0,0.15)", maxWidth: "320px" }}>
         You have been logged out successfully.
       </div>
     )}
 
     {showLogoutModal && (
-      <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 9998, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ background: "white", borderRadius: "16px", padding: "32px", maxWidth: "380px", width: "90%", textAlign: "center", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
+      <div className="backdrop-animate" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 9998, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div className="popup-animate" style={{ background: "white", borderRadius: "16px", padding: "32px", maxWidth: "380px", width: "90%", textAlign: "center", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
           <p style={{ fontSize: "48px", marginBottom: "12px" }}>👋</p>
           <h2 style={{ fontSize: "22px", fontWeight: 700, color: "#0F172A" }}>Leaving so soon?</h2>
           <p style={{ fontSize: "14px", color: "#6B7280", marginTop: "8px" }}>Your progress is saved. We&apos;ll be here when you come back.</p>

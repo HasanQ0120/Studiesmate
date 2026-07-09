@@ -19,7 +19,7 @@ export default function ConfirmNamePage() {
       const { data: { user } } = await supabase.auth.getUser();
 
       if (!user) { router.replace("/"); return; }
-      if (user.app_metadata?.provider !== "google") { router.replace("/dashboard"); return; }
+      if (user.app_metadata?.provider !== "google") { try { localStorage.removeItem("last_selected_subject"); } catch {} router.replace("/dashboard"); return; }
 
       const { data: profile } = await supabase
         .from("profiles")
@@ -27,7 +27,7 @@ export default function ConfirmNamePage() {
         .eq("id", user.id)
         .maybeSingle();
 
-      if (profile?.student_name?.trim()) { router.replace("/dashboard"); return; }
+      if (profile?.student_name?.trim()) { try { localStorage.removeItem("last_selected_subject"); } catch {} router.replace("/dashboard"); return; }
 
       const fetched = (
         (user.user_metadata?.full_name as string | undefined) ||
@@ -83,6 +83,7 @@ export default function ConfirmNamePage() {
     // Update user_metadata so the dashboard greeting reads the confirmed name
     await supabase.auth.updateUser({ data: { studentName: trimmed } });
 
+    try { localStorage.removeItem("last_selected_subject"); } catch {}
     router.replace("/dashboard");
   }
 

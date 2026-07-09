@@ -14,20 +14,24 @@ export default function NumbersWorksheetPage() {
         href: "/subjects/maths/chapters/numbers/worksheet",
         timestamp: new Date().toISOString(),
       }));
+      localStorage.setItem("last_view_mathematics", JSON.stringify({ section: "worksheet", topicId: "intro-to-place-value" }));
     } catch {}
   }, []);
 
   return (
-    <DashboardLayout>
+    <DashboardLayout selectedSubject="mathematics" onSubjectChange={() => {}}>
       <main className="min-h-screen bg-white text-[#0F172A] pb-20 md:pb-16">
         <div className="mx-auto max-w-4xl px-6 py-10">
           <button
             type="button"
-            onClick={() => router.back()}
+            onClick={() => {
+              try { localStorage.setItem("last_selected_subject", "mathematics"); } catch {}
+              router.push("/dashboard");
+            }}
             className="inline-flex items-center gap-2 rounded-xl bg-[#0B2B5A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0A2550] transition"
           >
             <span className="text-base leading-none">←</span>
-            <span>Back</span>
+            <span>Back to Dashboard</span>
           </button>
           <div className="mt-6 flex flex-wrap items-start justify-between gap-4">
             <div>

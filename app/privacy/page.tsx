@@ -9,7 +9,7 @@ export default function PrivacyPage() {
 
         <div className="mt-10 space-y-6 text-sm leading-7 text-slate-700">
           <p>
-            StudiesMate collects only the information needed to provide our service — your name, email address, and your child's grade level.
+            StudiesMate collects only the information needed to provide our service, including your name, email address, and your child's grade level.
           </p>
           <p>
             We do not sell, share, or distribute your personal data to any third party.

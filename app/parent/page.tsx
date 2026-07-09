@@ -34,7 +34,7 @@ export default function ParentPage() {
         .from("profiles")
         .select("connect_code")
         .eq("id", session.user.id)
-        .single()
+        .maybeSingle()
         .then(({ data }) => {
           if (data?.connect_code) setConnectedCode(data.connect_code);
           setAuthChecked(true);
@@ -42,7 +42,18 @@ export default function ParentPage() {
     });
   }, []);
 
-  if (!authChecked) return null;
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] px-4 py-12">
+        <div className="mx-auto max-w-lg">
+          <div className="skeleton mb-3" style={{ height: 32, width: 200 }} />
+          <div className="skeleton mb-8" style={{ height: 16, width: 280 }} />
+          <div className="skeleton mb-4" style={{ height: 120, borderRadius: 16 }} />
+          <div className="skeleton" style={{ height: 180, borderRadius: 16 }} />
+        </div>
+      </div>
+    );
+  }
 
   async function handleConnect() {
     const code = inputCode.trim().toUpperCase();
@@ -56,7 +67,7 @@ export default function ParentPage() {
         .from("profiles")
         .select("connect_code")
         .eq("connect_code", code)
-        .single();
+        .maybeSingle();
 
       if (queryError || !data) {
         setError("Invalid code. Please enter the correct Connect Code.");
@@ -113,7 +124,7 @@ export default function ParentPage() {
           </div>
         ) : (
           /* Connect form */
-          <div className="rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm premium-card-hover">
             <label className="block text-sm font-semibold text-[#0F172A]">
               Enter your child&apos;s Connect Code
             </label>

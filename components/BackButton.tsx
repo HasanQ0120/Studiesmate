@@ -5,12 +5,14 @@ import Link from "next/link";
 type Props = {
   href: string;
   label?: string; // optional custom text
+  onClick?: () => void;
 };
 
-export default function BackButton({ href, label = "Back" }: Props) {
+export default function BackButton({ href, label = "Back", onClick }: Props) {
   return (
     <Link
       href={href}
+      onClick={onClick}
       className="
         inline-flex items-center gap-2
         rounded-xl bg-[#0B2B5A] px-4 py-2
