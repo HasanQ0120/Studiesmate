@@ -5,6 +5,25 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { useEffect, useState } from "react";
 import confetti from "canvas-confetti";
 import Link from "next/link";
+import { supabase } from "@/lib/auth";
+
+async function sendQuizNotification(quizId: string) {
+  try {
+    if (localStorage.getItem("sm_email_notifications") === "false") return;
+    if (localStorage.getItem(`sm_quiz_email_sent_${quizId}`)) return;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) return;
+    const res = await fetch("/api/send-quiz-notification", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ quizId }),
+    });
+    if (res.ok) localStorage.setItem(`sm_quiz_email_sent_${quizId}`, "true");
+  } catch {}
+}
 
 export default function EnglishQuizPage() {
   const [showFeedbackNudge, setShowFeedbackNudge] = useState(false);
@@ -15,6 +34,7 @@ export default function EnglishQuizPage() {
         href: "/subjects/english/chapters/english-intro/quiz",
         timestamp: new Date().toISOString(),
       }));
+      localStorage.setItem("last_view_english", JSON.stringify({ section: "quiz", topicId: "simple-sentences" }));
     } catch {}
   }, []);
 
@@ -41,6 +61,7 @@ export default function EnglishQuizPage() {
         if (score >= 60) {
           confetti({ particleCount: 160, spread: 75, origin: { y: 0.6 } });
         }
+        sendQuizNotification("english-intro");
       }
     }
     window.addEventListener("message", handleMessage);
@@ -48,7 +69,7 @@ export default function EnglishQuizPage() {
   }, []);
 
   return (
-    <DashboardLayout>
+    <DashboardLayout selectedSubject="english" onSubjectChange={() => {}}>
       <main className="min-h-screen bg-white text-[#0F172A] pb-20 md:pb-16">
         <div className="mx-auto max-w-4xl px-6 py-10">
           <BackButton href="/dashboard" label="Back to Dashboard" />

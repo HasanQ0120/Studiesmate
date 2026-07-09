@@ -35,6 +35,7 @@ function GoogleCallbackInner() {
       }
 
       if (provider !== "google") {
+        try { localStorage.removeItem("last_selected_subject"); } catch {}
         router.replace("/dashboard");
         return;
       }
@@ -46,6 +47,7 @@ function GoogleCallbackInner() {
         .maybeSingle();
 
       if (profile?.student_name?.trim()) {
+        try { localStorage.removeItem("last_selected_subject"); } catch {}
         router.replace("/dashboard");
       } else {
         router.replace("/confirm-name");

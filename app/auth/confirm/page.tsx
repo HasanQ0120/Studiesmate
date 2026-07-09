@@ -46,6 +46,7 @@ function AuthConfirmInner() {
         return;
       }
 
+      try { localStorage.removeItem("last_selected_subject"); } catch {}
       router.replace("/dashboard");
     }
 
@@ -66,7 +67,7 @@ function AuthConfirmInner() {
           <p className="text-4xl mb-4">🌐</p>
           <h1 className="text-xl font-bold text-[#111827]">Open in Chrome or Safari</h1>
           <p className="mt-2 text-sm text-[#6B7280]">
-            This confirmation link needs to open in your default browser — not inside the Gmail or app webview — to work correctly.
+            This confirmation link needs to open in your default browser, not inside the Gmail or app webview, to work correctly.
           </p>
           <button
             type="button"

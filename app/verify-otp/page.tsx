@@ -60,6 +60,7 @@ function VerifyOtpContent() {
       setTimeout(() => refs.current[0]?.focus(), 50);
       return;
     }
+    try { localStorage.removeItem("last_selected_subject"); } catch {}
     router.push("/dashboard");
   }
 
@@ -195,7 +196,7 @@ function VerifyOtpContent() {
         </p>
 
         <p style={{ fontSize: "13px", color: "#9CA3AF", lineHeight: 1.5 }}>
-          Check your email on any device — then come back here to enter the code.
+          Check your email on any device. Then come back here to enter the code.
         </p>
       </div>
     </div>

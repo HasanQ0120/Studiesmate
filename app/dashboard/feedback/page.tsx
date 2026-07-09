@@ -96,6 +96,7 @@ export default function AdminFeedbackPage({ adminPassword }: Props) {
     if (isPasswordAdminRoute) return;
 
     if (!isAllowed) {
+      try { localStorage.removeItem("last_selected_subject"); } catch {}
       router.replace("/dashboard");
     }
   }, [authChecked, isAllowed, isPasswordAdminRoute, router]);
@@ -218,6 +219,7 @@ export default function AdminFeedbackPage({ adminPassword }: Props) {
 
           <Link
             href="/dashboard"
+            onClick={() => { try { localStorage.removeItem("last_selected_subject"); } catch {} }}
             className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-50"
           >
             ← Back to Dashboard

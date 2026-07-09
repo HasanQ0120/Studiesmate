@@ -51,7 +51,7 @@ body {
   to { transform: translateX(0); opacity: 1; }
 }
 
-.page-wrapper, main, [class*="container"] {
+.page-wrapper {
   animation: pageFadeIn 0.3s ease-out;
 }
 
@@ -97,4 +97,112 @@ body {
   width: 18px;
   height: 18px;
   opacity: 0.12;
+}
+
+/* ---- Standard card hover (all non-special cards) ---- */
+/* Placed in @layer utilities so Tailwind v4's layer ordering resolves correctly. */
+@layer utilities {
+  .premium-card-hover {
+    transition: transform 0.25s ease-out, box-shadow 0.25s ease-out;
+  }
+  .premium-card-hover:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ---- Breathing animation for 9 featured cards ---- */
+@keyframes breathe {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-6px); }
+}
+
+/* Outer wrapper: runs the breathing loop; pauses on hover so the
+   inner card's lift/scale takes over cleanly with no jitter. */
+.breathe-card {
+  animation: breathe 3s ease-in-out infinite;
+}
+.breathe-card:hover {
+  animation-play-state: paused;
+}
+
+/* Inner card: lift + scale + green glow on hover */
+.special-card-hover {
+  transition: transform 0.25s ease-out, box-shadow 0.25s ease-out;
+}
+.special-card-hover:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 0 24px 4px rgba(34, 197, 94, 0.35), 0 8px 24px rgba(0,0,0,0.06);
+}
+
+/* ---- Popup / modal entrance ---- */
+@keyframes popupFadeIn {
+  from { opacity: 0; transform: scale(0.95) translateY(8px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0);   }
+}
+
+@keyframes backdropFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.popup-animate {
+  animation: popupFadeIn 0.2s ease-out;
+}
+
+.backdrop-animate {
+  animation: backdropFadeIn 0.2s ease-out;
+}
+
+/* ---- Toast slide in ---- */
+.toast-slide-in {
+  animation: slideInRight 0.3s ease-out;
+}
+
+/* ---- Dropdown menus (appear below trigger, slide down) ---- */
+@keyframes dropdownIn {
+  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+
+/* ---- Dropup menus (appear above trigger, slide up) ---- */
+@keyframes dropupIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- Mobile nav panel (slides down from header) ---- */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- Skeleton loading shimmer ---- */
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #E5E7EB 25%, #F3F4F6 50%, #E5E7EB 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: 8px;
+}
+
+/* ---- Accessibility: disable all animations for users who prefer reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

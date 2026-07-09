@@ -89,6 +89,7 @@ export default function AuthModal({ isOpen, onClose, initialMode }: AuthModalPro
       setLoading(false);
       if (signInError) { setError(signInError.message || "Login failed."); return; }
       onClose();
+      try { localStorage.removeItem("last_selected_subject"); } catch {}
       router.push("/dashboard");
     }
   }
@@ -258,6 +259,7 @@ export default function AuthModal({ isOpen, onClose, initialMode }: AuthModalPro
                 borderRadius: "8px",
                 padding: "10px 14px",
                 fontSize: "13px",
+                animation: "fadeIn 0.2s ease-out",
               }}
             >
               {error}

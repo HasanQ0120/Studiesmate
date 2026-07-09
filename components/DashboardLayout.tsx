@@ -6,59 +6,95 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, Calculator, BookOpen, FlaskConical,
   ChevronDown, ChevronRight, FileText,
-  PlayCircle, HelpCircle, TrendingUp, Home,
-  Copy, Check, Eye, EyeOff,
+  PlayCircle, HelpCircle,
+  Copy, Lock, Settings,
 } from "lucide-react";
 import { supabase } from "@/lib/auth";
+import { CURRICULUM, SubjectKey } from "@/lib/curriculum";
 
-type SidebarChild = {
-  id: string;
-  label: string;
-  href: string;
-  icon: React.ElementType;
+const TOPIC_LESSON_URLS: Record<string, string> = {
+  "intro-to-place-value": "/subjects/maths/chapters/numbers",
+  "simple-sentences": "/subjects/english/chapters/english-intro",
+  "habitats": "/subjects/science/chapters/science-intro",
 };
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+const SUBJECT_EMOJI: Record<string, string> = {
+  mathematics: "🧮",
+  english: "📚",
+  science: "🔬",
+};
+
+const TOPIC_UNLOCK_MAP: Record<string, string> = {
+  "reading-writing-whole-numbers": "math-npv",
+  "compound-sentences": "english-intro",
+  "food-chains": "science-intro",
+};
+
+function getTopicUrl(topicId: string, section: "lesson" | "quiz" | "worksheet"): string | null {
+  const base = TOPIC_LESSON_URLS[topicId];
+  if (!base) return null;
+
+  const isMathTopic = base.includes("/subjects/maths/");
+
+  if (section === "lesson") return base;
+
+  if (isMathTopic) {
+    if (section === "quiz") return `${base}/quiz`;
+    return `${base}/worksheet`;
+  }
+
+  // English/Science use query params
+  if (section === "quiz") return `${base}?view=quiz`;
+  return `${base}?view=worksheet`;
+}
+
+type Props = {
+  children: React.ReactNode;
+  selectedSubject?: string | null;
+  onSubjectChange?: (subject: string | null) => void;
+};
+
+export default function DashboardLayout({ children, selectedSubject, onSubjectChange }: Props) {
   const pathname = usePathname();
   const router = useRouter();
 
-  const [expanded, setExpanded] = useState<string[]>([]);
-  const [connectCode, setConnectCode] = useState<string>("");
   const [studentName, setStudentName] = useState<string>("");
   const [userEmail, setUserEmail] = useState<string>("");
   const [dropupOpen, setDropupOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showToast, setShowToast] = useState(false);
-  const [codeVisible, setCodeVisible] = useState(false);
-  const [codeCopied, setCodeCopied] = useState(false);
+  const [quizCompletions, setQuizCompletions] = useState<Record<string, boolean>>({});
+
+  // Subject-mode sidebar state — initialize open section from current URL
+  const [expandedSection, setExpandedSection] = useState<"lesson" | "quiz" | "worksheet" | null>(() => {
+    if (pathname.endsWith("/quiz")) return "quiz";
+    if (pathname.endsWith("/worksheet")) return "worksheet";
+    if (pathname.startsWith("/subjects/")) return "lesson";
+    return null;
+  });
+  const [expandedUnits, setExpandedUnits] = useState<Set<string>>(new Set());
 
   const avatarRef = useRef<HTMLDivElement>(null);
+  const mainRef = useRef<HTMLElement>(null);
+  const prevSubjectRef = useRef(selectedSubject);
 
+  // Reset subject sidebar state only when selectedSubject actually changes value
   useEffect(() => {
-    let sectionId: string | null = null;
-    if (pathname.startsWith("/subjects/maths")) sectionId = "maths";
-    else if (pathname.startsWith("/subjects/english")) sectionId = "english";
-    else if (pathname.startsWith("/subjects/science")) sectionId = "science";
-    if (sectionId) {
-      setExpanded((prev) => (prev.includes(sectionId!) ? prev : [...prev, sectionId!]));
+    if (prevSubjectRef.current !== selectedSubject) {
+      setExpandedSection(null);
+      setExpandedUnits(new Set());
+      prevSubjectRef.current = selectedSubject;
     }
-  }, [pathname]);
+  }, [selectedSubject]);
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("studiesmate_sidebar_expanded");
-      if (saved) setExpanded(JSON.parse(saved));
-    } catch {}
-
     function handleDocClick(e: MouseEvent) {
       if (avatarRef.current && !avatarRef.current.contains(e.target as Node)) {
         setDropupOpen(false);
       }
     }
     document.addEventListener("click", handleDocClick);
-    return () => {
-      document.removeEventListener("click", handleDocClick);
-    };
+    return () => document.removeEventListener("click", handleDocClick);
   }, []);
 
   useEffect(() => {
@@ -67,22 +103,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       const name = ((session.user.user_metadata?.studentName as string | undefined) || "").trim();
       setStudentName(name.split(" ")[0] || "");
       setUserEmail(session.user.email || "");
-      const { data } = await supabase
-        .from("profiles")
-        .select("connect_code")
-        .eq("id", session.user.id)
-        .maybeSingle();
-      if (data?.connect_code) setConnectCode(data.connect_code);
     }
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       loadFromSession(session);
     });
-
     supabase.auth.getSession().then(({ data: { session } }) => loadFromSession(session));
-
     return () => subscription.unsubscribe();
   }, []);
+
+  // Scroll the content area back to top on every navigation
+  useEffect(() => {
+    if (mainRef.current) mainRef.current.scrollTop = 0;
+  }, [pathname]);
 
   // Hide site header and footer on all dashboard pages
   useEffect(() => {
@@ -96,30 +129,44 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     };
   }, []);
 
-  function toggleExpand(id: string) {
-    setExpanded((prev) => {
-      const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
-      try { localStorage.setItem("studiesmate_sidebar_expanded", JSON.stringify(next)); } catch {}
-      return next;
+  useEffect(() => {
+    try {
+      const completions = JSON.parse(localStorage.getItem("studiesmate_quiz_completions") || "{}");
+      setQuizCompletions(completions);
+    } catch {}
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === "studiesmate_quiz_completions") {
+        try {
+          setQuizCompletions(JSON.parse(e.newValue || "{}"));
+        } catch {}
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
+  function toggleSection(section: "lesson" | "quiz" | "worksheet") {
+    setExpandedSection((prev) => {
+      if (prev === section) return null;
+      setExpandedUnits(new Set());
+      return section;
     });
   }
 
-  useEffect(() => {
-    setCodeVisible(false);
-  }, [pathname]);
+  function toggleUnit(unitId: string) {
+    setExpandedUnits((prev) => {
+      const next = new Set(prev);
+      if (next.has(unitId)) next.delete(unitId);
+      else next.add(unitId);
+      return next;
+    });
+  }
 
   function isActive(href: string) { return pathname === href; }
 
   function handleLogout() {
     setDropupOpen(false);
     setShowLogoutModal(true);
-  }
-
-  function handleCopyCode() {
-    if (!connectCode) return;
-    navigator.clipboard.writeText(connectCode);
-    setCodeCopied(true);
-    setTimeout(() => setCodeCopied(false), 1500);
   }
 
   async function handleConfirmLogout() {
@@ -129,53 +176,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     setTimeout(() => router.push("/"), 2000);
   }
 
-  type SubjectEntry = {
-    id: string;
-    label: string;
-    icon: React.ElementType;
-    iconColor: string;
-    sectionLabel: string;
-    children: SidebarChild[];
-  };
-
-  const subjects: SubjectEntry[] = [
-    {
-      id: "maths",
-      label: "Mathematics",
-      icon: Calculator,
-      iconColor: "#22C55E",
-      sectionLabel: "NUMBERS & PLACE VALUE",
-      children: [
-        { id: "maths-lesson", label: "Lesson", href: "/subjects/maths/chapters/numbers", icon: PlayCircle },
-        { id: "maths-quiz", label: "Quiz", href: "/subjects/maths/chapters/numbers?view=quiz", icon: HelpCircle },
-        { id: "maths-ws", label: "Worksheet", href: "/subjects/maths/chapters/numbers?view=worksheet", icon: FileText },
-      ],
-    },
-    {
-      id: "english",
-      label: "English",
-      icon: BookOpen,
-      iconColor: "#3B82F6",
-      sectionLabel: "SIMPLE SENTENCE",
-      children: [
-        { id: "english-lesson", label: "Lesson", href: "/subjects/english/chapters/english-intro", icon: PlayCircle },
-        { id: "english-quiz", label: "Quiz", href: "/subjects/english/chapters/english-intro?view=quiz", icon: HelpCircle },
-        { id: "english-ws", label: "Worksheet", href: "/subjects/english/chapters/english-intro?view=worksheet", icon: FileText },
-      ],
-    },
-    {
-      id: "science",
-      label: "Science",
-      icon: FlaskConical,
-      iconColor: "#F59E0B",
-      sectionLabel: "HABITAT",
-      children: [
-        { id: "science-lesson", label: "Lesson", href: "/subjects/science/chapters/science-intro", icon: PlayCircle },
-        { id: "science-quiz", label: "Quiz", href: "/subjects/science/chapters/science-intro?view=quiz", icon: HelpCircle },
-        { id: "science-ws", label: "Worksheet", href: "/subjects/science/chapters/science-intro?view=worksheet", icon: FileText },
-      ],
-    },
-  ];
+  const isSubjectMode = !!selectedSubject;
+  const sidebarW = "260px";
+  const subjectData = selectedSubject ? CURRICULUM[selectedSubject as SubjectKey] : null;
+  const activeSectionFromPath = pathname.endsWith("/quiz") ? "quiz"
+    : pathname.endsWith("/worksheet") ? "worksheet"
+    : pathname.startsWith("/subjects/") ? "lesson"
+    : null;
 
   return (
     <div className="bg-[#F9FAFB]">
@@ -187,191 +194,254 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       `}</style>
 
       {/* ── SIDEBAR ── */}
-      <aside className="hidden md:flex w-[220px] flex-col justify-between bg-[#0F172A] fixed left-0 top-0 h-screen overflow-y-auto z-40">
-
-        <div className="flex flex-col">
+      <aside
+        className="hidden md:flex flex-col justify-between bg-[#0F172A] fixed left-0 top-0 h-screen overflow-y-auto z-40"
+        style={{ width: sidebarW }}
+      >
+        <div className="flex flex-col flex-1 min-h-0">
           {/* Logo */}
-          <div className="px-5 pt-5 pb-4 border-b border-white/10">
+          <div className="px-5 pt-5 pb-4 border-b border-white/10 flex-shrink-0">
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "white", borderRadius: "8px", padding: "8px", width: "100%" }}>
               <img src="/logo.png" alt="StudiesMate" style={{ width: "100%", maxWidth: "140px", height: "auto", objectFit: "contain", display: "block", margin: "0 auto" }} />
             </div>
             <p className="mt-1 text-[11px] text-[#6B7280]">Beta</p>
           </div>
 
-          {/* Nav */}
-          <nav className="px-3 pt-4 pb-2">
+          {isSubjectMode && subjectData ? (
+            /* ── SUBJECT MODE: Lesson / Quiz / Worksheet / Back ── */
+            <>
+              {/* Subject header */}
+              <div className="px-5 py-3 border-b border-white/10 flex-shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    try {
+                      localStorage.setItem("last_selected_subject", selectedSubject!);
+                      localStorage.removeItem(`last_view_${selectedSubject!}`);
+                    } catch {}
+                    router.push("/dashboard");
+                  }}
+                  className="flex items-center gap-2.5 w-full text-left group"
+                >
+                  <span className="text-xl leading-none">{SUBJECT_EMOJI[selectedSubject!] ?? "📖"}</span>
+                  <span className="text-sm font-bold text-white leading-tight group-hover:text-[#22C55E] transition-colors">
+                    {subjectData.name}
+                  </span>
+                </button>
+                <p className="mt-1 text-[11px] text-[#4B5563] leading-tight">Grade 4 · Beta</p>
+              </div>
 
-            {/* Home */}
-            <Link
-              href="/"
-              className="flex items-center gap-3 border-l-2 border-transparent rounded-r-lg px-3 py-2.5 mb-1 text-sm font-semibold text-white hover:bg-white/5 transition-all"
-              style={{ animation: "fadeIn 0.4s ease-out both", animationDelay: "0.05s" }}
-            >
-              <Home className="h-4 w-4 shrink-0" />
-              Home
-            </Link>
+              {/* Lesson / Quiz / Worksheet expandable sections */}
+              <nav className="px-3 pt-3 pb-2 flex-1 overflow-y-auto">
+                {(["lesson", "quiz", "worksheet"] as const).map((section) => {
+                  const sectionLabel = section === "lesson" ? "Lesson" : section === "quiz" ? "Quiz" : "Worksheet";
+                  const SectionIcon = section === "lesson" ? PlayCircle : section === "quiz" ? HelpCircle : FileText;
+                  const isSecExpanded = expandedSection === section;
 
-            {/* Dashboard */}
-            <Link
-              href="/dashboard"
-              className={`flex items-center gap-3 border-l-2 rounded-r-lg px-3 py-2.5 mb-1 text-sm font-semibold transition-all ${
-                isActive("/dashboard")
-                  ? "border-[#22C55E] bg-[#22C55E]/15 text-[#22C55E]"
-                  : "border-transparent text-white hover:bg-white/5"
-              }`}
-              style={{ animation: "fadeIn 0.4s ease-out both", animationDelay: "0.1s" }}
-            >
-              <LayoutDashboard className="h-4 w-4 shrink-0" />
-              Dashboard
-            </Link>
+                  return (
+                    <div key={section} className="mb-1">
+                      <button
+                        type="button"
+                        onClick={() => toggleSection(section)}
+                        className={`w-full flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all ${
+                          activeSectionFromPath === section
+                            ? "bg-[#22C55E]/15 text-[#22C55E] hover:bg-[#22C55E]/20"
+                            : "text-white hover:bg-white/5"
+                        }`}
+                      >
+                        <SectionIcon className="h-4 w-4 shrink-0" style={{ color: "#22C55E" }} />
+                        <span className="flex-1 text-left">{sectionLabel}</span>
+                        {isSecExpanded
+                          ? <ChevronDown className="h-3.5 w-3.5 text-[#6B7280]" />
+                          : <ChevronRight className="h-3.5 w-3.5 text-[#6B7280]" />
+                        }
+                      </button>
 
-            {/* Subject collapsibles */}
-            {subjects.map(({ id, label, icon: Icon, iconColor, sectionLabel, children }, i) => {
-              const isExpanded = expanded.includes(id);
-              return (
-                <div key={id} className="mb-1" style={{ animation: "fadeIn 0.4s ease-out both", animationDelay: `${(i + 3) * 0.05}s` }}>
-                  <button
-                    type="button"
-                    onClick={() => toggleExpand(id)}
-                    className="w-full flex items-center gap-3 border-l-2 border-transparent rounded-r-lg px-3 py-2.5 text-sm font-semibold text-white hover:bg-white/5 transition-all"
-                  >
-                    <Icon className="h-4 w-4 shrink-0" style={{ color: iconColor }} />
-                    <span className="flex-1 text-left">{label}</span>
-                    {isExpanded
-                      ? <ChevronDown className="h-3.5 w-3.5 text-[#6B7280]" />
-                      : <ChevronRight className="h-3.5 w-3.5 text-[#6B7280]" />
-                    }
-                  </button>
+                      <div
+                        className="ml-3 border-l border-white/10 pl-2 mt-0.5 space-y-0.5 overflow-hidden transition-all duration-200 ease-out"
+                        style={{ maxHeight: isSecExpanded ? "2000px" : "0px", opacity: isSecExpanded ? 1 : 0 }}
+                      >
+                          {subjectData.units.map((unit) => {
+                            const isUnitOpen = expandedUnits.has(unit.id);
+                            return (
+                              <div key={unit.id}>
+                                <button
+                                  type="button"
+                                  onClick={() => toggleUnit(unit.id)}
+                                  className="w-full flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-left hover:bg-white/5 transition-all"
+                                >
+                                  <ChevronRight
+                                    className="h-3 w-3 shrink-0 text-[#6B7280] transition-transform"
+                                    style={{ transform: isUnitOpen ? "rotate(90deg)" : "none" }}
+                                  />
+                                  <span className="text-[11px] font-semibold text-[#9CA3AF] leading-tight flex-1">
+                                    {unit.name}
+                                  </span>
+                                </button>
 
-                  {isExpanded && (
-                    <div className="ml-5 border-l border-white/10 pl-3 pt-1 pb-1 flex flex-col gap-0.5">
-                      <span className="px-1 pt-1 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-[#4B5563]">
-                        {sectionLabel}
-                      </span>
+                                <div
+                                  className="ml-4 space-y-0.5 pb-1 overflow-hidden transition-all duration-200 ease-out"
+                                  style={{ maxHeight: isUnitOpen ? "1000px" : "0px", opacity: isUnitOpen ? 1 : 0 }}
+                                >
+                                    {unit.topics.map((topic) => {
+                                      const requiredQuizKey = TOPIC_UNLOCK_MAP[topic.id];
+                                      const isUnlockedByQuiz = requiredQuizKey ? !!quizCompletions[requiredQuizKey] : false;
+                                      const isUnlocked = topic.status === "unlocked" || (topic.status === "locked-until-quiz" && isUnlockedByQuiz);
+                                      const isLocked = topic.status === "locked-until-quiz" && !isUnlockedByQuiz;
+                                      const url = isUnlocked ? getTopicUrl(topic.id, section) : null;
+                                      const topicBase = TOPIC_LESSON_URLS[topic.id];
+                                      const isActiveTopic = !!topicBase && pathname.startsWith(topicBase);
 
-                      {children.map((child) => {
-                        const ChildIcon = child.icon;
-                        return (
-                          <Link
-                            key={child.id}
-                            href={child.href}
-                            className={`flex items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-medium transition-all ${
-                              isActive(child.href)
-                                ? "text-[#22C55E] bg-[#22C55E]/10"
-                                : "text-[#9CA3AF] hover:text-white hover:bg-white/5"
-                            }`}
-                          >
-                            <ChildIcon className="h-3.5 w-3.5 shrink-0" />
-                            {child.label}
-                          </Link>
-                        );
-                      })}
+                                      if (url) {
+                                        return (
+                                          <Link
+                                            key={topic.id}
+                                            href={url}
+                                            className={`flex items-start gap-1.5 rounded px-2 py-1.5 text-[11px] font-medium transition-all ${
+                                              isActiveTopic
+                                                ? "bg-[#22C55E]/20 text-[#22C55E] font-semibold"
+                                                : "text-[#22C55E] hover:bg-white/5"
+                                            }`}
+                                          >
+                                            <span className="mt-0.5 shrink-0 text-[10px]">▶</span>
+                                            <span className="leading-tight">{topic.name}</span>
+                                          </Link>
+                                        );
+                                      }
+
+                                      return (
+                                        <div
+                                          key={topic.id}
+                                          title={isLocked ? "Complete the previous quiz to unlock" : undefined}
+                                          className="flex items-start gap-1.5 rounded px-2 py-1.5 cursor-default"
+                                        >
+                                          {isLocked
+                                            ? <Lock className="h-2.5 w-2.5 mt-0.5 shrink-0 text-[#4B5563]" />
+                                            : <span className="mt-0.5 shrink-0 text-[10px] text-[#374151]">○</span>
+                                          }
+                                          <span className="text-[11px] text-[#4B5563] leading-tight flex-1">{topic.name}</span>
+                                          {isLocked && (
+                                            <span className="text-[9px] bg-[#FEF3C7] text-[#92400E] rounded-full px-1.5 py-0.5 font-semibold shrink-0 self-start mt-0.5">Quiz</span>
+                                          )}
+                                          {topic.status === "coming-soon" && (
+                                            <span className="text-[9px] bg-[#1F2937] text-[#6B7280] rounded-full px-1.5 py-0.5 shrink-0 self-start mt-0.5">Soon</span>
+                                          )}
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                              </div>
+                            );
+                          })}
+                        </div>
                     </div>
-                  )}
-                </div>
-              );
-            })}
+                  );
+                })}
+              </nav>
 
-            {/* All Grades */}
-            <Link
-              href="/phase-1"
-              className={`flex items-center gap-3 border-l-2 border-transparent rounded-r-lg px-3 py-2.5 text-sm font-semibold transition-all ${
-                isActive("/phase-1")
-                  ? "border-[#22C55E] bg-[#22C55E]/15 text-[#22C55E]"
-                  : "text-[#9CA3AF] hover:bg-white/5 hover:text-white"
-              }`}
-              style={{ animation: "fadeIn 0.4s ease-out both", animationDelay: "0.3s" }}
-            >
-              <TrendingUp className="h-4 w-4 shrink-0" />
-              All Grades
-            </Link>
-          </nav>
+              {/* Back to Dashboard */}
+              <div className="border-t border-white/10 px-3 py-3 flex-shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    try { localStorage.removeItem("last_selected_subject"); } catch {}
+                    onSubjectChange?.(null);
+                    if (pathname !== "/dashboard") router.push("/dashboard");
+                  }}
+                  className="w-full flex items-center justify-center rounded-xl py-2.5 px-4 text-sm font-semibold text-[#111827] hover:bg-[#E5E7EB] transition-colors"
+                  style={{ background: "#F3F4F6" }}
+                >
+                  Dashboard
+                </button>
+              </div>
+            </>
+          ) : (
+            /* ── DEFAULT MODE ── */
+            <nav className="px-3 pt-4 pb-2 flex-1 overflow-y-auto">
+
+              {/* 1. Home */}
+              <Link
+                href="/"
+                className="flex items-center justify-center w-full rounded-xl py-3 px-4 mb-3 text-sm font-medium text-[#111827] bg-white border border-[#E5E7EB] hover:bg-[#F9FAFB] hover:border-[#D1D5DB] transition-colors"
+              >
+                Home
+              </Link>
+
+              {/* 2. Dashboard */}
+              <Link
+                href="/dashboard"
+                onClick={() => { try { localStorage.removeItem("last_selected_subject"); } catch {} }}
+                className="flex items-center justify-center w-full rounded-xl py-3 px-4 mb-3 text-sm font-medium text-[#111827] bg-white border border-[#E5E7EB] hover:bg-[#F9FAFB] hover:border-[#D1D5DB] transition-colors"
+              >
+                Dashboard
+              </Link>
+
+              {/* 3. Connect Code */}
+              <Link
+                href="/connect-code"
+                className={`flex items-center gap-3 border-l-2 rounded-r-lg px-3 py-2.5 text-sm font-semibold transition-all ${
+                  isActive("/connect-code")
+                    ? "border-[#22C55E] bg-[#22C55E]/15 text-[#22C55E]"
+                    : "border-transparent text-[#9CA3AF] hover:bg-white/5 hover:text-white"
+                }`}
+              >
+                <Copy className="h-4 w-4 shrink-0" />
+                Connect Code
+              </Link>
+
+              {/* 4. Settings */}
+              <Link
+                href="/settings"
+                className={`flex items-center gap-3 border-l-2 rounded-r-lg px-3 py-2.5 text-sm font-semibold transition-all ${
+                  isActive("/settings")
+                    ? "border-[#22C55E] bg-[#22C55E]/15 text-[#22C55E]"
+                    : "border-transparent text-[#9CA3AF] hover:bg-white/5 hover:text-white"
+                }`}
+              >
+                <Settings className="h-4 w-4 shrink-0" />
+                Settings
+              </Link>
+
+            </nav>
+          )}
         </div>
 
-        {/* Bottom — Connect Parent + Avatar */}
-        <div className="border-t border-white/10">
-          <div className="px-5 pt-4 pb-3">
-            <Link href="/parent" className="flex items-center gap-2 group">
-              <span className="h-2 w-2 rounded-full bg-[#22C55E]" />
-              <span className="text-sm font-medium text-white group-hover:text-[#22C55E] transition-colors">Connect Parent</span>
-            </Link>
-            <div className="mt-1.5 flex items-center gap-1.5">
-              <span className="font-mono text-xs text-[#22C55E]">
-                {connectCode
-                  ? `Code: ${codeVisible ? connectCode : connectCode.replace(/-.+$/, "-••••")}`
-                  : "Code: —"}
-              </span>
-              {connectCode && (
-                <>
+        {/* Bottom — Avatar with logout (default mode only) */}
+        {!isSubjectMode && (
+          <div className="border-t border-white/10 flex-shrink-0">
+            <div className="px-3 py-2.5 relative" ref={avatarRef}>
+              <button
+                type="button"
+                onClick={() => setDropupOpen((v) => !v)}
+                className="flex w-full items-center gap-2.5 rounded-lg p-2 hover:bg-white/5 transition-colors"
+              >
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#374151] text-xs font-bold text-white">
+                  {studentName ? studentName[0].toUpperCase() : userEmail ? userEmail[0].toUpperCase() : "U"}
+                </div>
+                <span className="flex-1 truncate text-left text-sm font-medium text-white">
+                  {studentName || userEmail.split("@")[0] || "Student"}
+                </span>
+              </button>
+
+              {dropupOpen && (
+                <div className="absolute bottom-full left-3 right-3 mb-1 overflow-hidden rounded-lg border border-[#E5E7EB] bg-white shadow-lg" style={{ animation: "dropupIn 0.15s ease-out" }}>
                   <button
                     type="button"
-                    onClick={handleCopyCode}
-                    title="Copy code"
-                    style={{ background: "none", border: "none", cursor: "pointer", padding: "1px", lineHeight: 1, color: codeCopied ? "#22C55E" : "#9CA3AF" }}
-                    className="hover:!text-white transition-colors"
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-2 px-3 py-2.5 text-sm text-[#111827] hover:bg-[#F9FAFB] transition-colors"
                   >
-                    {codeCopied
-                      ? <Check style={{ width: 14, height: 14 }} />
-                      : <Copy style={{ width: 14, height: 14 }} />
-                    }
+                    🚪 Logout
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => setCodeVisible((v) => !v)}
-                    title={codeVisible ? "Hide code" : "Show code"}
-                    style={{ background: "none", border: "none", cursor: "pointer", padding: "1px", lineHeight: 1, color: "#9CA3AF" }}
-                    className="hover:!text-white transition-colors"
-                  >
-                    {codeVisible
-                      ? <EyeOff style={{ width: 14, height: 14 }} />
-                      : <Eye style={{ width: 14, height: 14 }} />
-                    }
-                  </button>
-                </>
+                </div>
               )}
             </div>
           </div>
-
-          {/* Avatar row with dropup */}
-          <div className="border-t border-white/10 px-3 py-2.5 relative" ref={avatarRef}>
-            <button
-              type="button"
-              onClick={() => setDropupOpen((v) => !v)}
-              className="flex w-full items-center gap-2.5 rounded-lg p-2 hover:bg-white/5 transition-colors"
-            >
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#374151] text-xs font-bold text-white">
-                {studentName ? studentName[0].toUpperCase() : userEmail ? userEmail[0].toUpperCase() : "U"}
-              </div>
-              <span className="flex-1 truncate text-left text-sm font-medium text-white">
-                {studentName || userEmail.split("@")[0] || "Student"}
-              </span>
-            </button>
-
-            {dropupOpen && (
-              <div className="absolute bottom-full left-3 right-3 mb-1 overflow-hidden rounded-lg border border-[#E5E7EB] bg-white shadow-lg">
-                <button
-                  type="button"
-                  onClick={() => { setDropupOpen(false); router.push("/"); }}
-                  className="flex w-full items-center gap-2 px-3 py-2.5 text-sm text-[#111827] hover:bg-[#F9FAFB] transition-colors"
-                >
-                  🏠 Home
-                </button>
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="flex w-full items-center gap-2 px-3 py-2.5 text-sm text-[#111827] hover:bg-[#F9FAFB] transition-colors"
-                >
-                  🚪 Logout
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
+        )}
       </aside>
 
       {/* Mobile bottom tab bar */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-[#0F172A] flex items-center justify-around px-2 py-2">
-        <Link href="/dashboard" className="flex flex-col items-center gap-1 text-[10px] font-semibold text-[#9CA3AF]">
+        <Link href="/dashboard" onClick={() => { try { localStorage.removeItem("last_selected_subject"); } catch {} }} className="flex flex-col items-center gap-1 text-[10px] font-semibold text-[#9CA3AF]">
           <LayoutDashboard className="h-5 w-5" />
           Dashboard
         </Link>
@@ -390,9 +460,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
 
       {/* Main content */}
-      <main className="md:ml-[220px] h-screen overflow-y-auto pb-20 md:pb-0">
+      <main
+        ref={mainRef}
+        className="h-screen overflow-y-auto pb-20 md:pb-0"
+        style={{ marginLeft: `var(--sidebar-w, ${sidebarW})` }}
+      >
+        <style>{`:root { --sidebar-w: ${sidebarW}; } @media (max-width: 767px) { :root { --sidebar-w: 0px; } }`}</style>
         <div className="mx-auto max-w-[1100px]">
-          {children}
+          <div key={pathname} style={{ animation: "fadeIn 0.25s ease-out" }}>
+            {children}
+          </div>
         </div>
       </main>
 
@@ -406,41 +483,29 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Logout confirmation modal */}
       {showLogoutModal && (
         <>
-          <style>{`
-            @keyframes popupFadeIn {
-              from { opacity: 0; transform: scale(0.95); }
-              to { opacity: 1; transform: scale(1); }
-            }
-            @keyframes backdropFadeIn {
-              from { opacity: 0; }
-              to { opacity: 1; }
-            }
-            .logout-backdrop { animation: backdropFadeIn 0.2s ease-out; }
-            .logout-popup { animation: popupFadeIn 0.2s ease-out; }
-          `}</style>
-          <div className="logout-backdrop" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div className="logout-popup" style={{ background: "white", borderRadius: "16px", padding: "32px", maxWidth: "380px", width: "90%", textAlign: "center", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
-            <p style={{ fontSize: "48px", marginBottom: "12px" }}>👋</p>
-            <h2 style={{ fontSize: "22px", fontWeight: 700, color: "#0F172A" }}>Leaving so soon?</h2>
-            <p style={{ fontSize: "14px", color: "#6B7280", marginTop: "8px" }}>Your progress is saved. We&apos;ll be here when you come back.</p>
-            <div style={{ display: "flex", gap: "12px", justifyContent: "center", marginTop: "24px" }}>
-              <button
-                type="button"
-                onClick={() => setShowLogoutModal(false)}
-                style={{ background: "#22C55E", color: "white", borderRadius: "9999px", padding: "10px 24px", fontWeight: 600, border: "none", cursor: "pointer", fontSize: "14px" }}
-              >
-                Stay &amp; Learn
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmLogout}
-                style={{ background: "white", border: "1.5px solid #EF4444", color: "#EF4444", borderRadius: "9999px", padding: "10px 24px", fontWeight: 600, cursor: "pointer", fontSize: "14px" }}
-              >
-                Yes, Log out
-              </button>
+          <div className="backdrop-animate" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div className="popup-animate" style={{ background: "white", borderRadius: "16px", padding: "32px", maxWidth: "380px", width: "90%", textAlign: "center", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
+              <p style={{ fontSize: "48px", marginBottom: "12px" }}>👋</p>
+              <h2 style={{ fontSize: "22px", fontWeight: 700, color: "#0F172A" }}>Leaving so soon?</h2>
+              <p style={{ fontSize: "14px", color: "#6B7280", marginTop: "8px" }}>Your progress is saved. We&apos;ll be here when you come back.</p>
+              <div style={{ display: "flex", gap: "12px", justifyContent: "center", marginTop: "24px" }}>
+                <button
+                  type="button"
+                  onClick={() => setShowLogoutModal(false)}
+                  style={{ background: "#22C55E", color: "white", borderRadius: "9999px", padding: "10px 24px", fontWeight: 600, border: "none", cursor: "pointer", fontSize: "14px" }}
+                >
+                  Stay &amp; Learn
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmLogout}
+                  style={{ background: "white", border: "1.5px solid #EF4444", color: "#EF4444", borderRadius: "9999px", padding: "10px 24px", fontWeight: 600, cursor: "pointer", fontSize: "14px" }}
+                >
+                  Yes, Log out
+                </button>
+              </div>
             </div>
           </div>
-        </div>
         </>
       )}
     </div>

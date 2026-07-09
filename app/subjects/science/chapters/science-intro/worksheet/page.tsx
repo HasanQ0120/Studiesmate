@@ -14,11 +14,12 @@ export default function HabitatWorksheetPage() {
         href: "/subjects/science/chapters/science-intro/worksheet",
         timestamp: new Date().toISOString(),
       }));
+      localStorage.setItem("last_view_science", JSON.stringify({ section: "worksheet", topicId: "habitats" }));
     } catch {}
   }, []);
 
   return (
-    <DashboardLayout>
+    <DashboardLayout selectedSubject="science" onSubjectChange={() => {}}>
       <main className="min-h-screen bg-white text-[#0F172A] pb-20 md:pb-16">
         <div className="mx-auto max-w-4xl px-6 py-10">
           <button

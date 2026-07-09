@@ -7,7 +7,7 @@ export default function MathSubjectPage() {
   return (
     <main className="min-h-screen bg-white text-slate-900">
       <div className="mx-auto max-w-4xl px-4 py-12">
-        <BackButton href="/dashboard" label="Back to Dashboard" />
+        <BackButton href="/dashboard" label="Back to Dashboard" onClick={() => { try { localStorage.removeItem("last_selected_subject"); } catch {} }} />
 
         <h1 className="mt-6 text-3xl font-semibold tracking-tight">Mathematics</h1>
         <p className="mt-2 text-sm text-slate-700">
@@ -22,6 +22,7 @@ export default function MathSubjectPage() {
 
           <Link
             href="/dashboard"
+            onClick={() => { try { localStorage.removeItem("last_selected_subject"); } catch {} }}
             className="mt-5 inline-flex items-center justify-center rounded-xl bg-[#0B2B5A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0A2550]"
           >
             Open Maths Chapters →
