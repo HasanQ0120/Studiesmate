@@ -5,6 +5,25 @@ import confetti from "canvas-confetti";
 import Link from "next/link";
 import BackButton from "@/components/BackButton";
 import DashboardLayout from "@/components/DashboardLayout";
+import { supabase } from "@/lib/auth";
+
+async function sendQuizNotification(quizId: string) {
+  try {
+    if (localStorage.getItem("sm_email_notifications") === "false") return;
+    if (localStorage.getItem(`sm_quiz_email_sent_${quizId}`)) return;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) return;
+    const res = await fetch("/api/send-quiz-notification", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ quizId }),
+    });
+    if (res.ok) localStorage.setItem(`sm_quiz_email_sent_${quizId}`, "true");
+  } catch {}
+}
 
 export default function ScienceQuizPage() {
   const [showFeedbackNudge, setShowFeedbackNudge] = useState(false);
@@ -40,6 +59,7 @@ export default function ScienceQuizPage() {
         if (score >= 60) {
           confetti({ particleCount: 160, spread: 75, origin: { y: 0.6 } });
         }
+        sendQuizNotification("science-intro");
       }
     }
 
