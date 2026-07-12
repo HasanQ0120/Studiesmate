@@ -294,6 +294,7 @@ function ChapterPageInner() {
                       ref={videoEnRef}
                       src={videoIds.en}
                       controls
+                      controlsList="nodownload"
                       onLoadedMetadata={(e) => {
                         try {
                           const saved = localStorage.getItem(`video_progress_${chapterId}_en`);
@@ -307,6 +308,7 @@ function ChapterPageInner() {
                       ref={videoUrRef}
                       src={videoIds.ur}
                       controls
+                      controlsList="nodownload"
                       onLoadedMetadata={(e) => {
                         try {
                           const saved = localStorage.getItem(`video_progress_${chapterId}_ur`);

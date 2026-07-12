@@ -471,6 +471,7 @@ export default function HomePage() {
                 ref={demoEnRef}
                 src="https://studiesmate.b-cdn.net/simple_sentences_english.mp4.mp4"
                 controls
+                controlsList="nodownload"
                 width="100%"
                 style={{ borderRadius: "12px", background: "black", display: demoLang === "english" ? "block" : "none" }}
               />
@@ -478,6 +479,7 @@ export default function HomePage() {
                 ref={demoUrRef}
                 src="https://studiesmate.b-cdn.net/simple_sentence_urdu.mp4.mp4"
                 controls
+                controlsList="nodownload"
                 width="100%"
                 style={{ borderRadius: "12px", background: "black", display: demoLang === "urdu" ? "block" : "none" }}
               />

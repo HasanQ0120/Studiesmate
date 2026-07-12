@@ -272,6 +272,7 @@ function EnglishLessonPageInner() {
                       ref={videoEnRef}
                       src={VIDEO_IDS.en}
                       controls
+                      controlsList="nodownload"
                       onLoadedMetadata={(e) => {
                         try {
                           const saved = localStorage.getItem(`video_progress_${CHAPTER_ID}_en`);
@@ -285,6 +286,7 @@ function EnglishLessonPageInner() {
                       ref={videoUrRef}
                       src={VIDEO_IDS.ur}
                       controls
+                      controlsList="nodownload"
                       onLoadedMetadata={(e) => {
                         try {
                           const saved = localStorage.getItem(`video_progress_${CHAPTER_ID}_ur`);

@@ -12,6 +12,10 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE || !SUPABASE_ANON_KEY || !GROQ_API_K
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE);
 
+const ALLOWED_LANGUAGES = new Set(["english", "urdu"]);
+const MAX_TOPIC_LEN = 200;
+const MAX_SUBJECT_LEN = 100;
+
 export async function POST(req: NextRequest) {
   try {
     // Verify the caller is an authenticated session owner
@@ -42,6 +46,16 @@ export async function POST(req: NextRequest) {
       typeof language !== "string" || typeof userId !== "string"
     ) {
       return NextResponse.json({ error: "missing_fields" }, { status: 400 });
+    }
+
+    // Length limits prevent oversized prompts from being sent to Groq
+    if (topic.length > MAX_TOPIC_LEN || subject.length > MAX_SUBJECT_LEN) {
+      return NextResponse.json({ error: "invalid_input" }, { status: 400 });
+    }
+
+    // Whitelist language to the two supported values
+    if (!ALLOWED_LANGUAGES.has(language.toLowerCase().trim())) {
+      return NextResponse.json({ error: "invalid_input" }, { status: 400 });
     }
 
     // Ensure the session user matches the requested userId
@@ -84,6 +98,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "no_credits", creditsLeft: 0 }, { status: 403 });
     }
 
+    // Atomically decrement credits before calling Groq.
+    // The .eq("explain_credits", currentCredits) acts as an optimistic lock:
+    // if a concurrent request already decremented, this update matches 0 rows
+    // and we return 403 rather than letting two requests share the same credit.
+    const nowIso = new Date().toISOString();
+    const updatePayload: Record<string, unknown> = { explain_credits: currentCredits - 1 };
+    if (currentCredits === 4) updatePayload.explain_credits_reset_at = nowIso;
+
+    const { data: decremented } = await supabase
+      .from("profiles")
+      .update(updatePayload)
+      .eq("id", userId)
+      .eq("explain_credits", currentCredits)
+      .select("explain_credits")
+      .maybeSingle();
+
+    if (!decremented) {
+      return NextResponse.json({ error: "no_credits", creditsLeft: 0 }, { status: 403 });
+    }
+
     const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -116,21 +150,10 @@ export async function POST(req: NextRequest) {
     const groqData = await groqRes.json();
     const explanation: string = groqData.choices?.[0]?.message?.content ?? "";
 
-    const newCredits = currentCredits - 1;
-    const nowIso = new Date().toISOString();
-    const newResetAt = currentCredits === 4 ? nowIso : currentResetAt;
-
-    const updatePayload: Record<string, unknown> = { explain_credits: newCredits };
-    if (currentCredits === 4) {
-      updatePayload.explain_credits_reset_at = nowIso;
-    }
-
-    await supabase.from("profiles").update(updatePayload).eq("id", userId);
-
     return NextResponse.json({
       explanation,
-      creditsLeft: newCredits,
-      resetAt: newResetAt,
+      creditsLeft: currentCredits - 1,
+      resetAt: currentCredits === 4 ? nowIso : currentResetAt,
     });
   } catch (err) {
     console.error("explain route error:", err);

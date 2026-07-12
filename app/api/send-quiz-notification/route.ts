@@ -46,7 +46,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Parse and validate quiz ID
-    const { quizId } = await req.json() as { quizId?: string };
+    const rawBody = await req.json().catch(() => null);
+    const quizId = rawBody && typeof rawBody.quizId === "string" ? rawBody.quizId : "";
     const meta = quizId ? QUIZ_META[quizId] : undefined;
     if (!meta) {
       return NextResponse.json({ error: "invalid_quiz_id" }, { status: 400 });
