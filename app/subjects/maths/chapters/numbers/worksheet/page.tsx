@@ -1,44 +1,37 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import DashboardLayout from "@/components/DashboardLayout";
 
 export default function NumbersWorksheetPage() {
   const router = useRouter();
-  const [unlocked, setUnlocked] = useState<boolean | null>(null);
 
   useEffect(() => {
     try {
-      const isUnlocked = localStorage.getItem("worksheet_unlocked_place_value") === "true";
-      if (!isUnlocked) {
-        router.replace("/subjects/maths/chapters/numbers/quiz");
-        return;
-      }
-      setUnlocked(true);
       localStorage.setItem("studiesmate_last_activity_v2", JSON.stringify({
         action: "Opened Numbers & Place Value Worksheet",
         href: "/subjects/maths/chapters/numbers/worksheet",
         timestamp: new Date().toISOString(),
       }));
-    } catch {
-      setUnlocked(false);
-    }
-  }, [router]);
-
-  if (!unlocked) return null;
+      localStorage.setItem("last_view_mathematics", JSON.stringify({ section: "worksheet", topicId: "intro-to-place-value" }));
+    } catch {}
+  }, []);
 
   return (
-    <DashboardLayout>
+    <DashboardLayout selectedSubject="mathematics" onSubjectChange={() => {}}>
       <main className="min-h-screen bg-white text-[#0F172A] pb-20 md:pb-16">
         <div className="mx-auto max-w-4xl px-6 py-10">
           <button
             type="button"
-            onClick={() => router.back()}
+            onClick={() => {
+              try { localStorage.setItem("last_selected_subject", "mathematics"); } catch {}
+              router.push("/dashboard");
+            }}
             className="inline-flex items-center gap-2 rounded-xl bg-[#0B2B5A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0A2550] transition"
           >
             <span className="text-base leading-none">←</span>
-            <span>Back</span>
+            <span>Back to Dashboard</span>
           </button>
           <div className="mt-6 flex flex-wrap items-start justify-between gap-4">
             <div>

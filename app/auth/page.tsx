@@ -22,7 +22,7 @@ export default function AuthPage() {
             {/* Student */}
             <button
               type="button"
-              onClick={() => router.push("/login")}
+              onClick={() => router.push("/")}
               className="group rounded-2xl border border-slate-200 bg-white p-5 text-left transition hover:border-slate-300 hover:bg-slate-50"
             >
               <div className="flex items-center justify-between">
@@ -64,7 +64,7 @@ export default function AuthPage() {
           <div className="mt-8 space-y-3">
             <button
               type="button"
-              onClick={() => router.push("/login")}
+              onClick={() => router.push("/")}
               className="w-full rounded-xl bg-[#0B2B5A] px-5 py-3 text-sm font-semibold text-white hover:bg-[#0A2550]"
             >
               Log in
@@ -72,7 +72,7 @@ export default function AuthPage() {
 
             <button
               type="button"
-              onClick={() => router.push("/signup")}
+              onClick={() => router.push("/")}
               className="w-full rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-800 hover:bg-slate-50"
             >
               Create account

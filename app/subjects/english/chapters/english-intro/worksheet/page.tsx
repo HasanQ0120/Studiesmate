@@ -1,35 +1,25 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import DashboardLayout from "@/components/DashboardLayout";
 
 export default function SimpleSentenceWorksheetPage() {
   const router = useRouter();
-  const [unlocked, setUnlocked] = useState<boolean | null>(null);
 
   useEffect(() => {
     try {
-      const isUnlocked = localStorage.getItem("worksheet_unlocked_simple_sentence") === "true";
-      if (!isUnlocked) {
-        router.replace("/subjects/english/chapters/english-intro/quiz");
-        return;
-      }
-      setUnlocked(true);
       localStorage.setItem("studiesmate_last_activity_v2", JSON.stringify({
         action: "Opened Simple Sentences Worksheet",
         href: "/subjects/english/chapters/english-intro/worksheet",
         timestamp: new Date().toISOString(),
       }));
-    } catch {
-      setUnlocked(false);
-    }
-  }, [router]);
-
-  if (!unlocked) return null;
+      localStorage.setItem("last_view_english", JSON.stringify({ section: "worksheet", topicId: "simple-sentences" }));
+    } catch {}
+  }, []);
 
   return (
-    <DashboardLayout>
+    <DashboardLayout selectedSubject="english" onSubjectChange={() => {}}>
       <main className="min-h-screen bg-white text-[#0F172A] pb-20 md:pb-16">
         <div className="mx-auto max-w-4xl px-6 py-10">
           <button

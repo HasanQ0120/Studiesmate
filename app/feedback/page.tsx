@@ -1,272 +1,286 @@
 "use client";
 
 import Link from "next/link";
+import PageFade from "@/components/PageFade";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/lib/auth";
-import Reveal from "@/components/Reveal";
+import AuthModal from "@/components/AuthModal";
 
 type SbMeta = {
   studentName?: string;
   parentEmail?: string;
 };
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const ALLOWED_MIME = ["image/png", "image/jpeg", "image/webp"];
+const POSITIVE_TAGS = [
+  "Solves a real problem",
+  "Videos are clear and helpful",
+  "Bilingual slider is amazing",
+  "My child enjoyed learning",
+];
+
+const IMPROVE_TAGS = [
+  "Urdu explanation could be simpler",
+  "Video quality needs improvement",
+  "App feels slow or buggy",
+  "Needs more content",
+];
 
 export default function FeedbackPage() {
+  const [authOpen, setAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<"login" | "signup">("signup");
   const [studentName, setStudentName] = useState("");
   const [parentEmail, setParentEmail] = useState("");
-  const [message, setMessage] = useState("");
+  const [userId, setUserId] = useState<string | null>(null);
 
-  const [screenshot, setScreenshot] = useState<File | null>(null);
-  const [fileError, setFileError] = useState("");
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [comment, setComment] = useState("");
 
-  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">(
-    "idle"
-  );
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [error, setError] = useState("");
-
-  const fileInputId = "feedback-screenshot";
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     async function loadUser() {
       const { data } = await supabase.auth.getUser();
       const user = data.user;
       const meta = (user?.user_metadata || {}) as SbMeta;
-
       setStudentName((meta.studentName || "").trim());
       setParentEmail((user?.email || meta.parentEmail || "").trim());
+      setUserId(user?.id ?? null);
     }
-
     loadUser();
   }, []);
 
-  const isLoggedIn = useMemo(() => {
-    return !!parentEmail.trim();
-  }, [parentEmail]);
+  const isLoggedIn = useMemo(() => !!parentEmail.trim(), [parentEmail]);
+  const canSend = isLoggedIn && rating > 0 && status !== "sending";
 
-  const canSend = useMemo(() => {
-    // allow sending with or without screenshot, but only if logged in
-    return isLoggedIn && message.trim().length >= 10 && status !== "sending";
-  }, [isLoggedIn, message, status]);
-
-  function handlePickFile(e: React.ChangeEvent<HTMLInputElement>) {
-    setFileError("");
-    const file = e.target.files?.[0] || null;
-
-    if (!file) {
-      setScreenshot(null);
-      return;
-    }
-
-    if (!ALLOWED_MIME.includes(file.type)) {
-      setScreenshot(null);
-      setFileError("Only PNG, JPG, or WebP images are allowed.");
-      // reset input so user can re-pick same file
-      if (fileInputRef.current) fileInputRef.current.value = "";
-      return;
-    }
-
-    if (file.size > MAX_FILE_SIZE) {
-      setScreenshot(null);
-      setFileError("Image is too large. Max size is 5MB.");
-      if (fileInputRef.current) fileInputRef.current.value = "";
-      return;
-    }
-
-    setScreenshot(file);
-  }
-
-  async function uploadScreenshot(file: File) {
-    const ext = file.name.split(".").pop()?.toLowerCase() || "png";
-    const safeExt = ["png", "jpg", "jpeg", "webp"].includes(ext) ? ext : "png";
-    const path = `feedback/${Date.now()}-${Math.random()
-      .toString(16)
-      .slice(2)}.${safeExt}`;
-
-    const { error: upErr } = await supabase.storage
-      .from("feedback-screenshots")
-      .upload(path, file, {
-        cacheControl: "3600",
-        upsert: false,
-        contentType: file.type,
-      });
-
-    if (upErr) throw upErr;
-
-    const { data } = supabase.storage
-      .from("feedback-screenshots")
-      .getPublicUrl(path);
-    return data.publicUrl;
+  function toggleTag(tag: string) {
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+    );
   }
 
   async function handleSubmit() {
-    // Hard guard: never hit Supabase if user is not logged in
-    if (!isLoggedIn) {
-      setStatus("error");
-      setError("Please log in or sign up to submit feedback.");
-      return;
-    }
-
     if (!canSend) return;
-
     setStatus("sending");
     setError("");
-    setFileError("");
-
     try {
-      let screenshot_url: string | null = null;
-
-      if (screenshot) {
-        screenshot_url = await uploadScreenshot(screenshot);
-      }
-
       const payload = {
         user_email: parentEmail || null,
         student_name: studentName || null,
-        message: message.trim(),
+        message: comment.trim() || null,
+        comment: comment.trim() || null,
+        rating,
+        selected_tags: selectedTags.length > 0 ? selectedTags : null,
         page: "/feedback",
-        screenshot_url,
+        screenshot_url: null,
       };
-
       const { error: insertError } = await supabase.from("feedback").insert(payload);
-
       if (insertError) throw insertError;
-
+      try {
+        localStorage.setItem("feedback_submitted", "true");
+        window.dispatchEvent(new Event("feedback_submitted"));
+      } catch {}
       setStatus("sent");
-      setMessage("");
-      setScreenshot(null);
-      if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (err: any) {
       setStatus("error");
       setError(err?.message || "Failed to send feedback.");
     }
   }
 
-  return (
-    <div className="bg-white">
-      <div className="mx-auto max-w-6xl px-4 py-16">
-        <Reveal>
-          <div className="mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 text-slate-900 shadow-sm">
-            <div className="flex items-center justify-between gap-3">
-              <h1 className="text-xl font-semibold tracking-tight">Feedback</h1>
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-                Beta
-              </span>
-            </div>
-
-            <p className="mt-2 text-sm text-slate-600">
-              Tell us what’s confusing, broken, missing, or annoying. Short and
-              specific feedback is best.
+  if (status === "sent") {
+    return (
+      <PageFade>
+        <div className="min-h-[60vh] bg-white flex items-center justify-center px-4 py-20">
+          <div className="mx-auto max-w-md text-center">
+            <div className="text-5xl mb-6">✅</div>
+            <h2 style={{ color: "#0F172A", fontSize: "26px", fontWeight: 700, marginBottom: "16px" }}>
+              JazakAllah!
+            </h2>
+            <p style={{ color: "#6B7280", fontSize: "15px", lineHeight: 1.7, marginBottom: "12px" }}>
+              Your feedback has been submitted.
             </p>
-
-            {!isLoggedIn && (
-              <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4">
-                <p className="text-sm font-semibold text-slate-900">
-                  Log in required
-                </p>
-                <p className="mt-1 text-sm text-slate-700">
-                  Please log in or sign up to submit feedback.
-                </p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <Link
-                    href="/login"
-                    className="rounded-lg bg-[#0B2B5A] px-3 py-2 text-sm font-semibold text-white hover:bg-[#0A2550]"
-                  >
-                    Log in
-                  </Link>
-                  <Link
-                    href="/signup"
-                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50"
-                  >
-                    Sign up
-                  </Link>
-                </div>
-              </div>
-            )}
-
-            <div className="mt-6">
-              <label className="text-sm font-medium text-slate-800">
-                Your feedback (min 10 characters)
-              </label>
-              <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                rows={6}
-                placeholder="Example: Subjects page takes too long to load on mobile..."
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-slate-200"
-              />
-            </div>
-
-            {/* Screenshot upload */}
-            <div className="mt-6">
-              <p className="text-sm font-medium text-slate-800">
-                Optional screenshot
-              </p>
-
-              <input
-                ref={fileInputRef}
-                id={fileInputId}
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-                onChange={handlePickFile}
-                className="sr-only"
-              />
-
-              <div className="mt-2 flex flex-wrap items-center gap-3">
-                <label
-                  htmlFor={fileInputId}
-                  className="cursor-pointer rounded-xl bg-[#0B2B5A] px-4 py-2 text-sm font-semibold text-white"
-                >
-                  Choose image
-                </label>
-
-                <span className="text-sm text-slate-600">
-                  {screenshot ? screenshot.name : "No file chosen"}
-                </span>
-
-                {screenshot && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setScreenshot(null);
-                      setFileError("");
-                      if (fileInputRef.current) fileInputRef.current.value = "";
-                    }}
-                    className="text-sm font-semibold text-slate-700 underline"
-                  >
-                    Remove
-                  </button>
-                )}
-              </div>
-
-              <p className="mt-2 text-xs text-slate-500">
-                Optional. Upload one screenshot (PNG/JPG/WebP, max 5MB). Please
-                avoid sharing passwords, phone numbers, or private information.
-              </p>
-
-              {fileError && <p className="mt-2 text-sm text-red-600">{fileError}</p>}
-            </div>
-
-            {status === "error" && <p className="mt-3 text-sm text-red-600">{error}</p>}
-            {status === "sent" && (
-              <p className="mt-3 text-sm text-green-700">Feedback sent. Thanks.</p>
-            )}
-
-            <div className="mt-5">
-              <button
-                type="button"
-                onClick={handleSubmit}
-                disabled={!canSend}
-                className="rounded-xl bg-[#0B2B5A] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+            <p style={{ color: "#6B7280", fontSize: "15px", lineHeight: 1.7, marginBottom: "12px" }}>
+              If you ever face any issue or bug while using StudiesMate, please report it here anytime. We fix things fast.
+            </p>
+            <p style={{ color: "#6B7280", fontSize: "15px", lineHeight: 1.7, marginBottom: "32px" }}>
+              Have questions or want updates?{" "}
+              <a
+                href="https://chat.whatsapp.com/H8q5PBchpRNC4TWIeWp49I"
+                target="_blank"
+                rel="noreferrer"
+                style={{ color: "#22C55E", fontWeight: 600, textDecoration: "underline" }}
               >
-                {status === "sending" ? "Sending..." : "Submit feedback"}
-              </button>
+                Join our WhatsApp community
+              </a>
+            </p>
+            <Link
+              href="/dashboard"
+              onClick={() => { try { localStorage.removeItem("last_selected_subject"); } catch {} }}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "#F97316",
+                color: "white",
+                borderRadius: "12px",
+                padding: "12px 28px",
+                fontSize: "14px",
+                fontWeight: 700,
+                textDecoration: "none",
+              }}
+            >
+              Back to Dashboard
+            </Link>
+          </div>
+        </div>
+        <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} initialMode={authMode} />
+      </PageFade>
+    );
+  }
+
+  return (
+    <PageFade>
+    <div>
+      {/* Hero */}
+      <div className="bg-[#F0FDF4] px-4 py-14 text-center">
+        <div className="text-4xl">💬</div>
+        <h1 className="mt-4 text-3xl font-bold text-[#111827]">Share Your Feedback</h1>
+        <p className="mx-auto mt-3 max-w-md text-sm text-[#6B7280]">
+          Every message is read by the founders. Help us build something better for Pakistani students.
+        </p>
+      </div>
+
+      {/* Form */}
+      <div className="bg-white px-4 py-12">
+        <div className="mx-auto max-w-[600px] rounded-xl bg-white p-8 shadow-md border border-[#E5E7EB]">
+
+          {/* Not logged in */}
+          {!isLoggedIn && (
+            <div className="mb-6 rounded-xl border border-[#DCFCE7] bg-[#F0FDF4] p-4">
+              <p className="text-sm font-semibold text-[#16A34A]">Log in required</p>
+              <p className="mt-1 text-sm text-[#374151]">Please log in or sign up to submit feedback.</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button type="button" onClick={() => { setAuthMode("login"); setAuthOpen(true); }} className="rounded-lg border border-[#22C55E] px-3 py-2 text-sm font-semibold text-[#22C55E] hover:bg-[#F0FDF4] transition-colors">Log in</button>
+                <button type="button" onClick={() => { setAuthMode("signup"); setAuthOpen(true); }} className="rounded-lg border border-[#22C55E] px-3 py-2 text-sm font-semibold text-[#22C55E] hover:bg-[#F0FDF4] transition-colors">Sign up</button>
+              </div>
+            </div>
+          )}
+
+          {/* Star rating */}
+          <div className="mb-6">
+            <p className="text-sm font-semibold text-[#111827] mb-3">How would you rate StudiesMate?</p>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => setRating(star)}
+                  onMouseEnter={() => setHoverRating(star)}
+                  onMouseLeave={() => setHoverRating(0)}
+                  style={{
+                    fontSize: "36px",
+                    lineHeight: 1,
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: "2px",
+                    color: (hoverRating || rating) >= star ? "#F97316" : "#D1D5DB",
+                    transition: "color 0.1s",
+                  }}
+                  aria-label={`${star} star`}
+                >
+                  ★
+                </button>
+              ))}
+            </div>
+            {rating > 0 && (
+              <p className="mt-1 text-xs text-[#6B7280]">
+                {["", "Poor", "Fair", "Good", "Great", "Excellent!"][rating]}
+              </p>
+            )}
+          </div>
+
+          {/* Positive tags */}
+          <div className="mb-4">
+            <p className="text-sm font-semibold text-[#111827] mb-2">What's working well?</p>
+            <div className="flex flex-wrap gap-2">
+              {POSITIVE_TAGS.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => toggleTag(tag)}
+                  className="rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
+                  style={{
+                    background: selectedTags.includes(tag) ? "#DCFCE7" : "#F9FAFB",
+                    borderColor: selectedTags.includes(tag) ? "#22C55E" : "#E5E7EB",
+                    color: selectedTags.includes(tag) ? "#16A34A" : "#374151",
+                  }}
+                >
+                  {selectedTags.includes(tag) ? "✓ " : ""}{tag}
+                </button>
+              ))}
             </div>
           </div>
-        </Reveal>
+
+          {/* Improve tags */}
+          <div className="mb-6">
+            <p className="text-sm font-semibold text-[#111827] mb-2">Areas to improve</p>
+            <div className="flex flex-wrap gap-2">
+              {IMPROVE_TAGS.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => toggleTag(tag)}
+                  className="rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
+                  style={{
+                    background: selectedTags.includes(tag) ? "#FEF2F2" : "#F9FAFB",
+                    borderColor: selectedTags.includes(tag) ? "#EF4444" : "#E5E7EB",
+                    color: selectedTags.includes(tag) ? "#DC2626" : "#374151",
+                  }}
+                >
+                  {selectedTags.includes(tag) ? "✓ " : ""}{tag}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Optional comment */}
+          <div className="mb-6">
+            <label className="text-sm font-semibold text-[#111827]">
+              Anything else you&apos;d like to share? <span className="font-normal text-[#9CA3AF]">(optional)</span>
+            </label>
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              rows={4}
+              placeholder="Tell us more..."
+              className="mt-2 w-full rounded-lg border border-[#E5E7EB] bg-white p-3 text-sm text-[#111827] outline-none transition-colors focus:border-[#22C55E] focus:ring-2 focus:ring-[#22C55E]/20"
+            />
+          </div>
+
+          {status === "error" && <p className="mb-4 text-sm text-red-600">{error}</p>}
+
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={!canSend}
+            className="w-full rounded-xl bg-[#22C55E] py-3 text-sm font-semibold text-white transition-colors hover:bg-[#16A34A] disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {status === "sending" ? "Sending..." : "Submit feedback"}
+          </button>
+
+          {!isLoggedIn && (
+            <p className="mt-3 text-center text-xs text-[#9CA3AF]">You must be logged in to submit.</p>
+          )}
+          {rating === 0 && isLoggedIn && (
+            <p className="mt-3 text-center text-xs text-[#9CA3AF]">Please select a star rating to submit.</p>
+          )}
+        </div>
       </div>
     </div>
+    <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} initialMode={authMode} />
+    </PageFade>
   );
 }

@@ -21,7 +21,7 @@ export default function ScienceChaptersPage() {
   return (
     <main className="min-h-screen bg-white text-slate-900">
       <div className="mx-auto max-w-5xl px-4 py-12">
-        <BackButton href="/dashboard" label="Back to Dashboard" />
+        <BackButton href="/dashboard" label="Back to Dashboard" onClick={() => { try { localStorage.removeItem("last_selected_subject"); } catch {} }} />
 
         <h1 className="mt-6 text-3xl font-semibold tracking-tight">{SUBJECT_TITLE}</h1>
         <p className="mt-2 text-sm text-slate-700">

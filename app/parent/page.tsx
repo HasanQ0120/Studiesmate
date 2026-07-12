@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/auth";
-
-const PARENT_CODE_KEY = "parent_connected_code";
+import AuthModal from "@/components/AuthModal";
+import PageFade from "@/components/PageFade";
 
 const benefits = [
   "View your child's quiz scores and lesson progress",
@@ -15,17 +16,44 @@ const benefits = [
 ];
 
 export default function ParentPage() {
+  const router = useRouter();
   const [inputCode, setInputCode] = useState("");
   const [connecting, setConnecting] = useState(false);
   const [connectedCode, setConnectedCode] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [showAuth, setShowAuth] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(PARENT_CODE_KEY);
-      if (saved) setConnectedCode(saved);
-    } catch {}
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        router.push("/");
+        return;
+      }
+      supabase
+        .from("profiles")
+        .select("connect_code")
+        .eq("id", session.user.id)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data?.connect_code) setConnectedCode(data.connect_code);
+          setAuthChecked(true);
+        });
+    });
   }, []);
+
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] px-4 py-12">
+        <div className="mx-auto max-w-lg">
+          <div className="skeleton mb-3" style={{ height: 32, width: 200 }} />
+          <div className="skeleton mb-8" style={{ height: 16, width: 280 }} />
+          <div className="skeleton mb-4" style={{ height: 120, borderRadius: 16 }} />
+          <div className="skeleton" style={{ height: 180, borderRadius: 16 }} />
+        </div>
+      </div>
+    );
+  }
 
   async function handleConnect() {
     const code = inputCode.trim().toUpperCase();
@@ -39,14 +67,11 @@ export default function ParentPage() {
         .from("profiles")
         .select("connect_code")
         .eq("connect_code", code)
-        .single();
+        .maybeSingle();
 
       if (queryError || !data) {
         setError("Invalid code. Please enter the correct Connect Code.");
       } else {
-        try {
-          localStorage.setItem(PARENT_CODE_KEY, code);
-        } catch {}
         setConnectedCode(code);
       }
     } catch {
@@ -57,14 +82,12 @@ export default function ParentPage() {
   }
 
   function handleDisconnect() {
-    try {
-      localStorage.removeItem(PARENT_CODE_KEY);
-    } catch {}
     setConnectedCode(null);
     setInputCode("");
   }
 
   return (
+    <PageFade>
     <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A]">
       <div className="mx-auto max-w-lg px-6 py-16">
 
@@ -101,7 +124,7 @@ export default function ParentPage() {
           </div>
         ) : (
           /* Connect form */
-          <div className="rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm premium-card-hover">
             <label className="block text-sm font-semibold text-[#0F172A]">
               Enter your child&apos;s Connect Code
             </label>
@@ -135,9 +158,13 @@ export default function ParentPage() {
 
             <div className="mt-4 text-center text-sm text-[#475569]">
               No code yet?{" "}
-              <Link href="/signup" className="font-semibold text-[#0B2B5A] hover:underline">
+              <button
+                type="button"
+                onClick={() => setShowAuth(true)}
+                className="font-semibold text-[#0B2B5A] hover:underline"
+              >
                 Sign up as a Student first
-              </Link>
+              </button>
             </div>
           </div>
         )}
@@ -163,6 +190,9 @@ export default function ParentPage() {
         </div>
 
       </div>
+
+      <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} initialMode="signup" />
     </div>
+    </PageFade>
   );
 }

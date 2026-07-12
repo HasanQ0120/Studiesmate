@@ -9,7 +9,13 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+  },
+});
 
 export type StudiesMateUserMeta = {
   studentName?: string;
@@ -38,7 +44,6 @@ export async function signUpParentAccount(params: {
     email: parentEmail.trim().toLowerCase(),
     password: password.trim(),
     options: {
-      emailRedirectTo: 'https://studiesmate-web.vercel.app/dashboard',
       data: {
         studentName: studentName.trim(),
         studentClass: studentClass.trim(),
@@ -50,20 +55,18 @@ export async function signUpParentAccount(params: {
   });
 
   if (result.data?.user?.id) {
-    const newCode = 'SM-' + Math.floor(1000 + Math.random() * 9000);
-
     const { error: profileError } = await supabase
       .from('profiles')
       .upsert({
         id: result.data.user.id,
-        connect_code: newCode,
+        connect_code: connectCode,
       }, {
         onConflict: 'id',
         ignoreDuplicates: true,
       });
 
     if (profileError) {
-      console.log('Profile insert error:', profileError);
+      console.error('Profile upsert error:', profileError);
     }
   }
 
