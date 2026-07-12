@@ -11,17 +11,18 @@ async function sendQuizNotification(quizId: string) {
   try {
     if (localStorage.getItem("sm_email_notifications") === "false") return;
     if (localStorage.getItem(`sm_quiz_email_sent_${quizId}`)) return;
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.access_token) return;
-    const res = await fetch("/api/send-quiz-notification", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${session.access_token}`,
-      },
-      body: JSON.stringify({ quizId }),
-    });
-    if (res.ok) localStorage.setItem(`sm_quiz_email_sent_${quizId}`, "true");
+    // Email sending disabled until domain verification with Resend is complete. Re-enable by uncommenting the API call below.
+    // const { data: { session } } = await supabase.auth.getSession();
+    // if (!session?.access_token) return;
+    // const res = await fetch("/api/send-quiz-notification", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     "Authorization": `Bearer ${session.access_token}`,
+    //   },
+    //   body: JSON.stringify({ quizId }),
+    // });
+    // if (res.ok) localStorage.setItem(`sm_quiz_email_sent_${quizId}`, "true");
   } catch {}
 }
 
