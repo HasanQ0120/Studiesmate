@@ -8,6 +8,7 @@ function GoogleCallbackInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
+  const [duplicateEmail, setDuplicateEmail] = useState(false);
 
   useEffect(() => {
     async function handleCallback() {
@@ -15,6 +16,7 @@ function GoogleCallbackInner() {
 
       let userId: string;
       let provider: string | undefined;
+      let accessToken: string;
 
       if (code) {
         const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
@@ -24,6 +26,7 @@ function GoogleCallbackInner() {
         }
         userId = data.session.user.id;
         provider = data.session.user.app_metadata?.provider as string | undefined;
+        accessToken = data.session.access_token;
       } else {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
@@ -32,12 +35,36 @@ function GoogleCallbackInner() {
         }
         userId = session.user.id;
         provider = session.user.app_metadata?.provider as string | undefined;
+        accessToken = session.access_token;
       }
 
       if (provider !== "google") {
         try { localStorage.removeItem("last_selected_subject"); } catch {}
         router.replace("/dashboard");
         return;
+      }
+
+      // Check if another account already exists for this email using email/password.
+      // The API also deletes the phantom Google account server-side if a conflict is found.
+      try {
+        const checkRes = await fetch("/api/auth/check-duplicate-email", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`,
+          },
+        });
+        if (checkRes.ok) {
+          const { conflict } = await checkRes.json();
+          if (conflict) {
+            // Phantom Google account was deleted server-side; clear the local session too
+            try { await supabase.auth.signOut(); } catch {}
+            setDuplicateEmail(true);
+            return;
+          }
+        }
+      } catch {
+        // Non-fatal: if the duplicate check fails, proceed rather than blocking the user
       }
 
       const { data: profile } = await supabase
@@ -56,6 +83,27 @@ function GoogleCallbackInner() {
 
     handleCallback();
   }, [searchParams, router]);
+
+  if (duplicateEmail) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white px-6">
+        <div className="w-full max-w-sm text-center">
+          <p className="text-4xl mb-4">⚠️</p>
+          <h1 className="text-xl font-bold text-[#111827]">Account already exists</h1>
+          <p className="mt-3 text-sm text-[#6B7280] leading-relaxed">
+            An account with this email was created using email and password. Please log in
+            with your original method to keep all your existing progress.
+          </p>
+          <a
+            href="/"
+            className="mt-6 inline-flex items-center justify-center rounded-xl bg-[#0F172A] px-6 py-3 text-sm font-semibold text-white hover:bg-[#1E293B] transition-colors"
+          >
+            Go to homepage to log in
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   if (error) {
     return (

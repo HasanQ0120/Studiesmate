@@ -112,10 +112,10 @@ export default function DashboardLayout({ children, selectedSubject, onSubjectCh
     return () => subscription.unsubscribe();
   }, []);
 
-  // Scroll the content area back to top on every navigation
+  // Scroll the content area back to top on navigation OR when subject intro view opens
   useEffect(() => {
     if (mainRef.current) mainRef.current.scrollTop = 0;
-  }, [pathname]);
+  }, [pathname, selectedSubject]);
 
   // Hide site header and footer on all dashboard pages
   useEffect(() => {

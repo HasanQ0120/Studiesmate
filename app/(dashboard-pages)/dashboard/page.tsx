@@ -436,10 +436,7 @@ export default function DashboardPage() {
                   >
                   <button
                     type="button"
-                    onClick={() => {
-                      const url = getLastViewUrl(key);
-                      if (url) { router.push(url); } else { setSelectedSubject(key); }
-                    }}
+                    onClick={() => setSelectedSubject(key)}
                     className="rounded-2xl p-6 text-left w-full cursor-pointer special-card-hover"
                     style={{ background: cfg.bg }}
                   >
@@ -506,6 +503,8 @@ export default function DashboardPage() {
 
 // ── Subject Intro Component ──
 function SubjectIntroView({ subjectKey, onBack }: { subjectKey: SubjectKey; onBack: () => void }) {
+  const [resumeUrl, setResumeUrl] = useState<string | null>(null);
+  useEffect(() => { setResumeUrl(getLastViewUrl(subjectKey)); }, [subjectKey]);
   const data = CURRICULUM[subjectKey];
   const cfg = {
     mathematics: { emoji: "🧮", bg: "#F0FDF4", border: "#BBF7D0", accent: "#16A34A", light: "#DCFCE7" },
@@ -595,13 +594,24 @@ function SubjectIntroView({ subjectKey, onBack }: { subjectKey: SubjectKey; onBa
         <div className="rounded-2xl bg-white border border-[#E5E7EB] p-6 shadow-sm premium-card-hover">
           <h3 className="text-base font-bold text-[#111827] mb-1">Ready to begin?</h3>
           <p className="text-sm text-[#6B7280] mb-4">Jump straight into your first lesson.</p>
-          <Link
-            href={FIRST_LESSON_URL[subjectKey] ?? "/dashboard"}
-            className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white"
-            style={{ background: cfg.accent }}
-          >
-            Start Learning →
-          </Link>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href={FIRST_LESSON_URL[subjectKey] ?? "/dashboard"}
+              className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white"
+              style={{ background: cfg.accent }}
+            >
+              Start Learning →
+            </Link>
+            {resumeUrl && (
+              <Link
+                href={resumeUrl}
+                className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold"
+                style={{ background: "white", color: cfg.accent, border: `1.5px solid ${cfg.accent}` }}
+              >
+                Continue from last position →
+              </Link>
+            )}
+          </div>
         </div>
 
       </div>
