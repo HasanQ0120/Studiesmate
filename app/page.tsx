@@ -159,6 +159,25 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* PROMO STRIP */}
+      <div
+        className="w-full flex items-center justify-between gap-3 px-4 md:px-8 cursor-pointer"
+        style={{ background: "#F97316", minHeight: "48px" }}
+        onClick={handleStartBeta}
+      >
+        <p className="text-sm font-semibold leading-tight py-2" style={{ color: "#14532D" }}>
+          Unlock full lessons, quizzes &amp; Explain Again
+        </p>
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); handleStartBeta(); }}
+          className="flex-shrink-0 rounded-lg px-3 py-1.5 text-xs font-bold whitespace-nowrap hover:opacity-90 transition-opacity"
+          style={{ background: "#FFFFFF", color: "#0B2B5A" }}
+        >
+          Sign Up Free →
+        </button>
+      </div>
+
       {/* FOCUS (Blue section + image on right) */}
       <section className="bg-[#0B2B5A] text-white">
         <div className="mx-auto max-w-6xl px-4 py-16">
