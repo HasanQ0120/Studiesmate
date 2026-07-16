@@ -524,18 +524,20 @@ export default function HomePage() {
               )}
               <video
                 ref={demoEnRef}
-                src={demoSrcs?.en ?? ""}
+                src={demoSrcs?.en}
                 controls
                 controlsList="nodownload"
                 width="100%"
+                onError={() => { if (demoSrcs) setDemoError(true); }}
                 style={{ borderRadius: "12px", background: "black", display: demoSrcs && demoLang === "english" ? "block" : "none" }}
               />
               <video
                 ref={demoUrRef}
-                src={demoSrcs?.ur ?? ""}
+                src={demoSrcs?.ur}
                 controls
                 controlsList="nodownload"
                 width="100%"
+                onError={() => { if (demoSrcs) setDemoError(true); }}
                 style={{ borderRadius: "12px", background: "black", display: demoSrcs && demoLang === "urdu" ? "block" : "none" }}
               />
               <div className="mt-4">

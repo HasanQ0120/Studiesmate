@@ -58,17 +58,22 @@ function generateSignedUrl(filename: string): string {
 }
 
 export async function GET(req: NextRequest) {
+  console.log("[video-url] GET", req.nextUrl.searchParams.toString());
+
   if (!BUNNY_AUTH_KEY) {
+    console.log("[video-url] BUNNY_AUTH_KEY missing → 503");
     return NextResponse.json({ error: "video_unavailable" }, { status: 503 });
   }
 
   const filename = req.nextUrl.searchParams.get("path") ?? "";
   if (!filename || !ALLOWED_PATHS.has(filename)) {
+    console.log("[video-url] invalid path:", filename, "→ 400");
     return NextResponse.json({ error: "invalid_path" }, { status: 400 });
   }
 
   const authHeader = req.headers.get("Authorization");
   const token = authHeader?.replace(/^Bearer\s+/i, "");
+  console.log("[video-url] auth header present:", !!authHeader, "| token present:", !!token);
 
   let userId: string | null = null;
 
@@ -79,23 +84,30 @@ export async function GET(req: NextRequest) {
       auth: { persistSession: false },
     });
     const { data: { user }, error } = await userClient.auth.getUser();
+    console.log("[video-url] getUser result — userId:", user?.id ?? null, "| error:", error?.message ?? null);
     if (error || !user) {
+      console.log("[video-url] → 401 unauthorized");
       return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }
     userId = user.id;
   } else {
     // Unauthenticated request — only demo paths are allowed (homepage)
     if (!DEMO_PATHS.has(filename)) {
+      console.log("[video-url] no token + non-demo path → 401");
       return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }
+    console.log("[video-url] demo path, no auth required");
   }
 
   if (userId && !checkRateLimit(userId)) {
+    console.log("[video-url] rate limited for userId:", userId, "→ 429");
     return NextResponse.json(
       { error: "Too many video requests. Please wait a few minutes and try again." },
       { status: 429 }
     );
   }
 
-  return NextResponse.json({ url: generateSignedUrl(filename) });
+  const signedUrl = generateSignedUrl(filename);
+  console.log("[video-url] → 200 signed URL:", signedUrl);
+  return NextResponse.json({ url: signedUrl });
 }

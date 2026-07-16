@@ -138,20 +138,26 @@ function ChapterPageInner() {
       if (!videoPaths.en || !videoPaths.ur) return;
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        if (!session) { setVideoError(true); return; }
+        console.log("[fetchVideoUrls] session:", session ? `uid=${session.user.id}` : "null");
+        if (!session) { console.log("[fetchVideoUrls] no session → setVideoError"); setVideoError(true); return; }
         const headers = { Authorization: `Bearer ${session.access_token}` };
         const [enRes, urRes] = await Promise.all([
           fetch(`/api/video-url?path=${videoPaths.en}`, { headers }),
           fetch(`/api/video-url?path=${videoPaths.ur}`, { headers }),
         ]);
+        console.log("[fetchVideoUrls] API responses:", enRes.status, urRes.status);
         if (!enRes.ok || !urRes.ok) {
           if (enRes.status === 429 || urRes.status === 429) { setVideoRateLimited(true); } else { setVideoError(true); }
           return;
         }
         const [enData, urData] = await Promise.all([enRes.json(), urRes.json()]);
+        console.log("[fetchVideoUrls] en URL:", enData.url);
+        console.log("[fetchVideoUrls] ur URL:", urData.url);
         if (!enData.url || !urData.url) { setVideoError(true); return; }
         setVideoSrcs({ en: enData.url, ur: urData.url });
-      } catch {
+        console.log("[fetchVideoUrls] videoSrcs set — src that will be applied to <video>:", enData.url);
+      } catch (err) {
+        console.log("[fetchVideoUrls] caught error:", err);
         setVideoError(true);
       }
     }
