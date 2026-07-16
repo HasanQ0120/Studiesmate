@@ -322,7 +322,7 @@ function ScienceLessonPageInner() {
                     )}
                     {videoRateLimited && (
                       <div className="absolute inset-0 flex items-center justify-center bg-[#0F172A] px-6">
-                        <p className="text-center text-sm text-white/70">{"You've reached the video request limit for now. Please try again in a few minutes."}</p>
+                        <p className="text-center text-sm text-white/70">{"You've reached the video request limit. Please try again in 10 minutes."}</p>
                       </div>
                     )}
                     {videoError && (
