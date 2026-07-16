@@ -51,9 +51,12 @@ export default function DashboardPagesLayout({ children }: { children: ReactNode
 
       const serverToken = profile?.active_session_token ?? null;
 
-      // Migration case: neither side has a token yet (deployed after user logged in).
-      // Silently write a token so future checks work, and continue.
-      if (!localToken && !serverToken) {
+      // Fresh/migration case: server has no token yet. Covers three cases:
+      // 1) Pre-deployment sessions (neither side has a token)
+      // 2) New signups (signup path never writes a token; profile starts with null)
+      // 3) Deleted + re-registered accounts (stale localStorage from old account,
+      //    but new profile has no token — serverToken=null is authoritative here)
+      if (!serverToken) {
         const token = crypto.randomUUID();
         try {
           await supabase.from("profiles").update({ active_session_token: token }).eq("id", user.id);

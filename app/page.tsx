@@ -528,6 +528,7 @@ export default function HomePage() {
                 controls
                 controlsList="nodownload"
                 width="100%"
+                onError={() => { if (demoSrcs) setDemoError(true); }}
                 style={{ borderRadius: "12px", background: "black", display: demoSrcs && demoLang === "english" ? "block" : "none" }}
               />
               <video
@@ -536,6 +537,7 @@ export default function HomePage() {
                 controls
                 controlsList="nodownload"
                 width="100%"
+                onError={() => { if (demoSrcs) setDemoError(true); }}
                 style={{ borderRadius: "12px", background: "black", display: demoSrcs && demoLang === "urdu" ? "block" : "none" }}
               />
               <div className="mt-4">

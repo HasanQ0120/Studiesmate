@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/auth";
@@ -10,6 +10,7 @@ import { SubjectContext } from "../layout";
 const QUIZ_COMPLETIONS_KEY = "studiesmate_quiz_completions";
 const LESSON_COMPLETIONS_KEY = "studiesmate_lesson_completions";
 const LAST_ACTIVITY_V2_KEY = "studiesmate_last_activity_v2";
+const ACTIVE_GRADE_KEY = "sm_active_grade";
 
 // ── Progress snapshot constants ──
 const SNAP_LESSON_KEYS: Record<string, string> = {
@@ -95,9 +96,131 @@ function getLastViewUrl(subject: "mathematics" | "english" | "science"): string 
   }
 }
 
+// ── Shared grade progress bar ──
+function GradeProgressBar({
+  activeGrade,
+  onGradeClick,
+}: {
+  activeGrade: number;
+  onGradeClick: (grade: number) => void;
+}) {
+  return (
+    <div className="mb-6 rounded-2xl bg-white p-5 shadow-sm premium-card-hover">
+      <div className="flex items-start justify-between mb-5 gap-4">
+        <div>
+          <h2 className="text-base font-bold text-[#111827]">Grade Progress</h2>
+          <p className="mt-1 text-xs text-[#9CA3AF] leading-relaxed max-w-sm">
+            Switch between grades as they launch. Purchase to unlock seamless travelling across your entire learning journey.
+          </p>
+        </div>
+        <Link
+          href="/phase-1"
+          className="flex-shrink-0 text-xs font-semibold transition-colors"
+          style={{
+            background: "white",
+            border: "1px solid #22C55E",
+            color: "#22C55E",
+            borderRadius: "9999px",
+            padding: "6px 14px",
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLAnchorElement).style.background = "#22C55E";
+            (e.currentTarget as HTMLAnchorElement).style.color = "white";
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLAnchorElement).style.background = "white";
+            (e.currentTarget as HTMLAnchorElement).style.color = "#22C55E";
+          }}
+        >
+          View all grades →
+        </Link>
+      </div>
+      <div className="grid grid-cols-4 gap-x-2 gap-y-4 sm:flex sm:items-start sm:justify-between sm:gap-0">
+        {GRADES.map((grade, i) => {
+          const gradeNum = i + 1;
+          const isGrade4 = gradeNum === 4;
+          const isActive = activeGrade === gradeNum;
+          return (
+            <button
+              key={grade}
+              type="button"
+              onClick={() => onGradeClick(gradeNum)}
+              className="flex flex-col items-center gap-1.5 transition-opacity hover:opacity-70"
+              style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
+            >
+              <div
+                className="h-4 w-4 rounded-full border-2 flex-shrink-0"
+                style={{
+                  background: isGrade4 ? "#22C55E" : isActive ? "#E5E7EB" : "white",
+                  borderColor: isGrade4 ? "#22C55E" : isActive ? "#6B7280" : "#D1D5DB",
+                }}
+              />
+              <span
+                className="text-[10px] whitespace-nowrap"
+                style={{
+                  color: isGrade4 ? "#22C55E" : isActive ? "#374151" : "#9CA3AF",
+                  fontWeight: isGrade4 || isActive ? 600 : 500,
+                }}
+              >
+                {grade}
+              </span>
+              {isGrade4 ? (
+                <div className="flex flex-col items-center gap-0.5">
+                  <span className="rounded-full px-1.5 py-0.5 text-[9px] font-semibold whitespace-nowrap" style={{ background: "#DCFCE7", color: "#16A34A" }}>
+                    In Progress
+                  </span>
+                  <span className="rounded-full px-1.5 py-0.5 text-[9px] font-semibold whitespace-nowrap" style={{ background: "#F0FDF4", color: "#22C55E" }}>
+                    Beta
+                  </span>
+                </div>
+              ) : (
+                <span className="rounded-full px-1.5 py-0.5 text-[9px] font-semibold whitespace-nowrap" style={{ background: "#DBEAFE", color: "#2563EB" }}>
+                  Coming Soon
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const router = useRouter();
   const { selectedSubject, setSelectedSubject } = useContext(SubjectContext);
+
+  const [activeGrade, setActiveGrade] = useState<number>(4);
+  const [loadingGrade, setLoadingGrade] = useState<number | null>(null);
+  const loadingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // ── Init activeGrade from localStorage ──
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(ACTIVE_GRADE_KEY);
+      if (stored) {
+        const n = parseInt(stored, 10);
+        if (n >= 1 && n <= 8) setActiveGrade(n);
+      }
+    } catch {}
+  }, []);
+
+  // ── Grade click handler ──
+  function handleGradeClick(gradeNum: number) {
+    if (gradeNum === activeGrade && loadingGrade === null) return;
+    if (loadingTimerRef.current) clearTimeout(loadingTimerRef.current);
+    try { localStorage.setItem(ACTIVE_GRADE_KEY, String(gradeNum)); } catch {}
+    setSelectedSubject(null);
+    setLoadingGrade(gradeNum);
+    loadingTimerRef.current = setTimeout(() => {
+      setActiveGrade(gradeNum);
+      setLoadingGrade(null);
+    }, 2500);
+  }
+
+  useEffect(() => {
+    return () => { if (loadingTimerRef.current) clearTimeout(loadingTimerRef.current); };
+  }, []);
 
   useEffect(() => {
     try {
@@ -263,6 +386,9 @@ export default function DashboardPage() {
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
+  // Suppress unused-variable warnings for state kept for future use
+  void lastActivityData; void streak; void connectCode;
+
   // ── Welcome screen ──
   if (showWelcome) {
     return (
@@ -308,14 +434,43 @@ export default function DashboardPage() {
         }
       `}</style>
 
-      {selectedSubject ? (
-        /* ── SUBJECT INTRO VIEW ── */
+      {loadingGrade !== null ? (
+        /* ── GRADE LOADING SCREEN ── */
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white">
+          <div
+            className="h-14 w-14 rounded-full border-4 border-t-[#22C55E] mb-5"
+            style={{
+              borderColor: "#DCFCE7",
+              borderTopColor: "#22C55E",
+              animation: "spin 0.9s linear infinite",
+            }}
+          />
+          <p className="text-base font-semibold text-[#22C55E]">Loading Grade {loadingGrade}...</p>
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+
+      ) : selectedSubject && activeGrade === 4 ? (
+        /* ── SUBJECT INTRO VIEW (Grade 4 only) ── */
         <SubjectIntroView
           subjectKey={selectedSubject as SubjectKey}
           onBack={() => setSelectedSubject(null)}
         />
+
+      ) : activeGrade !== 4 ? (
+        /* ── COMING SOON VIEW (Grades 1–3, 5–8) ── */
+        <GradeComingSoonView
+          grade={activeGrade}
+          onGradeClick={handleGradeClick}
+          studentName={studentName}
+          profileLoading={profileLoading}
+          explainCredits={explainCredits}
+          countdown={countdown}
+          currentStreak={currentStreak}
+          resetAt={resetAt}
+        />
+
       ) : (
-        /* ── DEFAULT DASHBOARD VIEW ── */
+        /* ── DEFAULT GRADE 4 DASHBOARD VIEW ── */
         <div className="min-h-screen bg-[#F9FAFB] px-6 py-8 pb-24 md:pb-10">
           <div className="mx-auto max-w-5xl">
 
@@ -372,65 +527,8 @@ export default function DashboardPage() {
               </div>
             )}
 
-            {/* Grade Progress */}
-            <div className="mb-6 rounded-2xl bg-white p-5 shadow-sm premium-card-hover">
-              <div className="flex items-start justify-between mb-5 gap-4">
-                <div>
-                  <h2 className="text-base font-bold text-[#111827]">Grade Progress</h2>
-                  <p className="mt-1 text-xs text-[#9CA3AF] leading-relaxed max-w-sm">
-                    Switch between grades as they launch. Purchase to unlock seamless travelling across your entire learning journey.
-                  </p>
-                </div>
-                <Link
-                  href="/phase-1"
-                  className="flex-shrink-0 text-xs font-semibold transition-colors"
-                  style={{
-                    background: "white",
-                    border: "1px solid #22C55E",
-                    color: "#22C55E",
-                    borderRadius: "9999px",
-                    padding: "6px 14px",
-                  }}
-                  onMouseEnter={e => {
-                    (e.currentTarget as HTMLAnchorElement).style.background = "#22C55E";
-                    (e.currentTarget as HTMLAnchorElement).style.color = "white";
-                  }}
-                  onMouseLeave={e => {
-                    (e.currentTarget as HTMLAnchorElement).style.background = "white";
-                    (e.currentTarget as HTMLAnchorElement).style.color = "#22C55E";
-                  }}
-                >
-                  View all grades →
-                </Link>
-              </div>
-              <div className="grid grid-cols-4 gap-x-2 gap-y-4 sm:flex sm:items-start sm:justify-between sm:gap-0">
-                {GRADES.map((grade, i) => {
-                  const isGrade4 = i === 3;
-                  return (
-                    <div key={grade} className="flex flex-col items-center gap-1.5">
-                      <div className={`h-4 w-4 rounded-full border-2 flex-shrink-0 ${isGrade4 ? "bg-[#22C55E] border-[#22C55E]" : "bg-white border-[#D1D5DB]"}`} />
-                      <span className={`text-[10px] font-medium whitespace-nowrap ${isGrade4 ? "text-[#22C55E] font-semibold" : "text-[#9CA3AF]"}`}>
-                        {grade}
-                      </span>
-                      {isGrade4 ? (
-                        <div className="flex flex-col items-center gap-0.5">
-                          <span className="rounded-full px-1.5 py-0.5 text-[9px] font-semibold whitespace-nowrap" style={{ background: "#DCFCE7", color: "#16A34A" }}>
-                            In Progress
-                          </span>
-                          <span className="rounded-full px-1.5 py-0.5 text-[9px] font-semibold whitespace-nowrap" style={{ background: "#F0FDF4", color: "#22C55E" }}>
-                            Beta
-                          </span>
-                        </div>
-                      ) : (
-                        <span className="rounded-full px-1.5 py-0.5 text-[9px] font-semibold whitespace-nowrap" style={{ background: "#DBEAFE", color: "#2563EB" }}>
-                          Coming Soon
-                        </span>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+            {/* Grade Progress Bar */}
+            <GradeProgressBar activeGrade={activeGrade} onGradeClick={handleGradeClick} />
 
             {/* Progress Snapshot */}
             {(() => {
@@ -567,6 +665,142 @@ export default function DashboardPage() {
         </div>
       )}
     </>
+  );
+}
+
+// ── Grade Coming Soon View ──
+const COMING_SOON_SUBJECTS = [
+  { key: "mathematics", emoji: "🧮", name: "Mathematics", label: "Numbers & Place Value" },
+  { key: "english",     emoji: "📚", name: "English",     label: "Simple Sentences" },
+  { key: "science",     emoji: "🔬", name: "Science",     label: "What is a Habitat?" },
+] as const;
+
+function GradeComingSoonView({
+  grade,
+  onGradeClick,
+  studentName,
+  profileLoading,
+  explainCredits,
+  countdown,
+  currentStreak,
+  resetAt,
+}: {
+  grade: number;
+  onGradeClick: (grade: number) => void;
+  studentName: string;
+  profileLoading: boolean;
+  explainCredits: number | null;
+  countdown: string;
+  currentStreak: number;
+  resetAt: string | null;
+}) {
+  const gradeName = `Grade ${grade}`;
+
+  return (
+    <div className="min-h-screen bg-[#F9FAFB] px-6 py-8 pb-24 md:pb-10">
+      <div className="mx-auto max-w-5xl">
+
+        {/* Greeting */}
+        {profileLoading ? (
+          <div className="mb-6">
+            <div className="flex items-start justify-between gap-4">
+              <div className="skeleton" style={{ height: 36, width: 260, borderRadius: 8 }} />
+              <div className="skeleton flex-shrink-0" style={{ height: 34, width: 130, borderRadius: 9999 }} />
+            </div>
+            <div className="skeleton mt-3" style={{ height: 26, width: 180, borderRadius: 9999 }} />
+          </div>
+        ) : (
+          <div className="mb-6">
+            <div className="flex items-start justify-between gap-4">
+              <h1 className="text-2xl font-bold text-[#111827] md:text-3xl" style={{ animation: "blurIn 0.5s ease-out" }}>
+                Welcome back, {studentName || "Student"}! 👋
+              </h1>
+              <div className="flex-shrink-0 text-right">
+                {explainCredits !== null && (
+                  <>
+                    <div style={{ background: "#F0FDF4", border: "1px solid #22C55E", borderRadius: "9999px", padding: "6px 14px", display: "inline-block" }}>
+                      <span style={{ color: "#16A34A", fontSize: "13px", fontWeight: 500 }}>🧠 {explainCredits} credits left</span>
+                    </div>
+                    {explainCredits < 3 && resetAt && countdown && (
+                      <p className="mt-1 text-xs text-[#9CA3AF]">Resets in: {countdown}</p>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+            {currentStreak > 0 ? (
+              <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#FEF3C7] px-3 py-1 text-xs font-semibold text-[#92400E]">
+                🔥 {currentStreak} Day Streak — keep it up!
+              </div>
+            ) : (
+              <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#F3F4F6] px-3 py-1 text-xs font-semibold text-[#6B7280]">
+                Start your streak today!
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Grade Progress Bar */}
+        <GradeProgressBar activeGrade={grade} onGradeClick={onGradeClick} />
+
+        {/* Coming Soon card */}
+        <div
+          className="mb-6 rounded-2xl p-6 text-center"
+          style={{ background: "#F0FDF4", border: "1.5px solid #BBF7D0" }}
+        >
+          <div className="text-2xl mb-3">🚀</div>
+          <h2 className="text-lg font-bold text-[#15803D]">{gradeName} Beta Coming Soon</h2>
+          <p className="mt-2 text-sm text-[#4B7A56] leading-relaxed max-w-sm mx-auto">
+            Beta will be available soon. Get a sneak peek when we launch.
+          </p>
+        </div>
+
+        {/* Disabled subject cards */}
+        <h2 className="mb-3 text-base font-bold text-[#111827]">Your Subjects</h2>
+        <div className="mb-6 grid gap-4 grid-cols-1">
+          {COMING_SOON_SUBJECTS.map((s, idx) => (
+            <div
+              key={s.key}
+              aria-disabled="true"
+              style={{ animationDelay: `${idx * 0.3}s` }}
+              className="breathe-card w-full"
+            >
+              <div
+                className="rounded-2xl p-6 text-left w-full select-none"
+                style={{
+                  background: "#F9FAFB",
+                  border: "1px solid #E5E7EB",
+                  cursor: "not-allowed",
+                  opacity: 0.5,
+                }}
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full text-2xl leading-none flex-shrink-0" style={{ background: "#F3F4F6" }}>
+                    {s.emoji}
+                  </div>
+                  <span className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold" style={{ background: "#F3F4F6", color: "#9CA3AF" }}>
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#D1D5DB]" />
+                    Coming Soon
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="text-base font-bold text-[#9CA3AF]">{s.name}</h3>
+                </div>
+                <p className="text-xs text-[#C4C9D1] leading-relaxed">{s.label}</p>
+                <div className="mt-4 rounded-full overflow-hidden" style={{ height: 3, background: "#F3F4F6" }} />
+                <div className="mt-3 flex items-center justify-between gap-3">
+                  <p className="text-[11px] text-[#C4C9D1]">{gradeName} content not yet available</p>
+                  <div className="rounded-xl px-4 py-2 text-xs font-semibold text-white flex-shrink-0" style={{ background: "#D1D5DB" }}>
+                    Coming Soon
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+      </div>
+    </div>
   );
 }
 
