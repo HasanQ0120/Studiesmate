@@ -295,7 +295,7 @@ function ChapterPageInner() {
     window.location.reload();
   }
 
-  if (!meta || !videoIds.en) {
+  if (!meta || !videoPaths.en) {
     return (
       <DashboardLayout selectedSubject="mathematics" onSubjectChange={() => {}}>
         <div className="flex min-h-screen items-center justify-center bg-[#F9FAFB] text-center px-6">
