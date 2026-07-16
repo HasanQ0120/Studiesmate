@@ -350,7 +350,7 @@ function EnglishLessonPageInner() {
                       controlsList="nodownload"
                       onEnded={markComplete}
                       onTimeUpdate={handleVideoProgress}
-                      onError={() => setVideoError(true)}
+                      onError={() => { if (videoSrcs) setVideoError(true); }}
                       onLoadedMetadata={(e) => {
                         setVideoError(false);
                         try {
@@ -368,7 +368,7 @@ function EnglishLessonPageInner() {
                       controlsList="nodownload"
                       onEnded={markComplete}
                       onTimeUpdate={handleVideoProgress}
-                      onError={() => setVideoError(true)}
+                      onError={() => { if (videoSrcs) setVideoError(true); }}
                       onLoadedMetadata={(e) => {
                         setVideoError(false);
                         try {

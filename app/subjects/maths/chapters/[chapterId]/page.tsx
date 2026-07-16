@@ -361,7 +361,7 @@ function ChapterPageInner() {
                       controlsList="nodownload"
                       onEnded={markComplete}
                       onTimeUpdate={handleVideoProgress}
-                      onError={() => setVideoError(true)}
+                      onError={() => { if (videoSrcs) setVideoError(true); }}
                       onLoadedMetadata={(e) => {
                         setVideoError(false);
                         try {
@@ -379,7 +379,7 @@ function ChapterPageInner() {
                       controlsList="nodownload"
                       onEnded={markComplete}
                       onTimeUpdate={handleVideoProgress}
-                      onError={() => setVideoError(true)}
+                      onError={() => { if (videoSrcs) setVideoError(true); }}
                       onLoadedMetadata={(e) => {
                         setVideoError(false);
                         try {

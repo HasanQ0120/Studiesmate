@@ -346,7 +346,7 @@ function ScienceLessonPageInner() {
                       controlsList="nodownload"
                       onEnded={markComplete}
                       onTimeUpdate={handleVideoProgress}
-                      onError={() => setVideoError(true)}
+                      onError={() => { if (videoSrcs) setVideoError(true); }}
                       onLoadedMetadata={(e) => {
                         setVideoError(false);
                         try {
@@ -364,7 +364,7 @@ function ScienceLessonPageInner() {
                       controlsList="nodownload"
                       onEnded={markComplete}
                       onTimeUpdate={handleVideoProgress}
-                      onError={() => setVideoError(true)}
+                      onError={() => { if (videoSrcs) setVideoError(true); }}
                       onLoadedMetadata={(e) => {
                         setVideoError(false);
                         try {
