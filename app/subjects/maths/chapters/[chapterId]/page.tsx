@@ -10,10 +10,10 @@ import confetti from "canvas-confetti";
 
 import Link from "next/link";
 
-const VIDEO_IDS: Record<string, { en: string; ur: string }> = {
+const VIDEO_PATHS: Record<string, { en: string; ur: string }> = {
   numbers: {
-    en: "https://studiesmate.b-cdn.net/place_value_english.mp4.mp4",
-    ur: "https://studiesmate.b-cdn.net/place_value_urdu.mp4.mp4",
+    en: "place_value_english.mp4.mp4",
+    ur: "place_value_urdu.mp4.mp4",
   },
 };
 
@@ -110,7 +110,7 @@ function ChapterPageInner() {
   const searchParams = useSearchParams();
   const chapterId = params.chapterId;
   const meta = CHAPTER_META[chapterId];
-  const videoIds = VIDEO_IDS[chapterId] ?? { en: "", ur: "" };
+  const videoPaths = VIDEO_PATHS[chapterId] ?? { en: "", ur: "" };
 
   const [lang, setLang] = useState<"en" | "ur">("en");
   const [lessonCompletions, setLessonCompletions] = useState<Record<string, string>>({});
@@ -125,9 +125,39 @@ function ChapterPageInner() {
     searchParams.get("view") === "quiz" ? "quiz" :
     searchParams.get("view") === "worksheet" ? "worksheet" : "lesson"
   );
+  const [celebrationShown, setCelebrationShown] = useState(false);
+  const [videoSrcs, setVideoSrcs] = useState<{ en: string; ur: string } | null>(null);
+  const [videoError, setVideoError] = useState(false);
+  const [videoRateLimited, setVideoRateLimited] = useState(false);
 
   const videoEnRef = useRef<HTMLVideoElement>(null);
   const videoUrRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    async function fetchVideoUrls() {
+      if (!videoPaths.en || !videoPaths.ur) return;
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) { setVideoError(true); return; }
+        const headers = { Authorization: `Bearer ${session.access_token}` };
+        const [enRes, urRes] = await Promise.all([
+          fetch(`/api/video-url?path=${videoPaths.en}`, { headers }),
+          fetch(`/api/video-url?path=${videoPaths.ur}`, { headers }),
+        ]);
+        if (!enRes.ok || !urRes.ok) {
+          if (enRes.status === 429 || urRes.status === 429) { setVideoRateLimited(true); } else { setVideoError(true); }
+          return;
+        }
+        const [enData, urData] = await Promise.all([enRes.json(), urRes.json()]);
+        if (!enData.url || !urData.url) { setVideoError(true); return; }
+        setVideoSrcs({ en: enData.url, ur: urData.url });
+      } catch {
+        setVideoError(true);
+      }
+    }
+    fetchVideoUrls();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chapterId]);
 
   useEffect(() => {
     try {
@@ -246,13 +276,23 @@ function ChapterPageInner() {
     });
   }
 
-  function unmarkComplete() {
+  function handleVideoProgress(e: React.SyntheticEvent<HTMLVideoElement>) {
+    if (celebrationShown || isCompleted) return;
+    const video = e.currentTarget;
+    if (video.duration && video.currentTime / video.duration >= 0.8) {
+      setCelebrationShown(true);
+      markComplete();
+    }
+  }
+
+  function handleRefreshPage() {
+    const activeRef = lang === "en" ? videoEnRef : videoUrRef;
+    const key = `video_progress_${chapterId}_${lang}`;
     try {
-      const completions = JSON.parse(localStorage.getItem("studiesmate_lesson_completions") || "{}");
-      delete completions[chapterId];
-      localStorage.setItem("studiesmate_lesson_completions", JSON.stringify(completions));
-      setLessonCompletions(completions);
+      const t = activeRef.current?.currentTime;
+      if (t && t > 0) localStorage.setItem(key, String(Math.floor(t)));
     } catch {}
+    window.location.reload();
   }
 
   if (!meta || !videoIds.en) {
@@ -290,33 +330,65 @@ function ChapterPageInner() {
                 {/* Video player */}
                 <div className="overflow-hidden rounded-xl bg-[#0F172A]">
                   <div className="aspect-video relative">
+                    {!videoSrcs && !videoError && !videoRateLimited && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-[#0F172A]">
+                        <div className="h-8 w-8 animate-spin rounded-full border-4 border-white/30 border-t-white" />
+                      </div>
+                    )}
+                    {videoRateLimited && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-[#0F172A] px-6">
+                        <p className="text-center text-sm text-white/70">{"You've reached the video request limit for now. Please try again in a few minutes."}</p>
+                      </div>
+                    )}
+                    {videoError && (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-5 bg-[#0F172A] px-6">
+                        <p className="text-center text-sm text-white/70">This video session has expired. Please refresh the page to continue watching.</p>
+                        <button
+                          type="button"
+                          onClick={handleRefreshPage}
+                          style={{ background: "#22C55E", color: "white", borderRadius: "9999px", padding: "12px 24px", fontWeight: 600, border: "none", cursor: "pointer", fontSize: "14px" }}
+                          onMouseEnter={(e) => { e.currentTarget.style.background = "#16A34A"; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.background = "#22C55E"; }}
+                        >
+                          Refresh Page
+                        </button>
+                      </div>
+                    )}
                     <video
                       ref={videoEnRef}
-                      src={videoIds.en}
+                      src={videoSrcs?.en ?? ""}
                       controls
                       controlsList="nodownload"
+                      onEnded={markComplete}
+                      onTimeUpdate={handleVideoProgress}
+                      onError={() => setVideoError(true)}
                       onLoadedMetadata={(e) => {
+                        setVideoError(false);
                         try {
                           const saved = localStorage.getItem(`video_progress_${chapterId}_en`);
                           if (saved) e.currentTarget.currentTime = parseFloat(saved);
                         } catch {}
                       }}
                       className="absolute inset-0 h-full w-full"
-                      style={{ display: lang === "en" ? "block" : "none" }}
+                      style={{ display: videoSrcs && !videoError && !videoRateLimited && lang === "en" ? "block" : "none" }}
                     />
                     <video
                       ref={videoUrRef}
-                      src={videoIds.ur}
+                      src={videoSrcs?.ur ?? ""}
                       controls
                       controlsList="nodownload"
+                      onEnded={markComplete}
+                      onTimeUpdate={handleVideoProgress}
+                      onError={() => setVideoError(true)}
                       onLoadedMetadata={(e) => {
+                        setVideoError(false);
                         try {
                           const saved = localStorage.getItem(`video_progress_${chapterId}_ur`);
                           if (saved) e.currentTarget.currentTime = parseFloat(saved);
                         } catch {}
                       }}
                       className="absolute inset-0 h-full w-full"
-                      style={{ display: lang === "ur" ? "block" : "none" }}
+                      style={{ display: videoSrcs && !videoError && !videoRateLimited && lang === "ur" ? "block" : "none" }}
                     />
                   </div>
                   <div className="px-4 py-3">
@@ -548,29 +620,12 @@ function ChapterPageInner() {
             <div className="rounded-xl border border-[#E5E7EB] bg-white shadow-sm p-5 premium-card-hover">
               <p className="text-sm font-bold text-[#111827] mb-4">Quick Actions</p>
               {isCompleted ? (
-                <div className="flex flex-col gap-3">
-                  <button
-                    type="button"
-                    onClick={unmarkComplete}
-                    className="w-full rounded-full border border-[#6EE7B7] bg-[#ECFDF5] py-3 text-sm font-semibold text-[#10B981] hover:bg-[#D1FAE5] transition-colors"
-                  >
-                    ✓ Completed — Click to Undo
-                  </button>
-                  <Link
-                    href={`/subjects/maths/chapters/${chapterId}/quiz`}
-                    className="flex items-center justify-center gap-1.5 w-full rounded-full bg-[#22C55E] py-3 text-sm font-semibold text-white hover:bg-[#16A34A] transition-colors"
-                  >
-                    Continue to Quiz →
-                  </Link>
+                <div className="flex items-center justify-center gap-2 rounded-full bg-[#ECFDF5] border border-[#6EE7B7] px-3 py-2.5">
+                  <span className="font-bold text-[#10B981]">✓</span>
+                  <span className="text-sm font-semibold text-[#10B981]">Lesson completed</span>
                 </div>
               ) : (
-                <button
-                  type="button"
-                  onClick={markComplete}
-                  className="w-full rounded-full bg-[#0F172A] py-3 text-sm font-semibold text-white hover:bg-[#1E293B] transition-colors"
-                >
-                  ✓ Mark as Complete
-                </button>
+                <p className="text-sm text-[#9CA3AF] text-center py-2">Watch the full video to complete this lesson.</p>
               )}
             </div>
 

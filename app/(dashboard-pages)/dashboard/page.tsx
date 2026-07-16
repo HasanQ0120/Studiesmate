@@ -11,6 +11,48 @@ const QUIZ_COMPLETIONS_KEY = "studiesmate_quiz_completions";
 const LESSON_COMPLETIONS_KEY = "studiesmate_lesson_completions";
 const LAST_ACTIVITY_V2_KEY = "studiesmate_last_activity_v2";
 
+// ── Progress snapshot constants ──
+const SNAP_LESSON_KEYS: Record<string, string> = {
+  "intro-to-place-value": "numbers",
+  "simple-sentences":     "english-intro",
+  "habitats":             "science-intro",
+};
+const SNAP_QUIZ_KEYS: Record<string, string> = {
+  "intro-to-place-value": "math-npv",
+  "simple-sentences":     "english-intro",
+  "habitats":             "science-intro",
+};
+const SNAP_TOPIC_IDS = [
+  "intro-to-place-value", "reading-writing-whole-numbers",
+  "simple-sentences",     "compound-sentences",
+  "habitats",             "food-chains",
+];
+
+function ProgressRing({ pct, size = 80, strokeWidth = 8, color = "#22C55E", fontSize = 17 }: {
+  pct: number; size?: number; strokeWidth?: number; color?: string; fontSize?: number;
+}) {
+  const r = (size - strokeWidth) / 2;
+  const circ = 2 * Math.PI * r;
+  const filled = Math.max(0, Math.min(1, pct / 100)) * circ;
+  const cx = size / 2;
+  const cy = size / 2;
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ flexShrink: 0, display: "block" }}>
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#E5E7EB" strokeWidth={strokeWidth} />
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke={color} strokeWidth={strokeWidth}
+        strokeDasharray={`${filled} ${circ - filled}`}
+        strokeLinecap="round"
+        transform={`rotate(-90 ${cx} ${cy})`}
+        style={{ transition: "stroke-dasharray 0.6s ease" }}
+      />
+      <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central"
+        fontSize={fontSize} fontWeight="700" fill="#111827">
+        {pct}%
+      </text>
+    </svg>
+  );
+}
+
 function safeParseJSON<T>(raw: string | null, fallback: T): T {
   try {
     return raw ? (JSON.parse(raw) as T) : fallback;
@@ -97,7 +139,7 @@ export default function DashboardPage() {
         .eq("id", session.user.id)
         .maybeSingle();
       if (data) {
-        setExplainCredits(data.explain_credits ?? 4);
+        setExplainCredits(data.explain_credits ?? 3);
         setResetAt(data.explain_credits_reset_at ?? null);
         setCurrentStreak(data.current_streak ?? 0);
       }
@@ -107,10 +149,10 @@ export default function DashboardPage() {
 
   // ── Explain credits countdown ──
   useEffect(() => {
-    if (!resetAt || explainCredits === null || explainCredits > 3) { setCountdown(""); return; }
+    if (!resetAt || explainCredits === null || explainCredits >= 3) { setCountdown(""); return; }
     function calcCountdown() {
-      const resetPlusThree = new Date(new Date(resetAt!).getTime() + 3 * 24 * 60 * 60 * 1000);
-      const diffMs = resetPlusThree.getTime() - Date.now();
+      const resetPlusTwo = new Date(new Date(resetAt!).getTime() + 2 * 24 * 60 * 60 * 1000);
+      const diffMs = resetPlusTwo.getTime() - Date.now();
       if (diffMs <= 0) { setCountdown("Resetting soon..."); return; }
       const days = Math.floor(diffMs / (86400 * 1000));
       const hours = Math.floor((diffMs % (86400 * 1000)) / (3600 * 1000));
@@ -253,8 +295,6 @@ export default function DashboardPage() {
     );
   }
 
-  const mathStarted = !!lessonCompletions["numbers"];
-
   return (
     <>
       <style>{`
@@ -313,7 +353,7 @@ export default function DashboardPage() {
                         <div style={{ background: "#F0FDF4", border: "1px solid #22C55E", borderRadius: "9999px", padding: "6px 14px", display: "inline-block" }}>
                           <span style={{ color: "#16A34A", fontSize: "13px", fontWeight: 500 }}>🧠 {explainCredits} credits left</span>
                         </div>
-                        {explainCredits <= 3 && resetAt && countdown && (
+                        {explainCredits < 3 && resetAt && countdown && (
                           <p className="mt-1 text-xs text-[#9CA3AF]">Resets in: {countdown}</p>
                         )}
                       </>
@@ -392,6 +432,33 @@ export default function DashboardPage() {
               </div>
             </div>
 
+            {/* Progress Snapshot */}
+            {(() => {
+              const snapPctSum = SNAP_TOPIC_IDS.reduce((sum, id) => {
+                const lDone = SNAP_LESSON_KEYS[id] ? !!lessonCompletions[SNAP_LESSON_KEYS[id]] : false;
+                const qDone = SNAP_QUIZ_KEYS[id]   ? !!quizCompletions[SNAP_QUIZ_KEYS[id]]    : false;
+                return sum + (lDone ? 50 : 0) + (qDone ? 50 : 0);
+              }, 0);
+              const snapPct = Math.round(snapPctSum / SNAP_TOPIC_IDS.length);
+              const snapCompleted = SNAP_TOPIC_IDS.filter((id) => {
+                const lDone = SNAP_LESSON_KEYS[id] ? !!lessonCompletions[SNAP_LESSON_KEYS[id]] : false;
+                const qDone = SNAP_QUIZ_KEYS[id]   ? !!quizCompletions[SNAP_QUIZ_KEYS[id]]    : false;
+                return (lDone ? 50 : 0) + (qDone ? 50 : 0) === 100;
+              }).length;
+              return (
+                <Link href="/my-progress" className="mb-6 block rounded-2xl bg-white p-5 shadow-sm premium-card-hover">
+                  <div className="flex items-center gap-5">
+                    <ProgressRing pct={snapPct} size={80} strokeWidth={8} color="#22C55E" fontSize={17} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-[#111827]">My Progress</p>
+                      <p className="mt-1 text-sm text-[#6B7280]">{snapCompleted} of {SNAP_TOPIC_IDS.length} topics completed</p>
+                      <p className="mt-1 text-xs font-semibold" style={{ color: "#22C55E" }}>View details →</p>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })()}
+
             {/* First-time motivational nudge */}
             {Object.keys(lessonCompletions).length === 0 && !Object.values(quizCompletions).some(Boolean) && (
               <div
@@ -411,11 +478,15 @@ export default function DashboardPage() {
 
               {(["mathematics", "english", "science"] as const).map((key) => {
                 const cfg = SUBJECT_CONFIG[key];
-                const isStarted = key === "mathematics"
-                  ? mathStarted
-                  : key === "english"
-                  ? !!lessonCompletions["english-intro"]
-                  : !!lessonCompletions["science-intro"];
+                const lessonDone = key === "mathematics"
+                  ? !!lessonCompletions["numbers"]
+                  : !!lessonCompletions[key === "english" ? "english-intro" : "science-intro"];
+                const quizDone = key === "mathematics"
+                  ? !!quizCompletions["math-npv"]
+                  : !!quizCompletions[key === "english" ? "english-intro" : "science-intro"];
+                const progressPct = (lessonDone ? 50 : 0) + (quizDone ? 50 : 0);
+                const isStarted = lessonDone || quizDone;
+
                 const lastStudied = key === "mathematics"
                   ? lastLessons.math
                   : key === "english"
@@ -424,8 +495,6 @@ export default function DashboardPage() {
 
                 const unitCount = CURRICULUM[key].units.length;
                 const topicCount = CURRICULUM[key].units.reduce((sum, u) => sum + u.topics.length, 0);
-                const unit1Topics = CURRICULUM[key].units[0].topics.length;
-                const progressPct = isStarted ? Math.round((1 / unit1Topics) * 100) : 0;
 
                 const subjectIndex = ["mathematics", "english", "science"].indexOf(key);
                 return (
@@ -474,8 +543,8 @@ export default function DashboardPage() {
                         style={{ width: `${progressPct}%`, background: cfg.accent, transition: "width 0.5s ease" }}
                       />
                     </div>
-                    {isStarted && (
-                      <p className="mt-1 text-[10px]" style={{ color: cfg.dark }}>Unit 1 · {progressPct}% complete</p>
+                    {progressPct > 0 && (
+                      <p className="mt-1 text-[10px]" style={{ color: cfg.dark }}>{progressPct}% complete</p>
                     )}
 
                     {/* Bottom row: explore hint + compact continue button */}

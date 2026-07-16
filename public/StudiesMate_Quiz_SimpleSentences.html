@@ -215,7 +215,7 @@ function bind(){
       if(S.score>=Math.round(QS.length*.75)){playWin();boom();}
       set({done:true});
       try{localStorage.setItem("worksheet_unlocked_simple_sentence","true");}catch(e){}
-      window.parent.postMessage({ type: "quizComplete", quizId: "english-intro" }, "*");
+      window.parent.postMessage({ type: "quizComplete", quizId: "english-intro", score: Math.round(S.score/QS.length*100) }, "*");
     } else set({qi:S.qi+1,sel:null});
   });
   const rb=document.getElementById("rBtn");if(rb)rb.addEventListener("click",()=>set({qi:0,score:0,sel:null,done:false}));

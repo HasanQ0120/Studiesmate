@@ -82,12 +82,20 @@ export default function AuthModal({ isOpen, onClose, initialMode }: AuthModalPro
       onClose();
       router.push(`/verify-otp?email=${encodeURIComponent(email.trim().toLowerCase())}`);
     } else {
-      const { error: signInError } = await signInParentAccount({
+      const { error: signInError, data: signInData } = await signInParentAccount({
         parentEmail: email.trim().toLowerCase(),
         password,
       });
       setLoading(false);
       if (signInError) { setError(signInError.message || "Login failed."); return; }
+      const userId = signInData?.user?.id;
+      if (userId) {
+        const token = crypto.randomUUID();
+        try {
+          await supabase.from("profiles").update({ active_session_token: token }).eq("id", userId);
+          localStorage.setItem("sm_session_token", token);
+        } catch {}
+      }
       onClose();
       try { localStorage.removeItem("last_selected_subject"); } catch {}
       router.push("/dashboard");

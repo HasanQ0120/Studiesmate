@@ -18,6 +18,10 @@ export default function HomePage() {
 
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [promoVisible, setPromoVisible] = useState(false);
+  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
+  const [kickedMessage, setKickedMessage] = useState<string | null>(null);
+  const [demoSrcs, setDemoSrcs] = useState<{ en: string; ur: string } | null>(null);
+  const [demoError, setDemoError] = useState(false);
 
   useEffect(() => {
     let reached2s = false;
@@ -85,6 +89,34 @@ export default function HomePage() {
     };
   }, []);
 
+  useEffect(() => {
+    try {
+      const msg = localStorage.getItem("sm_kicked_message");
+      if (msg) {
+        setKickedMessage(msg);
+        localStorage.removeItem("sm_kicked_message");
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    async function fetchDemoUrls() {
+      try {
+        const [enRes, urRes] = await Promise.all([
+          fetch("/api/video-url?path=simple_sentences_english.mp4.mp4"),
+          fetch("/api/video-url?path=simple_sentence_urdu.mp4.mp4"),
+        ]);
+        if (!enRes.ok || !urRes.ok) { setDemoError(true); return; }
+        const [enData, urData] = await Promise.all([enRes.json(), urRes.json()]);
+        if (!enData.url || !urData.url) { setDemoError(true); return; }
+        setDemoSrcs({ en: enData.url, ur: urData.url });
+      } catch {
+        setDemoError(true);
+      }
+    }
+    fetchDemoUrls();
+  }, []);
+
   const faqs = [
     {
       q: "Is the Beta really free?",
@@ -143,6 +175,19 @@ export default function HomePage() {
 
   return (
     <>
+    {kickedMessage && (
+      <div className="fixed inset-x-0 top-0 z-50 flex items-center justify-between gap-4 bg-[#FEF2F2] border-b border-[#FECACA] px-4 py-3">
+        <p className="flex-1 text-center text-sm text-[#DC2626]">{kickedMessage}</p>
+        <button
+          type="button"
+          onClick={() => setKickedMessage(null)}
+          className="flex-shrink-0 text-[#DC2626] text-lg leading-none font-semibold"
+          aria-label="Dismiss"
+        >
+          ×
+        </button>
+      </div>
+    )}
     <main className="min-h-screen bg-white text-[#111827]">
       <style>{`
         @keyframes borderTravel {
@@ -467,21 +512,31 @@ export default function HomePage() {
                   اردو
                 </button>
               </div>
+              {!demoSrcs && !demoError && (
+                <div style={{ aspectRatio: "16/9", display: "flex", alignItems: "center", justifyContent: "center", background: "black", borderRadius: "12px" }}>
+                  <div className="h-8 w-8 animate-spin rounded-full border-4 border-white/30 border-t-white" />
+                </div>
+              )}
+              {demoError && (
+                <div style={{ aspectRatio: "16/9", display: "flex", alignItems: "center", justifyContent: "center", background: "black", borderRadius: "12px", padding: "0 24px" }}>
+                  <p style={{ color: "rgba(255,255,255,0.7)", fontSize: "14px", textAlign: "center" }}>Video temporarily unavailable, please refresh the page.</p>
+                </div>
+              )}
               <video
                 ref={demoEnRef}
-                src="https://studiesmate.b-cdn.net/simple_sentences_english.mp4.mp4"
+                src={demoSrcs?.en ?? ""}
                 controls
                 controlsList="nodownload"
                 width="100%"
-                style={{ borderRadius: "12px", background: "black", display: demoLang === "english" ? "block" : "none" }}
+                style={{ borderRadius: "12px", background: "black", display: demoSrcs && demoLang === "english" ? "block" : "none" }}
               />
               <video
                 ref={demoUrRef}
-                src="https://studiesmate.b-cdn.net/simple_sentence_urdu.mp4.mp4"
+                src={demoSrcs?.ur ?? ""}
                 controls
                 controlsList="nodownload"
                 width="100%"
-                style={{ borderRadius: "12px", background: "black", display: demoLang === "urdu" ? "block" : "none" }}
+                style={{ borderRadius: "12px", background: "black", display: demoSrcs && demoLang === "urdu" ? "block" : "none" }}
               />
               <div className="mt-4">
                 <div className="text-sm font-semibold text-white">Simple Sentences</div>
@@ -552,6 +607,40 @@ export default function HomePage() {
             <p className="mt-8 border-t border-[#E5E7EB] pt-6 text-sm leading-relaxed text-[#6B7280]">
               {"We're building this the right way, one subject, one topic at a time, with your child's understanding as the only real goal."}
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── SECTION 5.5: TESTIMONIALS ── */}
+      <section className="bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-16">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold text-[#111827]">What People Are Saying</h2>
+            <p className="mt-3 text-base text-[#6B7280]">Real feedback from real users.</p>
+          </div>
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+            {["/testimonial1.png", "/testimonial2.png", "/testimonial3.png"].map((src, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setLightboxSrc(src)}
+                className="w-full overflow-hidden rounded-2xl border border-[#F3F4F6] bg-white shadow-sm premium-card-hover cursor-zoom-in text-left"
+              >
+                <img
+                  src={src}
+                  alt={`Testimonial ${i + 1}`}
+                  className="block h-auto w-full"
+                />
+              </button>
+            ))}
+          </div>
+          <div className="mt-8 text-center">
+            <Link
+              href="/testimonials"
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#D1D5DB] bg-white px-6 py-3 text-sm font-semibold text-[#374151] transition-colors hover:border-[#9CA3AF]"
+            >
+              View More →
+            </Link>
           </div>
         </div>
       </section>
@@ -655,6 +744,45 @@ export default function HomePage() {
     </main>
     {typeof window !== "undefined" && createPortal(
       <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} initialMode={authMode} />,
+      document.body
+    )}
+    {typeof window !== "undefined" && lightboxSrc && createPortal(
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        style={{ background: "rgba(0,0,0,0.85)" }}
+        onClick={() => setLightboxSrc(null)}
+      >
+        <button
+          type="button"
+          onClick={() => setLightboxSrc(null)}
+          aria-label="Close"
+          style={{
+            position: "absolute",
+            top: "16px",
+            right: "16px",
+            width: "36px",
+            height: "36px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: "50%",
+            background: "rgba(255,255,255,0.15)",
+            color: "white",
+            fontSize: "22px",
+            lineHeight: 1,
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          ×
+        </button>
+        <img
+          src={lightboxSrc}
+          alt="Testimonial"
+          onClick={(e) => e.stopPropagation()}
+          style={{ maxHeight: "90vh", maxWidth: "100%", borderRadius: "12px", boxShadow: "0 25px 60px rgba(0,0,0,0.5)" }}
+        />
+      </div>,
       document.body
     )}
     </>

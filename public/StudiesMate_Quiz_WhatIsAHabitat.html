@@ -134,7 +134,7 @@ function bind(){
       try{localStorage.setItem("worksheet_unlocked_habitat","true");localStorage.removeItem("quiz_progress_habitat");}catch(e){}
       if(S.score>=Math.round(QS.length*.75)){playWin();boom();}
       set({done:true});
-      window.parent.postMessage({type:"quizComplete",quizId:"science-intro"},"*");
+      window.parent.postMessage({type:"quizComplete",quizId:"science-intro",score:Math.round(S.score/QS.length*100)},"*");
     } else {
       try{localStorage.setItem("quiz_progress_habitat",JSON.stringify({qi:S.qi+1,score:S.score}));}catch(e){}
       set({qi:S.qi+1,sel:null});

@@ -72,24 +72,24 @@ export async function POST(req: NextRequest) {
     if (!profile) {
       await supabase.from("profiles").upsert({
         id: userId,
-        explain_credits: 4,
+        explain_credits: 3,
         explain_credits_reset_at: null,
       }, { onConflict: "id" });
-      profile = { explain_credits: 4, explain_credits_reset_at: null };
+      profile = { explain_credits: 3, explain_credits_reset_at: null };
     }
 
     let currentCredits: number = profile.explain_credits ?? 0;
     let currentResetAt: string | null = profile.explain_credits_reset_at ?? null;
 
-    // Check if 3-day reset is due
+    // Check if 2-day reset is due
     if (currentResetAt !== null) {
-      const resetPlusThree = new Date(new Date(currentResetAt).getTime() + 3 * 24 * 60 * 60 * 1000);
-      if (new Date() >= resetPlusThree) {
+      const resetPlusTwo = new Date(new Date(currentResetAt).getTime() + 2 * 24 * 60 * 60 * 1000);
+      if (new Date() >= resetPlusTwo) {
         await supabase
           .from("profiles")
-          .update({ explain_credits: 4, explain_credits_reset_at: null })
+          .update({ explain_credits: 3, explain_credits_reset_at: null })
           .eq("id", userId);
-        currentCredits = 4;
+        currentCredits = 3;
         currentResetAt = null;
       }
     }
@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
     // and we return 403 rather than letting two requests share the same credit.
     const nowIso = new Date().toISOString();
     const updatePayload: Record<string, unknown> = { explain_credits: currentCredits - 1 };
-    if (currentCredits === 4) updatePayload.explain_credits_reset_at = nowIso;
+    if (currentCredits === 3) updatePayload.explain_credits_reset_at = nowIso;
 
     const { data: decremented } = await supabase
       .from("profiles")
@@ -153,7 +153,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       explanation,
       creditsLeft: currentCredits - 1,
-      resetAt: currentCredits === 4 ? nowIso : currentResetAt,
+      resetAt: currentCredits === 3 ? nowIso : currentResetAt,
     });
   } catch (err) {
     console.error("explain route error:", err);

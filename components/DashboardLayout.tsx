@@ -14,8 +14,11 @@ import { CURRICULUM, SubjectKey } from "@/lib/curriculum";
 
 const TOPIC_LESSON_URLS: Record<string, string> = {
   "intro-to-place-value": "/subjects/maths/chapters/numbers",
+  "reading-writing-whole-numbers": "/subjects/maths/chapters/addition-subtraction",
   "simple-sentences": "/subjects/english/chapters/english-intro",
+  "compound-sentences": "/subjects/english/chapters/compound-sentences",
   "habitats": "/subjects/science/chapters/science-intro",
+  "food-chains": "/subjects/science/chapters/food-chains",
 };
 
 const SUBJECT_EMOJI: Record<string, string> = {
@@ -37,14 +40,10 @@ function getTopicUrl(topicId: string, section: "lesson" | "quiz" | "worksheet"):
   const isMathTopic = base.includes("/subjects/maths/");
 
   if (section === "lesson") return base;
+  if (section === "quiz") return `${base}/quiz`;
 
-  if (isMathTopic) {
-    if (section === "quiz") return `${base}/quiz`;
-    return `${base}/worksheet`;
-  }
-
-  // English/Science use query params
-  if (section === "quiz") return `${base}?view=quiz`;
+  // worksheet: Math has a standalone page, English/Science use ?view=worksheet
+  if (isMathTopic) return `${base}/worksheet`;
   return `${base}?view=worksheet`;
 }
 
@@ -130,10 +129,17 @@ export default function DashboardLayout({ children, selectedSubject, onSubjectCh
   }, []);
 
   useEffect(() => {
-    try {
-      const completions = JSON.parse(localStorage.getItem("studiesmate_quiz_completions") || "{}");
-      setQuizCompletions(completions);
-    } catch {}
+    function reloadCompletions() {
+      try {
+        const data = JSON.parse(localStorage.getItem("studiesmate_quiz_completions") || "{}");
+        console.log("[StudiesMate] DashboardLayout reloadCompletions — quizCompletions:", JSON.stringify(data));
+        Object.entries(TOPIC_UNLOCK_MAP).forEach(([topicId, quizKey]) => {
+          console.log(`[StudiesMate]   unlock check: topic "${topicId}" requires quiz "${quizKey}" → passed: ${!!data[quizKey]}`);
+        });
+        setQuizCompletions(data);
+      } catch {}
+    }
+    reloadCompletions();
     const onStorage = (e: StorageEvent) => {
       if (e.key === "studiesmate_quiz_completions") {
         try {
@@ -142,8 +148,12 @@ export default function DashboardLayout({ children, selectedSubject, onSubjectCh
       }
     };
     window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, []);
+    window.addEventListener("sm-quiz-update", reloadCompletions);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("sm-quiz-update", reloadCompletions);
+    };
+  }, [pathname]);
 
   function toggleSection(section: "lesson" | "quiz" | "worksheet") {
     setExpandedSection((prev) => {
@@ -217,7 +227,6 @@ export default function DashboardLayout({ children, selectedSubject, onSubjectCh
                   onClick={() => {
                     try {
                       localStorage.setItem("last_selected_subject", selectedSubject!);
-                      localStorage.removeItem(`last_view_${selectedSubject!}`);
                     } catch {}
                     router.push("/dashboard");
                   }}
@@ -376,7 +385,15 @@ export default function DashboardLayout({ children, selectedSubject, onSubjectCh
                 Dashboard
               </Link>
 
-              {/* 3. Connect Code */}
+              {/* 3. My Progress */}
+              <Link
+                href="/my-progress"
+                className="flex items-center justify-center w-full rounded-xl py-3 px-4 mb-3 text-sm font-medium text-[#111827] bg-white border border-[#E5E7EB] hover:bg-[#F9FAFB] hover:border-[#D1D5DB] transition-colors"
+              >
+                My Progress
+              </Link>
+
+              {/* 4. Connect Code */}
               <Link
                 href="/connect-code"
                 className={`flex items-center gap-3 border-l-2 rounded-r-lg px-3 py-2.5 text-sm font-semibold transition-all ${
@@ -389,7 +406,7 @@ export default function DashboardLayout({ children, selectedSubject, onSubjectCh
                 Connect Code
               </Link>
 
-              {/* 4. Settings */}
+              {/* 5. Settings */}
               <Link
                 href="/settings"
                 className={`flex items-center gap-3 border-l-2 rounded-r-lg px-3 py-2.5 text-sm font-semibold transition-all ${

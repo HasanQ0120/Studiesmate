@@ -10,6 +10,14 @@ function GoogleCallbackInner() {
   const [error, setError] = useState<string | null>(null);
   const [duplicateEmail, setDuplicateEmail] = useState(false);
 
+  async function writeSessionToken(userId: string) {
+    const token = crypto.randomUUID();
+    try {
+      await supabase.from("profiles").update({ active_session_token: token }).eq("id", userId);
+      localStorage.setItem("sm_session_token", token);
+    } catch {}
+  }
+
   useEffect(() => {
     async function handleCallback() {
       const code = searchParams.get("code");
@@ -39,6 +47,7 @@ function GoogleCallbackInner() {
       }
 
       if (provider !== "google") {
+        await writeSessionToken(userId);
         try { localStorage.removeItem("last_selected_subject"); } catch {}
         router.replace("/dashboard");
         return;
@@ -73,6 +82,7 @@ function GoogleCallbackInner() {
         .eq("id", userId)
         .maybeSingle();
 
+      await writeSessionToken(userId);
       if (profile?.student_name?.trim()) {
         try { localStorage.removeItem("last_selected_subject"); } catch {}
         router.replace("/dashboard");
